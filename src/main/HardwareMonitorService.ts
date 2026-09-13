@@ -39,6 +39,7 @@ import {
 import {hardwareFlyoutView} from './HardwareFlyoutView';
 import {hardwareTelemetryHistory} from './HardwareTelemetryHistory';
 import {Pinger} from './pinger';
+import {processMonitorService} from './ProcessMonitorService';
 import {publicNetworkService} from './PublicNetworkService';
 import {getActiveComponentTypes} from './utils';
 
@@ -690,6 +691,8 @@ class HardwareMonitorService {
       } else if (data.section === 'ping') key = data.payload?.ping?.host;
 
       data.history = hardwareTelemetryHistory.getHistory(data.section, key);
+      data.topProcesses = processMonitorService.getCachedData();
+      data.showTopProcesses = this.config.showTopProcesses !== false;
       void hardwareFlyoutView.show(data);
     });
     ipcMain.on(HMONITOR_IPC_UPDATE_FLYOUT, (_, data) => {
@@ -706,6 +709,8 @@ class HardwareMonitorService {
       } else if (data.section === 'ping') key = data.payload?.ping?.host;
 
       data.history = hardwareTelemetryHistory.getHistory(data.section, key);
+      data.topProcesses = processMonitorService.getCachedData();
+      data.showTopProcesses = this.config.showTopProcesses !== false;
       hardwareFlyoutView.update(data);
     });
 

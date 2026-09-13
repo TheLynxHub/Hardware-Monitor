@@ -57,7 +57,14 @@ type ConfigurationTabProps = {
 
 export const ConfigurationTab = memo(
   ({settings, updateState, handleDisplayStyleChange, isRawStyle}: ConfigurationTabProps) => {
-    const {enabled, refreshInterval, displayStyle, showSectionLabel, enableHoverDetails = true} = settings;
+    const {
+      enabled,
+      refreshInterval,
+      displayStyle,
+      showSectionLabel,
+      enableHoverDetails = true,
+      showTopProcesses = true,
+    } = settings;
 
     return (
       <div className="flex flex-col gap-y-5 pb-4">
@@ -272,7 +279,7 @@ export const ConfigurationTab = memo(
                 </div>
               </div>
 
-              <div className="pt-1">
+              <div className="pt-1 flex flex-col gap-y-3">
                 <LynxSwitch
                   description={
                     'Displays an interactive telemetry popover with historical charts when hovering metrics in the' +
@@ -283,6 +290,18 @@ export const ConfigurationTab = memo(
                   title="Enable Hover Details Panel"
                   onEnabledChange={value => updateState('enableHoverDetails', value)}
                 />
+                {enableHoverDetails && (
+                  <LynxSwitch
+                    description={
+                      'Sample and display the top 3 resource-consuming processes (CPU, GPU, RAM) inside flyout ' +
+                      'popovers for instant troubleshooting.'
+                    }
+                    className="p-1"
+                    enabled={showTopProcesses}
+                    title="Top Resource-Consuming Processes"
+                    onEnabledChange={value => updateState('showTopProcesses', value)}
+                  />
+                )}
               </div>
             </div>
 

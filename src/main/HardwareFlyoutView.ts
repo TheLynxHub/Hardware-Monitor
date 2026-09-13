@@ -8,7 +8,14 @@ import {
   HMONITOR_IPC_FLYOUT_SET_RANGE,
   HMONITOR_IPC_REFRESH_PUBLIC_NETWORK,
 } from '../cross/constants';
-import {HardwareFlyoutAnchor, HardwareFlyoutSection, HardwareFlyoutShowData, TimeRangeOption} from '../cross/types';
+import {
+  HardwareFlyoutAnchor,
+  HardwareFlyoutSection,
+  HardwareFlyoutShowData,
+  TimeRangeOption,
+  TopProcessesData,
+} from '../cross/types';
+import {processMonitorService} from './ProcessMonitorService';
 
 const SECTION_WIDTHS: Record<HardwareFlyoutSection, number> = {
   cpu: 400,
@@ -393,6 +400,145 @@ export class HardwareFlyoutView {
     .details-table tr:nth-child(even) { background: var(--card-bg); border-radius: 6px; }
     .td-key { color: var(--text-muted); font-weight: 500; width: 35%; }
     .td-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; text-align: right; }
+
+    /* Top Consuming Processes Section */
+    .top-proc-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 9px;
+      padding: 8px 10px;
+      margin-top: 6px;
+    }
+    .top-proc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .top-proc-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .top-proc-tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--card-border);
+      border-radius: 999px;
+      padding: 1px;
+      gap: 2px;
+    }
+    .top-proc-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      outline: none;
+    }
+    .top-proc-tab-btn:hover {
+      color: var(--text-main);
+    }
+    .top-proc-tab-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 1px 4px var(--accent-glow);
+    }
+    .top-proc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .top-proc-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 4px 6px;
+      font-size: 11px;
+      gap: 6px;
+    }
+    .top-proc-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      flex: 1;
+    }
+    .top-proc-rank {
+      font-size: 9px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 1px 4px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .top-proc-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .top-proc-name {
+      font-weight: 600;
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-main);
+    }
+    .top-proc-sub {
+      font-size: 9px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .top-proc-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      flex-shrink: 0;
+      gap: 2px;
+    }
+    .top-proc-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .top-proc-bar {
+      width: 48px;
+      height: 3px;
+      background: var(--card-border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .top-proc-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+    .top-proc-empty {
+      padding: 8px 4px;
+      text-align: center;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
   </style>
 </head>
 <body style="background: transparent !important; background-color: transparent !important;">
@@ -431,6 +577,32 @@ export class HardwareFlyoutView {
     // Active Range state
     window.activeRange = 'minutes';
     window.currentFlyoutData = null;
+    window.activeProcTab = null;
+    window.activeProcTabLocked = false;
+
+    window.setProcTab = function(tab) {
+      window.activeProcTab = tab;
+      window.activeProcTabLocked = true;
+      if (window.currentFlyoutData) {
+        window.renderFlyout(window.currentFlyoutData, true);
+      }
+    };
+
+    window.updateTopProcessesData = function(data) {
+      if (window.currentFlyoutData) {
+        window.currentFlyoutData.topProcesses = data;
+        const procBox = document.getElementById('flyout-top-procs');
+        if (procBox) {
+          const currentSection = window.currentFlyoutData.section;
+          const defaultCat = currentSection === 'gpu' ? 'gpu' : currentSection === 'memory' ? 'memory' : 'cpu';
+          const isProcEnabled = window.currentFlyoutData.showTopProcesses !== false;
+          procBox.outerHTML = renderTopProcessesHtml(data, defaultCat, isProcEnabled);
+          reportResize();
+        } else {
+          window.renderFlyout(window.currentFlyoutData, true);
+        }
+      }
+    };
 
     window.setRange = function(range) {
       window.activeRange = range;
@@ -448,6 +620,95 @@ export class HardwareFlyoutView {
         window.electron.ipcRenderer.send('${HMONITOR_IPC_REFRESH_PUBLIC_NETWORK}');
       }
     };
+
+    function renderTopProcessesHtml(topProcs, defaultCategory, isEnabled) {
+      if (isEnabled === false) return '';
+      const currentTab = window.activeProcTab || defaultCategory || 'cpu';
+
+      const procs = topProcs || {};
+      let list = [];
+      let label = 'Top Processes';
+      if (currentTab === 'cpu') {
+        list = procs.cpu || [];
+        label = 'Top CPU Consumers';
+      } else if (currentTab === 'gpu') {
+        list = procs.gpu || [];
+        label = 'Top GPU Consumers';
+      } else if (currentTab === 'memory') {
+        list = procs.memory || [];
+        label = 'Top RAM Consumers';
+      }
+
+      const cpuActive = currentTab === 'cpu' ? ' active' : '';
+      const gpuActive = currentTab === 'gpu' ? ' active' : '';
+      const memActive = currentTab === 'memory' ? ' active' : '';
+      const tabsHtml =
+        '<div class="top-proc-tabs">' +
+          '<button class="top-proc-tab-btn' + cpuActive + '" onclick="setProcTab(&apos;cpu&apos;)">CPU</button>' +
+          '<button class="top-proc-tab-btn' + gpuActive + '" onclick="setProcTab(&apos;gpu&apos;)">GPU</button>' +
+          '<button class="top-proc-tab-btn' + memActive + '" onclick="setProcTab(&apos;memory&apos;)">RAM</button>' +
+        '</div>';
+
+      let itemsHtml = '';
+      if (!list || list.length === 0) {
+        itemsHtml = '<div class="top-proc-empty">Sampling active system processes...</div>';
+      } else {
+        itemsHtml = '<div class="top-proc-list">' + list.slice(0, 3).map((item, idx) => {
+          const rank = '#' + (idx + 1);
+          const name = item.name || 'Unknown';
+          const pid = item.pid;
+          let mainValStr = '';
+          let subText = 'PID: ' + pid;
+          let barPct = 0;
+          let color = 'var(--accent)';
+
+          if (currentTab === 'cpu') {
+            const cpu = typeof item.cpu === 'number' ? item.cpu : 0;
+            mainValStr = cpu + '%';
+            barPct = Math.min(100, Math.max(2, cpu));
+            color = getColorForVal(cpu, 25, 60);
+            if (item.memory) subText += ' · ' + formatBytes(item.memory);
+          } else if (currentTab === 'gpu') {
+            const gpu = typeof item.gpu === 'number' ? item.gpu : 0;
+            const vram = item.vram ? formatBytes(item.vram) : '';
+            mainValStr = gpu > 0 ? gpu + '% GPU' : (vram || 'Active');
+            barPct = gpu > 0 ? Math.min(100, Math.max(2, gpu)) : 50;
+            color = 'var(--cyan)';
+            if (vram) subText += ' · ' + vram + ' VRAM';
+          } else if (currentTab === 'memory') {
+            const mem = item.memory ? formatBytes(item.memory) : '0 MB';
+            mainValStr = mem;
+            barPct = 60;
+            color = 'var(--warning)';
+            if (typeof item.cpu === 'number' && item.cpu > 0) subText += ' · ' + item.cpu + '% CPU';
+          }
+
+          return '<div class="top-proc-item">' +
+            '<div class="top-proc-left">' +
+              '<span class="top-proc-rank">' + rank + '</span>' +
+              '<div class="top-proc-info">' +
+                '<span class="top-proc-name" title="' + name + ' (PID: ' + pid + ')">' + name + '</span>' +
+                '<span class="top-proc-sub">' + subText + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="top-proc-right">' +
+              '<span class="top-proc-val" style="color:' + color + '">' + mainValStr + '</span>' +
+              '<div class="top-proc-bar">' +
+                '<div class="top-proc-bar-fill" style="width:' + barPct + '%; background:' + color + '"></div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('') + '</div>';
+      }
+
+      return '<div class="top-proc-card" id="flyout-top-procs">' +
+        '<div class="top-proc-header">' +
+          '<span class="top-proc-title">⚡ ' + label + '</span>' +
+          tabsHtml +
+        '</div>' +
+        itemsHtml +
+      '</div>';
+    }
 
 
     function getColorForVal(val, low=60, med=80) {
@@ -715,6 +976,10 @@ export class HardwareFlyoutView {
       const range = window.activeRange || 'minutes';
       const rawHistory = data.history || [];
 
+      if (!isRangeChange && !window.activeProcTabLocked) {
+        window.activeProcTab = section === 'gpu' ? 'gpu' : section === 'memory' ? 'memory' : 'cpu';
+      }
+
       const history = filterHistoryByRange(rawHistory, range);
 
       const rangeButtonsHtml =
@@ -826,6 +1091,7 @@ export class HardwareFlyoutView {
             '<div class="section-subtitle">PER-CORE UTILIZATION</div>' +
             '<div class="scroll-container"><div class="core-grid">' + coreRowsHtml + '</div></div>';
         }
+        extraHtml += renderTopProcessesHtml(data.topProcesses, 'cpu', data.showTopProcesses);
       } else if (section === 'gpu') {
         const gpu = payload.gpu?.data || {};
         const raw = payload.gpu?.rawSensorValues || [];
@@ -915,7 +1181,7 @@ export class HardwareFlyoutView {
             '</div>';
         }
 
-        extraHtml = vramHtml;
+        extraHtml = vramHtml + renderTopProcessesHtml(data.topProcesses, 'gpu', data.showTopProcesses);
       } else if (section === 'memory') {
         const mem = payload.memory?.data || {};
         const raw = payload.memory?.rawSensorValues || [];
@@ -1017,7 +1283,8 @@ export class HardwareFlyoutView {
             avail.toFixed(1) +
             ' GB</div>' +
           '</div>' +
-          virtualRamHtml;
+          virtualRamHtml +
+          renderTopProcessesHtml(data.topProcesses, 'memory', data.showTopProcesses);
 
 
       } else if (section === 'network') {
@@ -1447,6 +1714,10 @@ export class HardwareFlyoutView {
 
     this.isShowing = true;
 
+    if (showData.showTopProcesses !== false && ['cpu', 'gpu', 'memory'].includes(showData.section)) {
+      processMonitorService.startActiveSampling(procs => this.updateTopProcesses(procs));
+    }
+
     try {
       const script = `window.renderFlyout(${JSON.stringify(showData)})`;
       const dims = (await this.flyoutView.webContents.executeJavaScript(script)) as
@@ -1461,12 +1732,22 @@ export class HardwareFlyoutView {
     }
   }
 
+  public updateTopProcesses(topProcesses: TopProcessesData): void {
+    if (!this.isShowing || !this.flyoutView || this.flyoutView.webContents.isDestroyed()) return;
+    const script =
+      `if (typeof window.updateTopProcessesData === 'function') { ` +
+      `window.updateTopProcessesData(${JSON.stringify(topProcesses)}); }`;
+    this.flyoutView.webContents.executeJavaScript(script).catch(() => {});
+  }
+
   public update(updateData: {
     section: HardwareFlyoutSection;
     payload: any;
     darkMode?: boolean;
     history?: any[];
     range?: TimeRangeOption;
+    topProcesses?: TopProcessesData;
+    showTopProcesses?: boolean;
   }): void {
     if (!this.isShowing || !this.flyoutView || this.flyoutView.webContents.isDestroyed()) return;
     if (this.activeSection !== updateData.section) return;
@@ -1513,6 +1794,8 @@ export class HardwareFlyoutView {
       this.hideTimer = undefined;
     }
 
+    processMonitorService.stopActiveSampling();
+
     this.isShowing = false;
     this.isMouseInsideFlyout = false;
     this.isMouseInsideTrigger = false;
@@ -1521,10 +1804,12 @@ export class HardwareFlyoutView {
 
     if (this.flyoutView && !this.flyoutView.webContents.isDestroyed()) {
       this.flyoutView.setBounds({x: -5000, y: -5000, width: 0, height: 0});
+      this.flyoutView.webContents.executeJavaScript('window.activeProcTabLocked = false;').catch(() => {});
     }
   }
 
   public destroy(): void {
+    processMonitorService.stopActiveSampling();
     this.hide();
     this.cleanupWindowListeners();
 

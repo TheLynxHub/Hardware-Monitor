@@ -151,6 +151,7 @@ export type MonitoringSettings = {
   showAliasMemory: boolean;
   showAliasNetwork: boolean;
   maskPublicIp?: boolean;
+  showTopProcesses?: boolean;
   sectionOrder?: string[];
   uptimeOrder?: string[];
 };
@@ -335,6 +336,22 @@ export type HardwareFlyoutAnchor = {
   height: number;
 };
 
+export type TopProcessItem = {
+  pid: number;
+  name: string;
+  cpu?: number; // percentage (0 - 100)
+  memory?: number; // bytes
+  gpu?: number; // percentage (0 - 100)
+  vram?: number; // bytes
+};
+
+export type TopProcessesData = {
+  cpu: TopProcessItem[];
+  gpu: TopProcessItem[];
+  memory: TopProcessItem[];
+  timestamp: number;
+};
+
 export type HardwareFlyoutShowData = {
   section: HardwareFlyoutSection;
   anchor: HardwareFlyoutAnchor;
@@ -342,4 +359,6 @@ export type HardwareFlyoutShowData = {
   darkMode?: boolean;
   history?: any[];
   range?: TimeRangeOption;
+  topProcesses?: TopProcessesData;
+  showTopProcesses?: boolean;
 };

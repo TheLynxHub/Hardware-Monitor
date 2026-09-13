@@ -72,6 +72,7 @@ export const initialSettings: MonitoringSettings = {
   showAliasMemory: true,
   showAliasNetwork: true,
   maskPublicIp: true,
+  showTopProcesses: true,
   sectionOrder: ['cpu', 'gpu', 'memory', 'network', 'uptime', 'ping'],
   uptimeOrder: ['uptimeSystem', 'uptimeApp'],
 };
