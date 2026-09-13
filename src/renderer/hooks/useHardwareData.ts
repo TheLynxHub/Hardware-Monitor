@@ -1,8 +1,12 @@
 import {HardwareReport} from '@lynxhub/hwmonitor';
 import {useEffect, useState} from 'react';
 
-import {HMONITOR_IPC_DATA_UPDATE, HMONITOR_IPC_MONITORING_ERROR} from '../../cross/constants';
-import {HardwareDataReport} from '../../cross/types';
+import {
+  HMONITOR_IPC_DATA_UPDATE,
+  HMONITOR_IPC_MONITORING_ERROR,
+  HMONITOR_IPC_UPDATE_PUBLIC_NETWORK,
+} from '../../cross/constants';
+import {HardwareDataReport, PublicNetworkInfo} from '../../cross/types';
 import {
   CPU_LOAD_CANDIDATES,
   CPU_TEMP_CANDIDATES,
@@ -43,7 +47,7 @@ export default function useHardwareData() {
     const handleHardwareUpdate = (_: unknown, data: HardwareReport & Partial<HardwareDataReport>) => {
       if (!data) return;
 
-      const transformedData: HardwareDataReport = {
+      setHardwareData(prev => ({
         cpu: data.CPU.map(item => {
           const rawTemp = findSensorValue(item.Sensors, CPU_TEMP_CANDIDATES, 'Temperature', {requirePositive: true});
           const rawUsage = findSensorValue(item.Sensors, CPU_LOAD_CANDIDATES, 'Load');
@@ -86,11 +90,18 @@ export default function useHardwareData() {
         },
         rawSensors: data.rawSensors || [],
         networkDetails: data.networkDetails,
-      };
-
-      setHardwareData(transformedData);
+        publicNetwork: data.publicNetwork ?? prev.publicNetwork,
+      }));
       setIsConnected(true);
       setError(null);
+    };
+
+    const handlePublicNetworkUpdate = (_: unknown, pubNet: PublicNetworkInfo) => {
+      if (!pubNet) return;
+      setHardwareData(prev => ({
+        ...prev,
+        publicNetwork: pubNet,
+      }));
     };
 
     const handleError = (_: unknown, err: Error) => {
@@ -100,10 +111,15 @@ export default function useHardwareData() {
     };
 
     const clearDataListener = window.electron.ipcRenderer.on(HMONITOR_IPC_DATA_UPDATE, handleHardwareUpdate);
+    const clearPublicNetListener = window.electron.ipcRenderer.on(
+      HMONITOR_IPC_UPDATE_PUBLIC_NETWORK,
+      handlePublicNetworkUpdate,
+    );
     const clearMonitorError = window.electron.ipcRenderer.on(HMONITOR_IPC_MONITORING_ERROR, handleError);
 
     return () => {
       clearDataListener();
+      clearPublicNetListener();
       clearMonitorError();
     };
   }, []);

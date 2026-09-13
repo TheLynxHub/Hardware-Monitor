@@ -11,8 +11,10 @@ import {
   Clock,
   Cpu,
   Database,
+  Globe,
   GripVertical,
   LucideProps,
+  ShieldCheck,
   Thermometer,
   Timer,
 } from 'lucide-react';
@@ -34,6 +36,8 @@ const METRIC_CONFIG: Record<string, {label: string; Icon: ForwardRefExoticCompon
   downloadSpeed: {label: 'Download Speed', Icon: ArrowDown},
   uploadData: {label: 'Data Uploaded', Icon: ArrowUp},
   downloadData: {label: 'Data Downloaded', Icon: ArrowDown},
+  publicIp: {label: 'Public IP', Icon: Globe},
+  vpnStatus: {label: 'VPN / Geo Status', Icon: ShieldCheck},
   uptimeSystem: {label: 'System Uptime', Icon: Clock},
   uptimeApp: {label: 'App Uptime', Icon: Timer},
 };
@@ -111,7 +115,9 @@ const HardwareMetricsReorderGroup = memo(({type, hardwareName, config}: Hardware
     if (type === 'cpu') return ['temp', 'usage'];
     if (type === 'gpu') return ['temp', 'usage', 'vram'];
     if (type === 'memory') return ['memory'];
-    if (type === 'network') return ['uploadSpeed', 'downloadSpeed', 'uploadData', 'downloadData'];
+    if (type === 'network') {
+      return ['uploadSpeed', 'downloadSpeed', 'uploadData', 'downloadData', 'publicIp', 'vpnStatus'];
+    }
     return [];
   }, [type]);
 
@@ -532,18 +538,32 @@ export const MetricsTab = memo(
                 }
                 headerExtra={
                   selectedNetworkConfig && (
-                    <Checkbox
-                      variant="secondary"
-                      isSelected={settings.showAliasNetwork}
-                      isDisabled={!selectedNetworkConfig.active}
-                      onChange={val => updateState('showAliasNetwork', val)}>
-                      <Checkbox.Content className="text-xs">
-                        <Checkbox.Control className="size-4 rounded-md">
-                          <Checkbox.Indicator />
-                        </Checkbox.Control>
-                        Friendly Alias
-                      </Checkbox.Content>
-                    </Checkbox>
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        variant="secondary"
+                        isSelected={settings.maskPublicIp ?? true}
+                        isDisabled={!selectedNetworkConfig.active}
+                        onChange={val => updateState('maskPublicIp', val)}>
+                        <Checkbox.Content className="text-xs">
+                          <Checkbox.Control className="size-4 rounded-md">
+                            <Checkbox.Indicator />
+                          </Checkbox.Control>
+                          Mask Public IP
+                        </Checkbox.Content>
+                      </Checkbox>
+                      <Checkbox
+                        variant="secondary"
+                        isSelected={settings.showAliasNetwork}
+                        isDisabled={!selectedNetworkConfig.active}
+                        onChange={val => updateState('showAliasNetwork', val)}>
+                        <Checkbox.Content className="text-xs">
+                          <Checkbox.Control className="size-4 rounded-md">
+                            <Checkbox.Indicator />
+                          </Checkbox.Control>
+                          Friendly Alias
+                        </Checkbox.Content>
+                      </Checkbox>
+                    </div>
                   )
                 }
                 category="network"

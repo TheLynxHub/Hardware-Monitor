@@ -74,6 +74,21 @@ export type UptimeData = {
   app: number;
 };
 
+export type PublicNetworkInfo = {
+  ip: string;
+  country?: string;
+  countryCode?: string;
+  flagEmoji?: string;
+  city?: string;
+  region?: string;
+  isp?: string;
+  org?: string;
+  isVpn: boolean;
+  vpnName?: string;
+  isProxy?: boolean;
+  lastUpdated: number;
+};
+
 // Represents a single raw sensor value sent from main to renderer
 export type RawSensorValue = {Identifier: string; Value: number | null};
 
@@ -86,6 +101,7 @@ export type HardwareDataReport = {
   uptime: UptimeData;
   rawSensors: RawSensorValue[]; // A flat list of all sensor values for easy lookup
   networkDetails?: NetworkInterfaceDetails[];
+  publicNetwork?: PublicNetworkInfo;
 };
 
 // Configuration for which parts of a metric are visible (e.g., icon, label)
@@ -134,6 +150,7 @@ export type MonitoringSettings = {
   showAliasGpu: boolean;
   showAliasMemory: boolean;
   showAliasNetwork: boolean;
+  maskPublicIp?: boolean;
   sectionOrder?: string[];
   uptimeOrder?: string[];
 };
@@ -149,7 +166,9 @@ export type SystemMetric =
   | 'uploadSpeed'
   | 'downloadSpeed'
   | 'uploadData'
-  | 'downloadData';
+  | 'downloadData'
+  | 'publicIp'
+  | 'vpnStatus';
 
 // A key for each hardware type in the settings
 export type MetricType = keyof Omit<EnabledMetrics, 'uptime'>;
@@ -287,6 +306,7 @@ export type MemoryFlyoutPayload = {
 export type NetworkFlyoutPayload = {
   data: NetworkData | undefined;
   networkDetails?: NetworkInterfaceDetails[];
+  publicNetwork?: PublicNetworkInfo;
   rawSensorValues: RawSensorValue[];
   metrics?: HardwareMetricsConfig;
   history?: NetworkTelemetrySample[];

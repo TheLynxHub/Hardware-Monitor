@@ -1,6 +1,7 @@
 import {convertStorageUnit, formatSize} from '@lynx_common/utils';
+import {GlobalIcon, ShieldCheckIcon, ShieldCrossIcon} from '@solar-icons/react/bold-duotone';
 import {Activity, ArrowDown, ArrowUp, Database, Gauge, Power, Thermometer, Wifi} from 'lucide-react';
-import {ElementType, memo, ReactNode, useMemo} from 'react';
+import {ElementType, memo, ReactNode, useMemo, useState} from 'react';
 
 import {
   HardwareFlyoutPayload,
@@ -8,6 +9,7 @@ import {
   HardwareMetricsConfig,
   NetworkData,
   NetworkInterfaceDetails,
+  PublicNetworkInfo,
   RawSensorValue,
 } from '../../../../cross/types';
 import {useHMonitorState} from '../../../state/hmonitorSlice';
@@ -34,16 +36,30 @@ const getIconForSensorType = (type: string): ElementType => {
   }
 };
 
+const maskIp = (ip: string): string => {
+  if (!ip || ip === 'Resolving...' || ip === 'Offline') return ip;
+  const parts = ip.split('.');
+  if (parts.length === 4) {
+    return `${parts[0]}.${parts[1]}.•••.•••`;
+  }
+  return ip.length > 8 ? `${ip.slice(0, 8)}••••` : '••••••••';
+};
+
 type Props = {
   data: NetworkData | undefined;
   metrics: HardwareMetricsConfig;
   hardwareInfo: HardwareInfo | undefined;
   rawSensorValues: RawSensorValue[];
   networkDetails?: NetworkInterfaceDetails[];
+  publicNetwork?: PublicNetworkInfo;
 };
 
-const NetworkSection = memo(({data, metrics, hardwareInfo, rawSensorValues, networkDetails}: Props) => {
+const NetworkSection = memo(({data, metrics, hardwareInfo, rawSensorValues, networkDetails, publicNetwork}: Props) => {
   const showAliasNetwork = useHMonitorState('showAliasNetwork');
+  const maskPublicIp = useHMonitorState('maskPublicIp') ?? true;
+  const [isTemporarilyUnmasked, setIsTemporarilyUnmasked] = useState(false);
+  const isMasked = maskPublicIp && !isTemporarilyUnmasked;
+
   const {name, uploadSpeed, downloadSpeed, uploadData, downloadData} = data || {
     name: '',
     uploadSpeed: 0,
@@ -56,6 +72,8 @@ const NetworkSection = memo(({data, metrics, hardwareInfo, rawSensorValues, netw
   const hasDownloadSpeed = useMemo(() => metrics.enabled.includes('downloadSpeed'), [metrics.enabled]);
   const hasUploadData = useMemo(() => metrics.enabled.includes('uploadData'), [metrics.enabled]);
   const hasDownloadData = useMemo(() => metrics.enabled.includes('downloadData'), [metrics.enabled]);
+  const hasPublicIp = useMemo(() => metrics.enabled.includes('publicIp'), [metrics.enabled]);
+  const hasVpnStatus = useMemo(() => metrics.enabled.includes('vpnStatus'), [metrics.enabled]);
 
   const sensorReadingMap = useMemo(() => {
     const map = new Map<string, RawSensorValue>();
@@ -93,6 +111,45 @@ const NetworkSection = memo(({data, metrics, hardwareInfo, rawSensorValues, netw
             value={formatSize(convertStorageUnit(downloadData?.toString() ?? '0', 'GB', 'B') || 0)}
           />,
         );
+      } else if (metricId === 'publicIp') {
+        const rawIp = publicNetwork?.ip || 'Resolving...';
+        const displayIp = isMasked ? maskIp(rawIp) : rawIp;
+        const flag = publicNetwork?.flagEmoji ? `${publicNetwork.flagEmoji} ` : '';
+        const ipLabel = publicNetwork?.countryCode ? `${flag}${publicNetwork.countryCode} IP` : `${flag}Public IP`;
+
+        list.push(
+          <div
+            onClick={e => {
+              e.stopPropagation();
+              setIsTemporarilyUnmasked(prev => !prev);
+            }}
+            title={
+              (isMasked ? 'Click to reveal Public IP' : 'Click to mask Public IP') +
+              (publicNetwork?.isp ? ` • ISP: ${publicNetwork.isp}` : '') +
+              (publicNetwork?.city ? ` • ${publicNetwork.city}` : '')
+            }
+            key="publicIp"
+            className="cursor-pointer select-none inline-flex">
+            <MetricItem label={ipLabel} icon={GlobalIcon} value={displayIp} />
+          </div>,
+        );
+      } else if (metricId === 'vpnStatus') {
+        const isVpn = Boolean(publicNetwork?.isVpn);
+        const vpnName = publicNetwork?.vpnName || (isVpn ? 'Active' : 'Direct');
+
+        list.push(
+          <MetricItem
+            colorClass={
+              isVpn
+                ? 'text-success bg-success/10 border-success/30'
+                : 'text-semi-muted bg-surface border-surface-secondary'
+            }
+            label="VPN"
+            key="vpnStatus"
+            value={vpnName}
+            icon={isVpn ? ShieldCheckIcon : ShieldCrossIcon}
+          />,
+        );
       } else {
         const customMetric = metrics.custom?.find(m => m.id === metricId);
         if (customMetric) {
@@ -116,7 +173,10 @@ const NetworkSection = memo(({data, metrics, hardwareInfo, rawSensorValues, netw
       }
     });
 
-    if (!hasUploadSpeed && !hasDownloadSpeed && !hasUploadData && !hasDownloadData) return null;
+    const hasAnyMetric =
+      hasUploadSpeed || hasDownloadSpeed || hasUploadData || hasDownloadData || hasPublicIp || hasVpnStatus;
+
+    if (!hasAnyMetric && (!metrics.custom || metrics.custom.length === 0)) return null;
 
     metrics.custom?.forEach(customMetric => {
       if (processedIds.has(customMetric.id)) return;
@@ -146,6 +206,14 @@ const NetworkSection = memo(({data, metrics, hardwareInfo, rawSensorValues, netw
     downloadSpeed,
     uploadData,
     downloadData,
+    publicNetwork,
+    isMasked,
+    hasUploadSpeed,
+    hasDownloadSpeed,
+    hasUploadData,
+    hasDownloadData,
+    hasPublicIp,
+    hasVpnStatus,
     hardwareInfo,
     sensorReadingMap,
   ]);
@@ -156,11 +224,12 @@ const NetworkSection = memo(({data, metrics, hardwareInfo, rawSensorValues, netw
       network: {
         data,
         networkDetails,
+        publicNetwork,
         rawSensorValues,
         metrics,
       },
     }),
-    [data, networkDetails, rawSensorValues, metrics],
+    [data, networkDetails, publicNetwork, rawSensorValues, metrics],
   );
 
   if (renderedMetrics?.length === 0) return null;

@@ -39,6 +39,9 @@ const hmonitorSlice = createSlice({
     setPingState: (state: MonitoringSettings, action: PayloadAction<PingState>) => {
       state.pingState = action.payload;
     },
+    toggleMaskPublicIp: state => {
+      state.maskPublicIp = !state.maskPublicIp;
+    },
     // Persists the current settings by sending them to the main process
     saveSettings: state => {
       window.electron.ipcRenderer.send(HMONITOR_IPC_SET_CONFIG, JSON.stringify(omit(state, 'modals')));

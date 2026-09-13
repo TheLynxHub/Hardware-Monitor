@@ -17,12 +17,14 @@ import {
   HMONITOR_IPC_FLYOUT_SET_RANGE,
   HMONITOR_IPC_HIDE_FLYOUT,
   HMONITOR_IPC_MONITORING_ERROR,
+  HMONITOR_IPC_REFRESH_PUBLIC_NETWORK,
   HMONITOR_IPC_RESET_CONFIG,
   HMONITOR_IPC_SET_CONFIG,
   HMONITOR_IPC_SHOW_FLYOUT,
   HMONITOR_IPC_STOP_PING,
   HMONITOR_IPC_UPDATE_FLYOUT,
   HMONITOR_IPC_UPDATE_PING,
+  HMONITOR_IPC_UPDATE_PUBLIC_NETWORK,
   HMONITOR_STORAGE_ID,
   initialSettings,
 } from '../cross/constants';
@@ -37,6 +39,7 @@ import {
 import {hardwareFlyoutView} from './HardwareFlyoutView';
 import {hardwareTelemetryHistory} from './HardwareTelemetryHistory';
 import {Pinger} from './pinger';
+import {publicNetworkService} from './PublicNetworkService';
 import {getActiveComponentTypes} from './utils';
 
 const HARDWARE_CHECK_MAX_RETRIES = 5;
@@ -173,6 +176,11 @@ class HardwareMonitorService {
     this.registerLifecycleHandlers();
     this.isInitialized = true;
 
+    publicNetworkService.start();
+    publicNetworkService.onUpdate(info => {
+      this.sendToRenderer(HMONITOR_IPC_UPDATE_PUBLIC_NETWORK, info);
+    });
+
     void this.getNetworkDetails();
 
     // Hardware probing can call .NET, GitHub, and the external CLI. Keep it off
@@ -308,6 +316,11 @@ class HardwareMonitorService {
       // Send the latest config to the renderer once it's ready
       this.sendToRenderer(HMONITOR_IPC_CONFIG_UPDATE, this.config);
 
+      const cachedPublicNet = publicNetworkService.getCachedInfo();
+      if (cachedPublicNet) {
+        this.sendToRenderer(HMONITOR_IPC_UPDATE_PUBLIC_NETWORK, cachedPublicNet);
+      }
+
       if (this.config.enabled) {
         void this.startMonitoring();
       }
@@ -341,6 +354,7 @@ class HardwareMonitorService {
           showAliasGpu: storedConfig.showAliasGpu ?? initialSettings.showAliasGpu,
           showAliasMemory: storedConfig.showAliasMemory ?? initialSettings.showAliasMemory,
           showAliasNetwork: storedConfig.showAliasNetwork ?? initialSettings.showAliasNetwork,
+          maskPublicIp: storedConfig.maskPublicIp ?? initialSettings.maskPublicIp,
           enableHoverDetails: storedConfig.enableHoverDetails ?? initialSettings.enableHoverDetails,
         }),
         configVersion: initialSettings.configVersion, // Ensure version is updated
@@ -371,6 +385,7 @@ class HardwareMonitorService {
       showAliasGpu: storedConfig.showAliasGpu ?? initialSettings.showAliasGpu,
       showAliasMemory: storedConfig.showAliasMemory ?? initialSettings.showAliasMemory,
       showAliasNetwork: storedConfig.showAliasNetwork ?? initialSettings.showAliasNetwork,
+      maskPublicIp: storedConfig.maskPublicIp ?? initialSettings.maskPublicIp,
       sectionOrder: storedConfig.sectionOrder ?? initialSettings.sectionOrder,
       uptimeOrder: storedConfig.uptimeOrder ?? initialSettings.uptimeOrder,
       enableHoverDetails: storedConfig.enableHoverDetails ?? initialSettings.enableHoverDetails,
@@ -544,6 +559,7 @@ class HardwareMonitorService {
           ...data,
           rawSensors,
           networkDetails: this.cachedNetworkDetails,
+          publicNetwork: publicNetworkService.getCachedInfo(),
         };
         this.sendToRenderer(HMONITOR_IPC_DATA_UPDATE, reportWithRawSensors);
         void this.getNetworkDetails();
@@ -641,6 +657,7 @@ class HardwareMonitorService {
     app.on('window-all-closed', () => {
       hardwareFlyoutView.destroy();
       hardwareTelemetryHistory.clear();
+      publicNetworkService.stop();
       this.stopPinging();
       this.stopMonitoring();
     });
@@ -655,6 +672,9 @@ class HardwareMonitorService {
     ipcMain.on(HMONITOR_IPC_RESET_CONFIG, () => {
       void this.resetConfig();
     });
+    ipcMain.on(HMONITOR_IPC_REFRESH_PUBLIC_NETWORK, () => {
+      void publicNetworkService.getPublicNetworkInfo(true);
+    });
 
     ipcMain.on(HMONITOR_IPC_SHOW_FLYOUT, (_, data) => {
       if (!this.config.enableHoverDetails) return;
@@ -662,8 +682,12 @@ class HardwareMonitorService {
       if (data.section === 'cpu') key = data.payload?.cpu?.data?.name;
       else if (data.section === 'gpu') key = data.payload?.gpu?.data?.name;
       else if (data.section === 'memory') key = data.payload?.memory?.data?.name;
-      else if (data.section === 'network') key = data.payload?.network?.data?.name;
-      else if (data.section === 'ping') key = data.payload?.ping?.host;
+      else if (data.section === 'network') {
+        key = data.payload?.network?.data?.name;
+        if (data.payload?.network) {
+          data.payload.network.publicNetwork = publicNetworkService.getCachedInfo();
+        }
+      } else if (data.section === 'ping') key = data.payload?.ping?.host;
 
       data.history = hardwareTelemetryHistory.getHistory(data.section, key);
       void hardwareFlyoutView.show(data);
@@ -674,8 +698,12 @@ class HardwareMonitorService {
       if (data.section === 'cpu') key = data.payload?.cpu?.data?.name;
       else if (data.section === 'gpu') key = data.payload?.gpu?.data?.name;
       else if (data.section === 'memory') key = data.payload?.memory?.data?.name;
-      else if (data.section === 'network') key = data.payload?.network?.data?.name;
-      else if (data.section === 'ping') key = data.payload?.ping?.host;
+      else if (data.section === 'network') {
+        key = data.payload?.network?.data?.name;
+        if (data.payload?.network) {
+          data.payload.network.publicNetwork = publicNetworkService.getCachedInfo();
+        }
+      } else if (data.section === 'ping') key = data.payload?.ping?.host;
 
       data.history = hardwareTelemetryHistory.getHistory(data.section, key);
       hardwareFlyoutView.update(data);

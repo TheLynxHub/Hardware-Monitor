@@ -6,6 +6,7 @@ import {
   HMONITOR_IPC_FLYOUT_MOUSE_EVENT,
   HMONITOR_IPC_FLYOUT_RESIZE,
   HMONITOR_IPC_FLYOUT_SET_RANGE,
+  HMONITOR_IPC_REFRESH_PUBLIC_NETWORK,
 } from '../cross/constants';
 import {HardwareFlyoutAnchor, HardwareFlyoutSection, HardwareFlyoutShowData, TimeRangeOption} from '../cross/types';
 
@@ -439,6 +440,12 @@ export class HardwareFlyoutView {
       if (window.currentFlyoutData) {
         window.currentFlyoutData.range = range;
         window.renderFlyout(window.currentFlyoutData, true);
+      }
+    };
+
+    window.refreshPublicNetwork = function() {
+      if (window.electron && window.electron.ipcRenderer) {
+        window.electron.ipcRenderer.send('${HMONITOR_IPC_REFRESH_PUBLIC_NETWORK}');
       }
     };
 
@@ -1031,12 +1038,23 @@ export class HardwareFlyoutView {
         const maxUp = Math.max(...upVals);
         const avgUp = Math.round(upVals.reduce((a, b) => a + b, 0) / upVals.length);
 
+        const pubNet = payload.network?.publicNetwork;
+        const vpnBadge = pubNet
+          ? pubNet.isVpn
+            ? '<span class="badge" style="background:var(--success-soft); color:var(--success);' +
+              ' border:1px solid rgba(16,185,129,0.3);">🛡️ ' +
+              (pubNet.vpnName || 'VPN Active') +
+              '</span>'
+            : '<span class="badge-subtle">Direct</span>'
+          : '';
+
         headerHtml =
           '<div class="header">' +
             '<div class="header-left"><span class="title">' +
             (details.name || net.name || 'Network Interface') +
             '</span></div>' +
             '<div class="header-badges">' +
+              vpnBadge +
               '<span class="badge">NETWORK</span>' +
             '</div>' +
           '</div>';
@@ -1119,9 +1137,57 @@ export class HardwareFlyoutView {
           detailRows.push('<tr><td class="td-key">MAC</td><td class="td-val">' + details.mac + '</td></tr>');
         }
 
-        if (detailRows.length > 0) {
-          extraHtml = '<table class="details-table">' + detailRows.join('') + '</table>';
+        let publicNetworkHtml = '';
+        if (pubNet) {
+          const locParts = [pubNet.city, pubNet.region, pubNet.country].filter(Boolean);
+          const locStr = locParts.length > 0 ? locParts.join(', ') : 'Unknown location';
+          const flag = pubNet.flagEmoji || '🌐';
+          publicNetworkHtml =
+            '<div class="details-card" style="margin-top:6px; padding:8px 10px;' +
+            ' background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px;">' +
+              '<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;">' +
+                '<div style="display:flex; align-items:center; gap:5px;">' +
+                  '<span style="font-size:12px;">' + flag + '</span>' +
+                  '<span style="font-size:10px; font-weight:700; text-transform:uppercase;' +
+                  ' letter-spacing:0.5px; color:var(--text-muted);">' +
+                    'Public IP & Geo' +
+                  '</span>' +
+                '</div>' +
+                '<button onclick="refreshPublicNetwork()" style="background:transparent; border:none;' +
+                ' color:var(--text-muted); cursor:pointer; font-size:10px; display:flex;' +
+                ' align-items:center; gap:3px;" title="Refresh Public IP & VPN status">' +
+                  '↻ Refresh' +
+                '</button>' +
+              '</div>' +
+              '<table class="details-table">' +
+                '<tr>' +
+                  '<td class="td-key">Public IP</td>' +
+                  '<td class="td-val font-mono" style="color:var(--accent); font-weight:700;">' +
+                    pubNet.ip +
+                  '</td>' +
+                '</tr>' +
+                '<tr>' +
+                  '<td class="td-key">Location</td>' +
+                  '<td class="td-val">' + locStr + '</td>' +
+                '</tr>' +
+                (pubNet.isp
+                  ? '<tr><td class="td-key">ISP / Org</td><td class="td-val">' + pubNet.isp + '</td></tr>'
+                  : '') +
+                '<tr>' +
+                  '<td class="td-key">VPN Status</td>' +
+                  '<td class="td-val" style="color:' +
+                  (pubNet.isVpn ? 'var(--success)' : 'var(--text-muted)') +
+                  '; font-weight:600;">' +
+                    (pubNet.isVpn ? 'Active (' + (pubNet.vpnName || 'VPN') + ')' : 'Direct Connection') +
+                  '</td>' +
+                '</tr>' +
+              '</table>' +
+            '</div>';
         }
+
+        const tableHtml =
+          detailRows.length > 0 ? '<table class="details-table">' + detailRows.join('') + '</table>' : '';
+        extraHtml = tableHtml + publicNetworkHtml;
       } else if (section === 'ping') {
         const p = payload.ping || {};
         const host = p.host || 'Target Host';
