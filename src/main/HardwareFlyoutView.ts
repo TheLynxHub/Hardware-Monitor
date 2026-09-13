@@ -240,6 +240,13 @@ export class HardwareFlyoutView {
       gap: 6px;
       margin-bottom: 10px;
     }
+    /* 6-Card Stat Matrix for Extended Telemetry */
+    .stat-matrix-6 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
     .stat-card-micro {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -1130,7 +1137,26 @@ export class HardwareFlyoutView {
 
         const totalPackets = pingSamples.length;
         const droppedPackets = pingSamples.filter(s => s.latency == null).length;
-        const lossPct = totalPackets > 0 ? Math.round((droppedPackets / totalPackets) * 100) : 0;
+        const lossPct = pingData.packetLoss != null ?
+          pingData.packetLoss : (totalPackets > 0 ? Math.round((droppedPackets / totalPackets) * 100) : 0);
+
+        let jitter = typeof pingData.jitter === 'number' ? pingData.jitter : 0;
+        if (jitter === 0 && validLatencies.length >= 2) {
+          let sumDiff = 0;
+          for (let i = 1; i < validLatencies.length; i++) {
+            sumDiff += Math.abs(validLatencies[i] - validLatencies[i - 1]);
+          }
+          jitter = Math.round((sumDiff / (validLatencies.length - 1)) * 10) / 10;
+        }
+
+        const isGateway = Boolean(pingData.isGateway || p.isGateway || host.toLowerCase().includes('gateway'));
+        const targetBadge = isGateway
+          ? '<span class="badge" style="background:var(--accent-soft); color:var(--accent);">LAN Gateway</span>'
+          : '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted);">WAN Target</span>';
+
+        const jitterColor = jitter < 5 ? 'var(--success)' : jitter < 20 ? 'var(--warning)' : 'var(--danger)';
+        const jitterBadge = lat != null ?
+          '<span class="badge" style="color:' + jitterColor + ';">±' + jitter + ' ms Jitter</span>' : '';
 
         const lossBadge =
           lossPct > 0
@@ -1142,8 +1168,12 @@ export class HardwareFlyoutView {
 
         headerHtml =
           '<div class="header">' +
-            '<div class="header-left"><span class="title">Ping: ' + host + '</span></div>' +
+            '<div class="header-left" style="display:flex; align-items:center; gap:6px;">' +
+              targetBadge +
+              '<span class="title">Ping: ' + host + '</span>' +
+            '</div>' +
             '<div class="header-badges">' +
+              jitterBadge +
               lossBadge +
               '<span class="badge" style="color:' + pingBadgeColor + '">' +
                 (lat != null ? lat + ' ms' : 'Offline') +
@@ -1151,13 +1181,23 @@ export class HardwareFlyoutView {
             '</div>' +
           '</div>';
 
+        const reliabilityColor = lossPct > 0 ? 'var(--danger)' : 'var(--success)';
+
         statMatrixHtml =
-          '<div class="stat-matrix">' +
+          '<div class="stat-matrix-6">' +
             '<div class="stat-card-micro">' +
               '<span class="stat-label">CURRENT</span>' +
               '<span class="stat-val" style="color:' + pingBadgeColor + '">' +
                 (lat != null ? lat + ' ms' : 'Offline') +
               '</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">JITTER</span>' +
+              '<span class="stat-val" style="color:' + jitterColor + '">' + jitter + ' ms</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">LOSS</span>' +
+              '<span class="stat-val" style="color:' + reliabilityColor + '">' + lossPct + '%</span>' +
             '</div>' +
             '<div class="stat-card-micro">' +
               '<span class="stat-label">MIN</span>' +
@@ -1191,11 +1231,44 @@ export class HardwareFlyoutView {
           maxVal: Math.max(60, maxPing + 10)
         });
 
-        const reliabilityColor = lossPct > 0 ? 'var(--danger)' : 'var(--success)';
+        let diagCardHtml = '';
+        const diag = p.diagnostic;
+        if (diag && diag.status !== 'unknown') {
+          const diagColors = {
+            'optimal': {bg: 'rgba(34, 197, 94, 0.1)', border: 'rgba(34, 197, 94, 0.3)', text: 'var(--success)'},
+            'lan-bottleneck': {bg: 'rgba(239, 68, 68, 0.12)', border: 'rgba(239, 68, 68, 0.35)', text: 'var(--danger)'},
+            'wan-lag': {bg: 'rgba(234, 179, 8, 0.12)', border: 'rgba(234, 179, 8, 0.35)', text: 'var(--warning)'},
+            'disconnected': {bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.4)', text: 'var(--danger)'}
+          };
+          const dc = diagColors[diag.status] || diagColors['optimal'];
+          diagCardHtml =
+            '<div class="details-card" style="display:flex; flex-direction:column; gap:4px;' +
+            ' margin-top:6px; padding:8px 10px; background:' +
+            dc.bg +
+            '; border:1px solid ' +
+            dc.border +
+            '; border-radius:8px;">' +
+              '<div style="display:flex; align-items:center; justify-content:space-between;">' +
+                '<span style="font-size:10px; font-weight:700; text-transform:uppercase;' +
+                ' letter-spacing:0.5px; color:' +
+                dc.text +
+                ';">Dual-Target Diagnostic</span>' +
+                '<span class="font-mono" style="font-size:10.5px; font-weight:700; color:' +
+                dc.text +
+                ';">' +
+                diag.title +
+                '</span>' +
+              '</div>' +
+              '<div style="font-size:11px; color:var(--text-muted); line-height:1.4;">' +
+              diag.description +
+              '</div>' +
+            '</div>';
+        }
+
         extraHtml =
           '<div class="details-card" style="display:flex; justify-content:space-between; ' +
-          'align-items:center; font-size:11px;">' +
-            '<span style="color:var(--text-muted)">Reliability (Loss Rate):</span>' +
+          'align-items:center; font-size:11px; margin-bottom:4px;">' +
+            '<span style="color:var(--text-muted)">Reliability (Packet Loss):</span>' +
             '<span class="font-mono" style="font-weight:700; color:' +
             reliabilityColor +
             '">' +
@@ -1204,9 +1277,18 @@ export class HardwareFlyoutView {
               (totalPackets - droppedPackets) +
               '/' +
               totalPackets +
-              ' ok)</span>' +
-          '</div>';
-
+              ' received)</span>' +
+          '</div>' +
+          '<div class="details-card" style="display:flex; justify-content:space-between; ' +
+          'align-items:center; font-size:11px;">' +
+            '<span style="color:var(--text-muted)">Latency Jitter (Variance):</span>' +
+            '<span class="font-mono" style="font-weight:700; color:' +
+            jitterColor +
+            '">' +
+              jitter +
+              ' ms</span>' +
+          '</div>' +
+          diagCardHtml;
       }
 
 

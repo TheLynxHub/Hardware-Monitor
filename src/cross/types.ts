@@ -158,6 +158,9 @@ export type PingConfig = {
   host: string;
   intervalMs: number;
   timeoutMs?: number;
+  historySize?: number;
+  isGateway?: boolean;
+  label?: string;
 };
 
 export type PingResult = {
@@ -167,6 +170,13 @@ export type PingResult = {
   timestamp: Date;
   rawOutput?: string;
   error?: string;
+  packetLoss?: number; // 0 - 100 percentage
+  jitter?: number; // in milliseconds
+  min?: number;
+  max?: number;
+  avg?: number;
+  isGateway?: boolean;
+  label?: string;
 };
 
 export type PingState = {
@@ -175,12 +185,30 @@ export type PingState = {
   enabledHosts: string[];
   interval: number;
   timeout: number;
+  autoPingGateway?: boolean;
 };
 
 export type PingData = {
   host: string;
   timeString: string;
   latency: number | undefined;
+  packetLoss?: number;
+  jitter?: number;
+  min?: number;
+  max?: number;
+  avg?: number;
+  isGateway?: boolean;
+  label?: string;
+};
+
+export type NetworkDiagnostic = {
+  status: 'optimal' | 'lan-bottleneck' | 'wan-lag' | 'disconnected' | 'unknown';
+  title: string;
+  description: string;
+  lanLatency?: number;
+  wanLatency?: number;
+  lanLoss?: number;
+  wanLoss?: number;
 };
 
 export type TimeRangeOption = 'minutes' | 'hour' | 'overall';
@@ -221,6 +249,8 @@ export type NetworkTelemetrySample = {
 export type PingTelemetrySample = {
   timestamp: number;
   latency: number | null;
+  jitter?: number;
+  packetLoss?: number;
 };
 
 export type TelemetryHistoryMap = {
@@ -266,6 +296,7 @@ export type PingFlyoutPayload = {
   host: string;
   data: PingData | null;
   history: (PingHistorySample | PingTelemetrySample)[];
+  diagnostic?: NetworkDiagnostic;
 };
 
 export type HardwareFlyoutPayload = {

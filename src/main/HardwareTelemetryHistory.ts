@@ -143,11 +143,19 @@ export class HardwareTelemetryHistory {
     }
   }
 
-  public recordPing(host: string, latency: number | undefined, alive: boolean): void {
+  public recordPing(
+    host: string,
+    latency: number | undefined,
+    alive: boolean,
+    jitter?: number,
+    packetLoss?: number,
+  ): void {
     const now = Date.now();
     const sample: PingTelemetrySample = {
       timestamp: now,
       latency: alive && latency != null && latency >= 0 ? latency : null,
+      jitter,
+      packetLoss,
     };
 
     const list = this.pingHistory.get(host) || [];

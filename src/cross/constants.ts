@@ -62,6 +62,7 @@ export const initialSettings: MonitoringSettings = {
     enabledHosts: [],
     interval: 1000,
     timeout: 2000,
+    autoPingGateway: true,
   },
   showAliasCpu: true,
   showAliasGpu: true,

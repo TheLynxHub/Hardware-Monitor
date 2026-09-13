@@ -63,6 +63,53 @@ class HardwareMonitorService {
 
   private constructor() {}
 
+  private cachedDefaultGateway: string = '';
+  private lastGatewayResolveTime: number = 0;
+
+  private async resolveDefaultGateway(): Promise<string> {
+    const now = Date.now();
+    if (this.cachedDefaultGateway && now - this.lastGatewayResolveTime < 30_000) {
+      return this.cachedDefaultGateway;
+    }
+
+    let defaultGateway = '';
+    const osPlatform = platform();
+    try {
+      if (osPlatform === 'win32') {
+        const stdout = await new Promise<string>(resolve => {
+          exec('route print 0.0.0.0', {windowsHide: true}, (_, out) => {
+            resolve(out || '');
+          });
+        });
+        const match = stdout.match(/0\.0\.0\.0\s+0\.0\.0\.0\s+([\d.]+)/);
+        if (match && match[1]) {
+          defaultGateway = match[1];
+        }
+      } else if (osPlatform === 'darwin') {
+        const stdout = await new Promise<string>(resolve => {
+          exec('route -n get default', (_, out) => resolve(out || ''));
+        });
+        const match = stdout.match(/gateway:\s*([\d.]+)/);
+        if (match && match[1]) defaultGateway = match[1];
+      } else if (osPlatform === 'linux') {
+        const stdout = await new Promise<string>(resolve => {
+          exec('ip route show default', (_, out) => resolve(out || ''));
+        });
+        const match = stdout.match(/default\s+via\s+([\d.]+)/);
+        if (match && match[1]) defaultGateway = match[1];
+      }
+    } catch {
+      // ignore error
+    }
+
+    if (defaultGateway) {
+      this.cachedDefaultGateway = defaultGateway;
+      this.lastGatewayResolveTime = now;
+    }
+
+    return defaultGateway;
+  }
+
   private async getNetworkDetails(): Promise<NetworkInterfaceDetails[]> {
     const now = Date.now();
     if (this.cachedNetworkDetails.length > 0 && now - this.lastNetworkDetailsTime < 30_000) {
@@ -72,23 +119,7 @@ class HardwareMonitorService {
     try {
       const interfaces = networkInterfaces();
       const dnsServers = getServers();
-
-      let defaultGateway = '';
-      if (platform() === 'win32') {
-        try {
-          const stdout = await new Promise<string>(resolve => {
-            exec('route print 0.0.0.0', {windowsHide: true}, (_, out) => {
-              resolve(out || '');
-            });
-          });
-          const match = stdout.match(/0\.0\.0\.0\s+0\.0\.0\.0\s+([\d.]+)/);
-          if (match && match[1]) {
-            defaultGateway = match[1];
-          }
-        } catch {
-          // ignore error
-        }
-      }
+      const defaultGateway = await this.resolveDefaultGateway();
 
       const details: NetworkInterfaceDetails[] = [];
       for (const [name, addrs] of Object.entries(interfaces)) {
@@ -114,7 +145,7 @@ class HardwareMonitorService {
       this.lastNetworkDetailsTime = now;
       return details;
     } catch {
-      return this.cachedNetworkDetails;
+      return [];
     }
   }
 
@@ -165,35 +196,94 @@ class HardwareMonitorService {
     this.stopPinging();
 
     if (pingState.isActive) {
-      Array.from(new Set(pingState.enabledHosts)).forEach(host => {
-        if (!this.pingers.some(p => p.host === host)) {
-          const pinger = new Pinger({host, timeoutMs: pingState.timeout, intervalMs: pingState.interval});
+      void this.spawnPingers();
+    }
+  }
 
-          pinger.onResult = result => {
-            const timeString = result.timestamp.toLocaleTimeString();
-            if (this.config.enableHoverDetails) {
-              hardwareTelemetryHistory.recordPing(host, result.latency, result.alive);
-            }
-            if (result.alive) {
-              const data: PingData = {host, timeString, latency: result.latency};
-              this.sendToRenderer(HMONITOR_IPC_UPDATE_PING, data);
-            } else {
-              this.sendToRenderer(HMONITOR_IPC_UPDATE_PING, host);
-            }
-          };
+  private async spawnPingers(): Promise<void> {
+    const pingState = this.config.pingState;
+    if (!pingState.isActive) return;
 
-          pinger.onError = () => {
-            if (this.config.enableHoverDetails) {
-              hardwareTelemetryHistory.recordPing(host, undefined, false);
-            }
-            this.sendToRenderer(HMONITOR_IPC_UPDATE_PING, host);
-          };
+    let gatewayHost: string | null = null;
+    if (pingState.autoPingGateway !== false) {
+      const gw = await this.resolveDefaultGateway();
+      if (gw && gw !== '0.0.0.0' && gw !== '127.0.0.1') {
+        gatewayHost = gw;
+      }
+    }
 
-          pinger.start();
-          this.pingers.push(pinger);
-        }
+    const targets: Array<{host: string; isGateway: boolean; label?: string}> = [];
+
+    if (gatewayHost) {
+      targets.push({
+        host: gatewayHost,
+        isGateway: true,
+        label: 'Gateway (LAN)',
       });
     }
+
+    Array.from(new Set(pingState.enabledHosts)).forEach(host => {
+      if (host !== gatewayHost) {
+        targets.push({
+          host,
+          isGateway: false,
+          label: host,
+        });
+      }
+    });
+
+    targets.forEach(({host, isGateway, label}) => {
+      if (!this.pingers.some(p => p.host === host)) {
+        const pinger = new Pinger({
+          host,
+          timeoutMs: pingState.timeout,
+          intervalMs: pingState.interval,
+          isGateway,
+          label,
+        });
+
+        pinger.onResult = result => {
+          const timeString = result.timestamp.toLocaleTimeString();
+          if (this.config.enableHoverDetails) {
+            hardwareTelemetryHistory.recordPing(host, result.latency, result.alive, result.jitter, result.packetLoss);
+          }
+
+          const data: PingData = {
+            host,
+            timeString,
+            latency: result.alive ? result.latency : undefined,
+            packetLoss: result.packetLoss,
+            jitter: result.jitter,
+            min: result.min,
+            max: result.max,
+            avg: result.avg,
+            isGateway: result.isGateway,
+            label: result.label,
+          };
+          this.sendToRenderer(HMONITOR_IPC_UPDATE_PING, data);
+        };
+
+        pinger.onError = () => {
+          if (this.config.enableHoverDetails) {
+            hardwareTelemetryHistory.recordPing(host, undefined, false, 0, 100);
+          }
+
+          const data: PingData = {
+            host,
+            timeString: new Date().toLocaleTimeString(),
+            latency: undefined,
+            packetLoss: 100,
+            jitter: 0,
+            isGateway,
+            label,
+          };
+          this.sendToRenderer(HMONITOR_IPC_UPDATE_PING, data);
+        };
+
+        pinger.start();
+        this.pingers.push(pinger);
+      }
+    });
   }
 
   /**
@@ -268,6 +358,8 @@ class HardwareMonitorService {
     }
     if (!storedConfig.pingState) {
       storedConfig.pingState = initialSettings.pingState;
+    } else if (storedConfig.pingState.autoPingGateway === undefined) {
+      storedConfig.pingState.autoPingGateway = true;
     }
 
     // Keep the last known hardware so the renderer can show configured sections immediately.

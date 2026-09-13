@@ -7,16 +7,19 @@ import {
   KeyboardEvent,
   Label,
   NumberField,
+  Switch,
   TextField,
 } from '@heroui/react';
+import {GlobalIcon, WiFiRouterIcon} from '@solar-icons/react/bold-duotone';
 import {UnreadIcon} from '@solar-icons/react/linear';
 import {AnimatePresence, motion} from 'framer-motion';
 import {isEqual} from 'lodash-es';
-import {Globe, Plus, Timer} from 'lucide-react';
+import {Plus, Timer} from 'lucide-react';
 import {memo, ReactNode, useEffect, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 
 import {PingState} from '../../../cross/types';
+import useHardwareData from '../../hooks/useHardwareData';
 import {hmonitorActions, useHMonitorState} from '../../state/hmonitorSlice';
 import SettingsCategoryCard from './SettingsCategoryCard';
 
@@ -33,10 +36,13 @@ type PingSettingsProps = {
 export const PingSettings = memo(({dragHandle}: PingSettingsProps) => {
   const dispatch = useDispatch();
   const preConfig = useHMonitorState('pingState');
+  const {hardwareData} = useHardwareData();
+  const detectedGateway = hardwareData.networkDetails?.find(d => d.gateway)?.gateway;
 
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [isActive, setIsActive] = useState<boolean>(preConfig.isActive);
+  const [autoPingGateway, setAutoPingGateway] = useState<boolean>(preConfig.autoPingGateway !== false);
   const [hostInput, setHostInput] = useState<string>('');
   const [interval, setInterval] = useState<number>(preConfig.interval);
   const [timeoutMs, setTimeoutMs] = useState<number>(preConfig.timeout);
@@ -54,6 +60,7 @@ export const PingSettings = memo(({dragHandle}: PingSettingsProps) => {
         timeout: timeoutMs,
         interval,
         isActive,
+        autoPingGateway,
       };
 
       if (!isEqual(newState, preConfig)) dispatch(hmonitorActions.setPingState(newState));
@@ -65,7 +72,7 @@ export const PingSettings = memo(({dragHandle}: PingSettingsProps) => {
         debounceTimerRef.current = null;
       }
     };
-  }, [isActive, interval, timeoutMs, hosts, enabledHosts, preConfig, dispatch]);
+  }, [isActive, autoPingGateway, interval, timeoutMs, hosts, enabledHosts, preConfig, dispatch]);
 
   const onToggleActivate = () => setIsActive(prevState => !prevState);
 
@@ -105,6 +112,47 @@ export const PingSettings = memo(({dragHandle}: PingSettingsProps) => {
       title="Network Latency & Ping"
       toggleAriaLabel="Activate Ping Monitoring"
       disabledMessage="Ping monitoring is inactive. Toggle the switch above to enable.">
+      {/* Dual-Target LAN Gateway Diagnostic */}
+      <div
+        className={
+          'flex items-center justify-between p-3 bg-surface-secondary/70' +
+          ' border border-surface-tertiary rounded-2xl'
+        }>
+        <div className="flex items-start gap-2.5 mr-3">
+          <div className="p-2 bg-accent/10 text-accent rounded-xl shrink-0 mt-0.5">
+            <WiFiRouterIcon className="size-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-foreground">Auto-Ping Default Gateway (LAN)</span>
+              {detectedGateway && (
+                <span
+                  className={
+                    'text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-surface' +
+                    ' border border-surface-tertiary text-accent font-semibold'
+                  }>
+                  {detectedGateway}
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-muted leading-relaxed mt-0.5">
+              Automatically pings your local router to isolate Wi-Fi/cable bottlenecks from ISP/Internet latency.
+            </p>
+          </div>
+        </div>
+        <Switch
+          size="sm"
+          isSelected={autoPingGateway}
+          onChange={setAutoPingGateway}
+          aria-label="Toggle Auto-Ping Default Gateway">
+          <Switch.Content>
+            <Switch.Control>
+              <Switch.Thumb />
+            </Switch.Control>
+          </Switch.Content>
+        </Switch>
+      </div>
+
       {/* Quick Presets for Beginners */}
       <div className="flex flex-col gap-y-1.5">
         <Label className="text-xs font-semibold text-foreground/90">Quick Preset Servers</Label>
@@ -119,7 +167,7 @@ export const PingSettings = memo(({dragHandle}: PingSettingsProps) => {
                 onPress={() => onHostAdd(preset.host)}
                 variant={alreadyAdded ? 'secondary' : 'tertiary'}
                 className={'text-xs h-7 px-2.5 transition-transform active:scale-[0.97]'}>
-                <Globe className="size-3 mr-1 text-accent" />
+                <GlobalIcon className="size-3.5 mr-1 text-accent" />
                 {preset.label}
                 {!alreadyAdded && <Plus className="size-3 ml-1 text-muted" />}
               </Button>
@@ -138,6 +186,7 @@ export const PingSettings = memo(({dragHandle}: PingSettingsProps) => {
             <AnimatePresence>
               {hosts.map(host => {
                 const isEnabled = enabledHosts.includes(host);
+                const isGatewayHost = Boolean(detectedGateway && host === detectedGateway);
                 return (
                   <motion.div
                     className={
@@ -157,8 +206,13 @@ export const PingSettings = memo(({dragHandle}: PingSettingsProps) => {
                       type="button"
                       onClick={() => onToggleHost(host)}
                       className="flex items-center gap-1 cursor-pointer focus:outline-hidden">
-                      <UnreadIcon className={`size-4 ${isEnabled ? 'text-accent' : 'text-muted'}`} />
+                      {isGatewayHost ? (
+                        <WiFiRouterIcon className={`size-4 ${isEnabled ? 'text-accent' : 'text-muted'}`} />
+                      ) : (
+                        <UnreadIcon className={`size-4 ${isEnabled ? 'text-accent' : 'text-muted'}`} />
+                      )}
                       <span className="font-JetBrainsMono">{host}</span>
+                      {isGatewayHost && <span className="text-[10px] text-muted font-normal">(Gateway)</span>}
                     </button>
                     <CloseButton
                       onPress={() => removeHost(host)}
