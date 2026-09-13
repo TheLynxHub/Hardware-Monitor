@@ -72,7 +72,7 @@ const CpuSection = memo(({data, metrics, hardwareInfo, rawSensorValues}: Props) 
             <MetricItem key="temp" label="Temp" icon={Thermometer} value="Admin Required">
               <Thermometer
                 className={`${
-                  ['compact', 'two-column', 'segmented'].includes(displayStyle) ? 'size-3' : 'size-4'
+                  ['compact', 'two-column', 'segmented', 'ghost'].includes(displayStyle) ? 'size-3' : 'size-4'
                 } shrink-0 text-danger`}
               />
               <span className="text-xs font-medium text-danger whitespace-nowrap">Admin Required</span>

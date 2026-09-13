@@ -11,7 +11,7 @@ const DISPLAY_STYLES: Array<{
   value: DisplayStyle;
   label: string;
   preview: {
-    type: 'default' | 'compact' | 'segmented' | 'two-column' | 'raw' | 'raw-two-column';
+    type: 'default' | 'compact' | 'segmented' | 'ghost' | 'two-column' | 'raw' | 'raw-two-column';
   };
 }> = [
   {
@@ -28,6 +28,11 @@ const DISPLAY_STYLES: Array<{
     value: 'segmented',
     label: 'Segmented',
     preview: {type: 'segmented'},
+  },
+  {
+    value: 'ghost',
+    label: 'Ghost (Minimal)',
+    preview: {type: 'ghost'},
   },
   {
     value: 'two-column',
@@ -242,6 +247,15 @@ export const ConfigurationTab = memo(
                                 <div className="w-1/2 h-full bg-accent rounded-full" />
                               </div>
                             </div>
+                          </div>
+                        )}
+                        {style.preview.type === 'ghost' && (
+                          <div className="flex items-center gap-1 text-[9px] px-1 py-0.5">
+                            <span className="font-semibold text-foreground/80">CPU</span>
+                            <span className="text-foreground/30">•</span>
+                            <span className="text-foreground/70">42°C</span>
+                            <span className="text-foreground/30">•</span>
+                            <span className="text-foreground/70">35%</span>
                           </div>
                         )}
                         {style.preview.type === 'two-column' && (

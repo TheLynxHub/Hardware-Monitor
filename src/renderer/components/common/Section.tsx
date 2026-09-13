@@ -18,6 +18,41 @@ const Section = memo(({title, icon: Icon, children}: SectionProps) => {
   const isTwoColumn = ['two-column', 'raw-two-column'].includes(displayStyle);
   const isCompact = ['compact', 'two-column'].includes(displayStyle);
   const isSegmented = displayStyle === 'segmented';
+  const isGhost = displayStyle === 'ghost';
+
+  if (isGhost) {
+    const validChildren = Children.toArray(children).filter(Boolean);
+    if (!showSectionLabel && validChildren.length === 0) return null;
+
+    return (
+      <div
+        className={
+          'flex items-center shrink-0 hover:bg-surface-secondary/60 rounded-md px-1.5 py-0.5 ' +
+          'gap-x-1.5 transition-colors duration-150 cursor-pointer'
+        }>
+        {showSectionLabel ? (
+          <div className="flex items-center gap-x-1 shrink-0 text-foreground/80">
+            <Icon className="size-3.5 shrink-0 text-foreground/70" />
+            {isEmpty(title) ? (
+              <Spinner size="sm" color="current" className="text-muted" />
+            ) : (
+              <span className="font-semibold text-foreground/90 uppercase text-[11px] tracking-wide whitespace-nowrap">
+                {title}
+              </span>
+            )}
+          </div>
+        ) : (
+          <Icon className="size-3.5 shrink-0 text-foreground/70" />
+        )}
+        {validChildren.map((child, i) => (
+          <Fragment key={i}>
+            <span className="text-foreground/30 select-none text-[10px]">•</span>
+            {child}
+          </Fragment>
+        ))}
+      </div>
+    );
+  }
 
   if (isSegmented) {
     const validChildren = Children.toArray(children).filter(Boolean);

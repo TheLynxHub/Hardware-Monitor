@@ -136,9 +136,16 @@ function HardwareStatusBar() {
       if (index > 0 && displayStyle !== 'segmented') {
         acc.push(
           <Separator
+            className={
+              `shrink-0 ` +
+              (displayStyle === 'ghost'
+                ? 'my-1.5 h-3.5 bg-foreground/20'
+                : displayStyle.includes('two-column')
+                  ? 'my-1 h-10'
+                  : 'my-2')
+            }
             key={`sep_${index}`}
             orientation="vertical"
-            className={`shrink-0 ${displayStyle.includes('two-column') ? 'my-1 h-10' : 'my-2'}`}
           />,
         );
       }
@@ -158,7 +165,7 @@ function HardwareStatusBar() {
 
   if (!enabled) return null;
 
-  const isSmallStyle = ['compact', 'raw', 'segmented'].includes(displayStyle);
+  const isSmallStyle = ['compact', 'raw', 'segmented', 'ghost'].includes(displayStyle);
   const isTwoColumn = ['two-column', 'raw-two-column'].includes(displayStyle);
   const heightClass =
     displayStyle === 'raw' || displayStyle === 'segmented'
@@ -171,7 +178,7 @@ function HardwareStatusBar() {
   const buttonSizeClass = isSmallStyle ? 'size-5' : 'size-8';
 
   return (
-    <div className={`relative ${heightClass} w-full bg-surface`}>
+    <div className={`relative ${heightClass} w-full ${displayStyle === 'ghost' ? 'bg-transparent' : 'bg-surface'}`}>
       {canScrollLeft && (
         <button
           className={

@@ -51,15 +51,16 @@ const MetricItem = memo(({icon: Icon, label, value, unit = '', progress, colorCl
   const isTwoColumn = displayStyle === 'two-column';
   const isCompact = ['compact', 'two-column'].includes(displayStyle);
   const isSegmented = displayStyle === 'segmented';
+  const isGhost = displayStyle === 'ghost';
 
   const renderProgress = useMemo(() => {
-    if (!progress || !metricVisibility.progressBar) return null;
+    if (!progress || !metricVisibility.progressBar || isGhost) return null;
 
     const max = progress.max || 100;
     const progressValue = Math.min(progress.value, max);
 
     return <ProgressBar {...progress} value={progressValue} />;
-  }, [progress, metricVisibility]);
+  }, [progress, metricVisibility, isGhost]);
 
   if (isRaw) {
     return (
@@ -101,6 +102,36 @@ const MetricItem = memo(({icon: Icon, label, value, unit = '', progress, colorCl
           {renderProgress}
         </div>
       </div>
+    );
+  }
+
+  if (isGhost) {
+    if (children) {
+      return (
+        <span className="inline-flex items-center gap-1 shrink-0 text-xs font-medium text-foreground leading-none">
+          {children}
+        </span>
+      );
+    }
+
+    const textColor = colorClass
+      ? colorClass
+          .split(' ')
+          .filter(c => c.startsWith('text-'))
+          .join(' ')
+      : '';
+
+    return (
+      <span className="inline-flex items-center gap-1 shrink-0 text-xs font-medium leading-none">
+        {metricVisibility.icon && <Icon className={`size-3 shrink-0 ${textColor || 'text-foreground/70'}`} />}
+        {metricVisibility.label && <span className="text-foreground/60 shrink-0 whitespace-nowrap">{label}:</span>}
+        {metricVisibility.value && (
+          <span className={`shrink-0 whitespace-nowrap font-medium ${textColor || 'text-foreground'}`}>
+            {value}
+            {unit}
+          </span>
+        )}
+      </span>
     );
   }
 
