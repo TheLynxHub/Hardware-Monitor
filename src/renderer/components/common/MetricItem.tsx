@@ -12,14 +12,15 @@ type ProgressBarProps = {
 const ProgressBar = memo(({value, max = 100, isTemp = false}: ProgressBarProps) => {
   const displayStyle = useHMonitorState('displayStyle');
   const isTwoColumn = displayStyle === 'two-column';
+  const isSegmented = displayStyle === 'segmented';
   const isCompact = ['compact', 'two-column'].includes(displayStyle);
   const percentage = Math.min((value / max) * 100, 100);
 
   return (
     <div
-      className={`${isTwoColumn ? 'w-7' : isCompact ? 'w-8' : 'w-12'} ${
-        isCompact ? 'h-1' : 'h-1.5'
-      } bg-white/10 rounded-full overflow-hidden shrink-0`}>
+      className={`${isTwoColumn || isSegmented ? 'w-7' : isCompact ? 'w-8' : 'w-12'} ${
+        isCompact || isSegmented ? 'h-1' : 'h-1.5'
+      } bg-foreground/10 rounded-full overflow-hidden shrink-0`}>
       <div
         className={
           `h-full bg-linear-to-r ${getProgressColor(isTemp ? value : percentage, isTemp)}` +
@@ -49,6 +50,7 @@ const MetricItem = memo(({icon: Icon, label, value, unit = '', progress, colorCl
   const isRaw = ['raw', 'raw-two-column'].includes(displayStyle);
   const isTwoColumn = displayStyle === 'two-column';
   const isCompact = ['compact', 'two-column'].includes(displayStyle);
+  const isSegmented = displayStyle === 'segmented';
 
   const renderProgress = useMemo(() => {
     if (!progress || !metricVisibility.progressBar) return null;
@@ -70,6 +72,35 @@ const MetricItem = memo(({icon: Icon, label, value, unit = '', progress, colorCl
           </span>
         )}
       </span>
+    );
+  }
+
+  if (isSegmented) {
+    if (children) {
+      return <div className="flex items-center shrink-0 gap-x-1.5 text-xs font-medium text-foreground">{children}</div>;
+    }
+
+    const textColor = colorClass
+      ? colorClass
+          .split(' ')
+          .filter(c => c.startsWith('text-'))
+          .join(' ')
+      : '';
+
+    return (
+      <div className="flex items-center shrink-0 gap-x-1.5 text-xs font-medium">
+        {metricVisibility.icon && <Icon className={`size-3 shrink-0 ${textColor || 'text-foreground/70'}`} />}
+        <div className="flex items-center shrink-0 gap-1">
+          {metricVisibility.label && <span className="text-foreground/60 shrink-0 whitespace-nowrap">{label}:</span>}
+          {metricVisibility.value && (
+            <span className={`shrink-0 whitespace-nowrap font-medium ${textColor || 'text-foreground'}`}>
+              {value}
+              {unit}
+            </span>
+          )}
+          {renderProgress}
+        </div>
+      </div>
     );
   }
 

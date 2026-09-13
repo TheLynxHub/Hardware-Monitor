@@ -11,7 +11,7 @@ const DISPLAY_STYLES: Array<{
   value: DisplayStyle;
   label: string;
   preview: {
-    type: 'default' | 'compact' | 'two-column' | 'raw' | 'raw-two-column';
+    type: 'default' | 'compact' | 'segmented' | 'two-column' | 'raw' | 'raw-two-column';
   };
 }> = [
   {
@@ -23,6 +23,11 @@ const DISPLAY_STYLES: Array<{
     value: 'compact',
     label: 'Compact',
     preview: {type: 'compact'},
+  },
+  {
+    value: 'segmented',
+    label: 'Segmented',
+    preview: {type: 'segmented'},
   },
   {
     value: 'two-column',
@@ -218,6 +223,24 @@ export const ConfigurationTab = memo(
                             <span className="text-foreground/70">42%</span>
                             <div className="w-5 h-1 bg-foreground/10 rounded-full overflow-hidden">
                               <div className="w-1/2 h-full bg-accent rounded-full" />
+                            </div>
+                          </div>
+                        )}
+                        {style.preview.type === 'segmented' && (
+                          <div
+                            className={
+                              'flex items-center gap-1 text-[9px] bg-surface ' +
+                              'border border-surface-tertiary rounded-full px-1.5 py-0.5'
+                            }>
+                            <span className="font-semibold text-accent uppercase text-[8px]">CPU</span>
+                            <span className="w-px h-2 bg-foreground/20 shrink-0" />
+                            <span className="text-foreground/80">42°C</span>
+                            <span className="w-px h-2 bg-foreground/20 shrink-0" />
+                            <div className="flex items-center gap-1">
+                              <span className="text-foreground/80">35%</span>
+                              <div className="w-3.5 h-1 bg-foreground/10 rounded-full overflow-hidden shrink-0">
+                                <div className="w-1/2 h-full bg-accent rounded-full" />
+                              </div>
                             </div>
                           </div>
                         )}

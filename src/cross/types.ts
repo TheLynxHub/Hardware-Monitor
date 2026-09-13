@@ -132,7 +132,7 @@ export type EnabledMetrics = {
 };
 
 // Defines the visual style of the status bar
-export type DisplayStyle = 'default' | 'compact' | 'two-column' | 'raw' | 'raw-two-column';
+export type DisplayStyle = 'default' | 'compact' | 'segmented' | 'two-column' | 'raw' | 'raw-two-column';
 
 // The complete settings object for the extension
 export type MonitoringSettings = {

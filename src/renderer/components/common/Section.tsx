@@ -17,6 +17,40 @@ const Section = memo(({title, icon: Icon, children}: SectionProps) => {
   const isRaw = ['raw', 'raw-two-column'].includes(displayStyle);
   const isTwoColumn = ['two-column', 'raw-two-column'].includes(displayStyle);
   const isCompact = ['compact', 'two-column'].includes(displayStyle);
+  const isSegmented = displayStyle === 'segmented';
+
+  if (isSegmented) {
+    const validChildren = Children.toArray(children).filter(Boolean);
+    if (!showSectionLabel && validChildren.length === 0) return null;
+
+    return (
+      <div
+        className={
+          'flex items-center shrink-0 bg-surface-secondary/80 hover:bg-surface-secondary ' +
+          'border border-surface-tertiary rounded-full px-2.5 py-1 gap-x-2 backdrop-blur-sm ' +
+          'transition-colors duration-200'
+        }>
+        {showSectionLabel && (
+          <div className="flex items-center gap-x-1.5 shrink-0">
+            <Icon className="size-3.5 text-accent shrink-0" />
+            {isEmpty(title) ? (
+              <Spinner size="sm" color="current" className="text-muted" />
+            ) : (
+              <span className="text-xs font-semibold text-accent uppercase tracking-wider whitespace-nowrap">
+                {title}
+              </span>
+            )}
+          </div>
+        )}
+        {validChildren.map((child, i) => (
+          <Fragment key={i}>
+            {(showSectionLabel || i > 0) && <span className="w-px h-3 bg-foreground/15 shrink-0" />}
+            {child}
+          </Fragment>
+        ))}
+      </div>
+    );
+  }
 
   if (isRaw) {
     return (

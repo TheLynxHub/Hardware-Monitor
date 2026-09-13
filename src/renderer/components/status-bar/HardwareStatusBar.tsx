@@ -133,7 +133,7 @@ function HardwareStatusBar() {
 
     // 3. Inject vertical separators dynamically between active elements
     return elements.reduce<ReactNode[]>((acc, element, index) => {
-      if (index > 0) {
+      if (index > 0 && displayStyle !== 'segmented') {
         acc.push(
           <Separator
             key={`sep_${index}`}
@@ -158,9 +158,16 @@ function HardwareStatusBar() {
 
   if (!enabled) return null;
 
-  const isSmallStyle = ['compact', 'raw'].includes(displayStyle);
+  const isSmallStyle = ['compact', 'raw', 'segmented'].includes(displayStyle);
   const isTwoColumn = ['two-column', 'raw-two-column'].includes(displayStyle);
-  const heightClass = displayStyle === 'raw' ? 'h-8' : isSmallStyle ? 'h-7' : isTwoColumn ? 'h-11' : 'h-12';
+  const heightClass =
+    displayStyle === 'raw' || displayStyle === 'segmented'
+      ? 'h-8'
+      : isSmallStyle
+        ? 'h-7'
+        : isTwoColumn
+          ? 'h-11'
+          : 'h-12';
   const buttonSizeClass = isSmallStyle ? 'size-5' : 'size-8';
 
   return (
@@ -191,7 +198,7 @@ function HardwareStatusBar() {
 
       <div
         className={`h-full flex items-center ${isSmallStyle ? 'px-2' : 'px-3'} ${
-          displayStyle.includes('raw') ? 'gap-x-3' : 'gap-x-2'
+          displayStyle.includes('raw') ? 'gap-x-3' : displayStyle === 'segmented' ? 'gap-x-2.5' : 'gap-x-2'
         } overflow-x-auto`}
         ref={initRef}
         style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
