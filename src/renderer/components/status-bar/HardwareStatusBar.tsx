@@ -138,7 +138,7 @@ function HardwareStatusBar() {
           <Separator
             key={`sep_${index}`}
             orientation="vertical"
-            className={displayStyle.includes('two-column') ? 'my-1 h-10' : 'my-2'}
+            className={`shrink-0 ${displayStyle.includes('two-column') ? 'my-1 h-10' : 'my-2'}`}
           />,
         );
       }

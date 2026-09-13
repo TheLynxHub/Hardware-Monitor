@@ -72,7 +72,7 @@ const HardwareFlyoutTrigger = memo(({children, section, payload, className = ''}
   return (
     <div
       className={
-        'inline-flex items-center ' +
+        'inline-flex items-center shrink-0 ' +
         (enableHoverDetails
           ? `cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-accent ${className}`
           : `cursor-default ${className}`)

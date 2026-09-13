@@ -114,8 +114,7 @@ const NetworkSection = memo(({data, metrics, hardwareInfo, rawSensorValues, netw
       } else if (metricId === 'publicIp') {
         const rawIp = publicNetwork?.ip || 'Resolving...';
         const displayIp = isMasked ? maskIp(rawIp) : rawIp;
-        const flag = publicNetwork?.flagEmoji ? `${publicNetwork.flagEmoji} ` : '';
-        const ipLabel = publicNetwork?.countryCode ? `${flag}${publicNetwork.countryCode} IP` : `${flag}Public IP`;
+        const ipLabel = publicNetwork?.countryCode ? `${publicNetwork.countryCode} IP` : 'Public IP';
 
         list.push(
           <div
@@ -126,10 +125,11 @@ const NetworkSection = memo(({data, metrics, hardwareInfo, rawSensorValues, netw
             title={
               (isMasked ? 'Click to reveal Public IP' : 'Click to mask Public IP') +
               (publicNetwork?.isp ? ` • ISP: ${publicNetwork.isp}` : '') +
-              (publicNetwork?.city ? ` • ${publicNetwork.city}` : '')
+              (publicNetwork?.city ? ` • ${publicNetwork.city}` : '') +
+              (publicNetwork?.country ? ` • ${publicNetwork.country}` : '')
             }
             key="publicIp"
-            className="cursor-pointer select-none inline-flex">
+            className="cursor-pointer select-none inline-flex shrink-0">
             <MetricItem label={ipLabel} icon={GlobalIcon} value={displayIp} />
           </div>,
         );

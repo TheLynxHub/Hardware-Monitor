@@ -77,7 +77,7 @@ const MetricItem = memo(({icon: Icon, label, value, unit = '', progress, colorCl
     return (
       <div
         className={
-          `flex items-center ${isCompact ? 'px-2 py-0.5 gap-x-1.5' : 'px-3 py-2 gap-x-2'} ${
+          `flex items-center shrink-0 ${isCompact ? 'px-2 py-0.5 gap-x-1.5' : 'px-3 py-2 gap-x-2'} ${
             isTwoColumn ? 'h-5 min-w-0' : ''
           } rounded-lg border` +
           ` backdrop-blur-sm transition-colors duration-200 text-foreground ` +
@@ -91,17 +91,17 @@ const MetricItem = memo(({icon: Icon, label, value, unit = '', progress, colorCl
   return (
     <div
       className={
-        `flex items-center ${isCompact ? 'px-2 py-0.5 gap-x-1.5' : 'px-3 py-2 gap-x-2'} ${
+        `flex items-center shrink-0 ${isCompact ? 'px-2 py-0.5 gap-x-1.5' : 'px-3 py-2 gap-x-2'} ${
           isTwoColumn ? 'h-5 min-w-0' : ''
         } rounded-lg` +
         ` border backdrop-blur-sm transition-colors duration-200` +
         ` ${colorClass || 'text-semi-muted bg-surface border-surface-secondary'}`
       }>
       {metricVisibility.icon && <Icon className={`${isCompact ? 'size-3' : 'size-4'} shrink-0`} />}
-      <div className={`flex items-center ${isTwoColumn ? 'gap-1.5 min-w-0' : 'gap-2'} text-xs font-medium`}>
-        {metricVisibility.label && <span className="opacity-80 shrink-0">{label}:</span>}
+      <div className={`flex items-center shrink-0 ${isTwoColumn ? 'gap-1.5 min-w-0' : 'gap-2'} text-xs font-medium`}>
+        {metricVisibility.label && <span className="opacity-80 shrink-0 whitespace-nowrap">{label}:</span>}
         {metricVisibility.value && (
-          <span className="shrink-0">
+          <span className="shrink-0 whitespace-nowrap">
             {value}
             {unit}
           </span>

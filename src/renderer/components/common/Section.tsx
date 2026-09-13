@@ -75,8 +75,8 @@ const Section = memo(({title, icon: Icon, children}: SectionProps) => {
       <div
         className={
           isTwoColumn
-            ? `grid grid-flow-col grid-rows-2 auto-cols-max gap-x-1 gap-y-0.5 h-10 content-center items-center`
-            : ' flex items-center gap-x-2'
+            ? `grid grid-flow-col grid-rows-2 auto-cols-max gap-x-1 gap-y-0.5 h-10 content-center items-center shrink-0`
+            : ' flex items-center gap-x-2 shrink-0'
         }>
         {children}
       </div>
