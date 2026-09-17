@@ -1,6 +1,15 @@
 {
   "versions": [
     {
+      "version": "0.16.0",
+      "commit": "008691b",
+      "engines": {
+        "extensionApi": "^2.2.0"
+      },
+      "stage": "early_access",
+      "platforms": ["win32"]
+    },
+    {
       "version": "0.15.5",
       "commit": "9ea9714",
       "engines": {
@@ -83,6 +92,50 @@
     }
   ],
   "changes": [
+    {
+      "version": "0.16.0",
+      "date": "2026-09-17",
+      "items": [
+        {
+          "✨ New Features": [
+            {
+              "Interactive status bar metric hover flyout panels:": [
+                "Live top resource-consuming processes inspection with CPU, GPU, and RAM sampling.",
+                "Historical telemetry graphs with interactive time ranges and statistical metrics.",
+                "Dedicated settings option to enable or disable hover detail panels on demand."
+              ]
+            },
+            {
+              "Added two new status bar layout styles:": ["Segmented Chip Layout", "Editor Minimalist Ghost Layout"]
+            },
+            "Added jitter tracking, packet loss percentage, and dual-target LAN/WAN diagnostics into ping monitoring.",
+            "Added public IP resolution with click-to-mask privacy toggle, geolocation, ISP details, and VPN status indicator."
+          ]
+        },
+        {
+          "⚡ Improvements": [
+            "Redesigned settings modal with an updated layout, category badges, dedicated category cards, and visual style previews.",
+            "Eliminated Windows subprocess churn and battery drain by executing ping directly.",
+            "Enhanced sensor discovery resilience on AMD Ryzen CPUs and heavy compute/AI workloads (CUDA, Tensor, DirectCompute, 3D).",
+            "Polished status bar spacing, separator styling, and prevented metric text overlap across all display modes."
+          ]
+        },
+        {
+          "🐛 Bug Fixes": [
+            "Fixed nested drag-and-drop reordering where moving child metrics erroneously dragged parent categories.",
+            "Stabilized metric drag animations by isolating drag controls and optimizing motion transitions.",
+            "Fixed EventEmitter listener accumulation and orphaned ping processes by ensuring proper cleanup on window-all-closed.",
+            "Cleaned up country IP labels on Windows to prevent missing emoji rendering issues."
+          ]
+        },
+        {
+          "📌 Minor Changes": [
+            "Limited drag boundaries to keep cards and metrics contained within their reorder lists.",
+            "Adjusted card border radii, input styles, and grid layouts across settings tabs for visual consistency."
+          ]
+        }
+      ]
+    },
     {
       "version": "0.15.5",
       "date": "2026-08-30",
