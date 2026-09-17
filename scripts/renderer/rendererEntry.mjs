@@ -2,7 +2,7 @@
 (function() {
 	try {
 		var e = "undefined" != typeof window ? window : "undefined" != typeof global ? global : "undefined" != typeof globalThis ? globalThis : "undefined" != typeof self ? self : {};
-		e.SENTRY_RELEASE = { id: "f9f2e045fae8353a4c8417903eeca14e9c7534d6" };
+		e.SENTRY_RELEASE = { id: "ea803f2051806c332cf6a29b882a65ba1ae1bc76" };
 		var n = new e.Error().stack;
 		n && (e._sentryDebugIds = e._sentryDebugIds || {}, e._sentryDebugIds[n] = "31530299-1e7f-484d-bd77-0fac035fd6d9", e._sentryDebugIdIdentifier = "sentry-dbid-31530299-1e7f-484d-bd77-0fac035fd6d9");
 	} catch (e) {}
@@ -85,8 +85,8 @@ var exportSet = /* @__PURE__ */ new Set([
 	"_export_sfc"
 ]);
 var moduleMap = { "Extension": () => {
-	dynamicLoadingCss(["style-ubazG2rJ.css"], false, "Extension");
-	return __federation_import("./__federation_expose_Extension-B7EU4qQu.js").then((module) => Object.keys(module).every((item) => exportSet.has(item)) ? () => module.default : () => module);
+	dynamicLoadingCss(["style-DEOecNfV.css"], false, "Extension");
+	return __federation_import("./__federation_expose_Extension-C4BppodP.js").then((module) => Object.keys(module).every((item) => exportSet.has(item)) ? () => module.default : () => module);
 } };
 var seen = {};
 var dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {

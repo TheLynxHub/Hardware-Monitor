@@ -2,7 +2,7 @@
 (function() {
 	try {
 		var e = "undefined" != typeof window ? window : "undefined" != typeof global ? global : "undefined" != typeof globalThis ? globalThis : "undefined" != typeof self ? self : {};
-		e.SENTRY_RELEASE = { id: "f9f2e045fae8353a4c8417903eeca14e9c7534d6" };
+		e.SENTRY_RELEASE = { id: "ea803f2051806c332cf6a29b882a65ba1ae1bc76" };
 		var n = new e.Error().stack;
 		n && (e._sentryDebugIds = e._sentryDebugIds || {}, e._sentryDebugIds[n] = "3f43c65d-cd2f-45c2-9490-e284555c9545", e._sentryDebugIdIdentifier = "sentry-dbid-3f43c65d-cd2f-45c2-9490-e284555c9545");
 	} catch (e) {}
@@ -268,4 +268,4 @@ function flattenModule(module, name) {
 //#endregion
 export { getSharedFromRuntime as n, importShared as r, getSharedFromLocal as t };
 
-//# sourceMappingURL=_virtual___federation_fn_import-DeyyGZp8.js.map
+//# sourceMappingURL=_virtual___federation_fn_import-DQkStKZl.js.map

@@ -1,9 +1,9 @@
 (function() {
 	try {
 		var e = "undefined" != typeof window ? window : "undefined" != typeof global ? global : "undefined" != typeof globalThis ? globalThis : "undefined" != typeof self ? self : {};
-		e.SENTRY_RELEASE = { id: "f9f2e045fae8353a4c8417903eeca14e9c7534d6" };
+		e.SENTRY_RELEASE = { id: "ea803f2051806c332cf6a29b882a65ba1ae1bc76" };
 		var n = new e.Error().stack;
-		n && (e._sentryDebugIds = e._sentryDebugIds || {}, e._sentryDebugIds[n] = "3418677b-a57d-48ba-923c-afa2529b7e3d", e._sentryDebugIdIdentifier = "sentry-dbid-3418677b-a57d-48ba-923c-afa2529b7e3d");
+		n && (e._sentryDebugIds = e._sentryDebugIds || {}, e._sentryDebugIds[n] = "e50b2990-5603-4916-9d61-62119b05a94c", e._sentryDebugIdIdentifier = "sentry-dbid-e50b2990-5603-4916-9d61-62119b05a94c");
 	} catch (e) {}
 })();
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
@@ -48,12 +48,13 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 }) : target, mod));
 var __toCommonJS = (mod) => __hasOwnProp.call(mod, "module.exports") ? mod["module.exports"] : __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 //#endregion
-let node_path = require("node:path");
-node_path = __toESM(node_path, 1);
 let node_child_process = require("node:child_process");
-let node_events = require("node:events");
+let node_dns = require("node:dns");
 let node_os = require("node:os");
 node_os = __toESM(node_os, 1);
+let node_path = require("node:path");
+node_path = __toESM(node_path, 1);
+let node_events = require("node:events");
 let node_util = require("node:util");
 let node_fs_promises = require("node:fs/promises");
 node_fs_promises = __toESM(node_fs_promises, 1);
@@ -69,12 +70,21 @@ var HMONITOR_IPC_SET_CONFIG = "hmonitor-set-config";
 var HMONITOR_IPC_RESET_CONFIG = "hmonitor-reset-config";
 var HMONITOR_IPC_UPDATE_PING = "hmonitor-update-ping";
 var HMONITOR_IPC_STOP_PING = "hmonitor-stop-ping";
+var HMONITOR_IPC_UPDATE_PUBLIC_NETWORK = "hmonitor-update-public-network";
+var HMONITOR_IPC_REFRESH_PUBLIC_NETWORK = "hmonitor-refresh-public-network";
+var HMONITOR_IPC_SHOW_FLYOUT = "hmonitor-show-flyout";
+var HMONITOR_IPC_UPDATE_FLYOUT = "hmonitor-update-flyout";
+var HMONITOR_IPC_HIDE_FLYOUT = "hmonitor-hide-flyout";
+var HMONITOR_IPC_FLYOUT_MOUSE_EVENT = "hmonitor-flyout-mouse-event";
+var HMONITOR_IPC_FLYOUT_RESIZE = "hmonitor-flyout-resize";
+var HMONITOR_IPC_FLYOUT_SET_RANGE = "hmonitor-flyout-set-range";
 var initialSettings = {
 	configVersion: .6,
 	refreshInterval: 1,
 	enabled: true,
 	displayStyle: "default",
 	showSectionLabel: true,
+	enableHoverDetails: true,
 	metricVisibility: {
 		icon: true,
 		label: true,
@@ -102,12 +112,15 @@ var initialSettings = {
 		hosts: [],
 		enabledHosts: [],
 		interval: 1e3,
-		timeout: 2e3
+		timeout: 2e3,
+		autoPingGateway: true
 	},
 	showAliasCpu: true,
 	showAliasGpu: true,
 	showAliasMemory: true,
 	showAliasNetwork: true,
+	maskPublicIp: true,
+	showTopProcesses: true,
 	sectionOrder: [
 		"cpu",
 		"gpu",
@@ -121,7 +134,7 @@ var initialSettings = {
 var SENTRY_DSN = "https://13d766c04f102d67c984dcbef9544512@o4509344104316928.ingest.us.sentry.io/4511891776405504";
 //#endregion
 //#region extension/node_modules/@lynxhub/hwmonitor/dist/utils.js
-var execAsync$1 = (0, node_util.promisify)(node_child_process.exec);
+var execAsync$2 = (0, node_util.promisify)(node_child_process.exec);
 var DOTNET_LIST_RUNTIMES_COMMAND = "dotnet --list-runtimes";
 var DOTNET_10_RUNTIME_PATTERN = /microsoft\.netcore\.app\s+10\./i;
 function isDotNet10RuntimeInstalled(output) {
@@ -138,7 +151,7 @@ function isDotNet10RuntimeInstalled(output) {
 */
 async function checkDotNetRuntime10(logger = console) {
 	try {
-		const { stdout, stderr } = await execAsync$1(DOTNET_LIST_RUNTIMES_COMMAND);
+		const { stdout, stderr } = await execAsync$2(DOTNET_LIST_RUNTIMES_COMMAND);
 		if (stderr) logger.warn(`Stderr from 'dotnet --list-runtimes': ${stderr}`);
 		return isDotNet10RuntimeInstalled(stdout);
 	} catch (error) {
@@ -9912,7 +9925,7 @@ var require_pify = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 //#region extension/node_modules/make-dir/index.js
 var require_make_dir = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var fs = require("fs");
-	var path$3 = require("path");
+	var path$4 = require("path");
 	var pify = require_pify();
 	var defaults = {
 		mode: 511 & ~process.umask(),
@@ -9920,7 +9933,7 @@ var require_make_dir = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	};
 	var checkPath = (pth) => {
 		if (process.platform === "win32") {
-			if (/[<>:"|?*]/.test(pth.replace(path$3.parse(pth).root, ""))) {
+			if (/[<>:"|?*]/.test(pth.replace(path$4.parse(pth).root, ""))) {
 				const err = /* @__PURE__ */ new Error(`Path contains invalid characters: ${pth}`);
 				err.code = "EINVAL";
 				throw err;
@@ -9935,15 +9948,15 @@ var require_make_dir = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		const make = (pth) => {
 			return mkdir(pth, opts.mode).then(() => pth).catch((err) => {
 				if (err.code === "ENOENT") {
-					if (err.message.includes("null bytes") || path$3.dirname(pth) === pth) throw err;
-					return make(path$3.dirname(pth)).then(() => make(pth));
+					if (err.message.includes("null bytes") || path$4.dirname(pth) === pth) throw err;
+					return make(path$4.dirname(pth)).then(() => make(pth));
 				}
 				return stat(pth).then((stats) => stats.isDirectory() ? pth : Promise.reject()).catch(() => {
 					throw err;
 				});
 			});
 		};
-		return make(path$3.resolve(input));
+		return make(path$4.resolve(input));
 	});
 	module.exports.sync = (input, opts) => {
 		checkPath(input);
@@ -9953,8 +9966,8 @@ var require_make_dir = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				opts.fs.mkdirSync(pth, opts.mode);
 			} catch (err) {
 				if (err.code === "ENOENT") {
-					if (err.message.includes("null bytes") || path$3.dirname(pth) === pth) throw err;
-					make(path$3.dirname(pth));
+					if (err.message.includes("null bytes") || path$4.dirname(pth) === pth) throw err;
+					make(path$4.dirname(pth));
 					return make(pth);
 				}
 				try {
@@ -9965,7 +9978,7 @@ var require_make_dir = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			return pth;
 		};
-		return make(path$3.resolve(input));
+		return make(path$4.resolve(input));
 	};
 }));
 //#endregion
@@ -9993,31 +10006,31 @@ var init_index_jsnext = __esmMin((() => {}));
 * https://github.com/shinnn/node-strip-dirs
 */
 var require_strip_dirs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var path$2 = require("path");
+	var path$3 = require("path");
 	var util = require("util");
 	var isNaturalNumber = (init_index_jsnext(), __toCommonJS(index_jsnext_exports));
 	module.exports = function stripDirs(pathStr, count, option) {
 		if (typeof pathStr !== "string") throw new TypeError(util.inspect(pathStr) + " is not a string. First argument to strip-dirs must be a path string.");
-		if (path$2.posix.isAbsolute(pathStr) || path$2.win32.isAbsolute(pathStr)) throw new Error(`${pathStr} is an absolute path. strip-dirs requires a relative path.`);
+		if (path$3.posix.isAbsolute(pathStr) || path$3.win32.isAbsolute(pathStr)) throw new Error(`${pathStr} is an absolute path. strip-dirs requires a relative path.`);
 		if (!isNaturalNumber(count, { includeZero: true })) throw new Error("The Second argument of strip-dirs must be a natural number or 0, but received " + util.inspect(count) + ".");
 		if (option) {
 			if (typeof option !== "object") throw new TypeError(util.inspect(option) + " is not an object. Expected an object with a boolean `disallowOverflow` property.");
 			if (Array.isArray(option)) throw new TypeError(util.inspect(option) + " is an array. Expected an object with a boolean `disallowOverflow` property.");
 			if ("disallowOverflow" in option && typeof option.disallowOverflow !== "boolean") throw new TypeError(util.inspect(option.disallowOverflow) + " is neither true nor false. `disallowOverflow` option must be a Boolean value.");
 		} else option = { disallowOverflow: false };
-		const pathComponents = path$2.normalize(pathStr).split(path$2.sep);
+		const pathComponents = path$3.normalize(pathStr).split(path$3.sep);
 		if (pathComponents.length > 1 && pathComponents[0] === ".") pathComponents.shift();
 		if (count > pathComponents.length - 1) {
 			if (option.disallowOverflow) throw new RangeError("Cannot strip more directories than there are.");
 			count = pathComponents.length - 1;
 		}
-		return path$2.join.apply(null, pathComponents.slice(count));
+		return path$3.join.apply(null, pathComponents.slice(count));
 	};
 }));
 //#endregion
 //#region extension/node_modules/@lynxhub/hwmonitor/dist/cli_downloader.js
 var import_decompress = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var path$1 = require("path");
+	var path$2 = require("path");
 	var fs = require_graceful_fs();
 	var decompressTar = require_decompress_tar();
 	var decompressTarbz2 = require_decompress_tarbz2();
@@ -10033,7 +10046,7 @@ var import_decompress = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin((
 	};
 	var safeMakeDir = (dir, realOutputPath) => {
 		return fsP.realpath(dir).catch((_) => {
-			return safeMakeDir(path$1.dirname(dir), realOutputPath);
+			return safeMakeDir(path$2.dirname(dir), realOutputPath);
 		}).then((realParentPath) => {
 			if (realParentPath.indexOf(realOutputPath) !== 0) throw new Error("Refusing to create a directory outside the output path.");
 			return makeDir(dir).then(fsP.realpath);
@@ -10056,17 +10069,17 @@ var import_decompress = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin((
 		if (typeof opts.map === "function") files = files.map(opts.map);
 		if (!output) return files;
 		return Promise.all(files.map((x) => {
-			const dest = path$1.join(output, x.path);
+			const dest = path$2.join(output, x.path);
 			const mode = x.mode & ~process.umask();
 			const now = /* @__PURE__ */ new Date();
 			if (x.type === "directory") return makeDir(output).then((outputPath) => fsP.realpath(outputPath)).then((realOutputPath) => safeMakeDir(dest, realOutputPath)).then(() => fsP.utimes(dest, now, x.mtime)).then(() => x);
 			return makeDir(output).then((outputPath) => fsP.realpath(outputPath)).then((realOutputPath) => {
-				return safeMakeDir(path$1.dirname(dest), realOutputPath).then(() => realOutputPath);
+				return safeMakeDir(path$2.dirname(dest), realOutputPath).then(() => realOutputPath);
 			}).then((realOutputPath) => {
 				if (x.type === "file") return preventWritingThroughSymlink(dest, realOutputPath);
 				return realOutputPath;
 			}).then((realOutputPath) => {
-				return fsP.realpath(path$1.dirname(dest)).then((realDestinationDir) => {
+				return fsP.realpath(path$2.dirname(dest)).then((realDestinationDir) => {
 					if (realDestinationDir.indexOf(realOutputPath) !== 0) throw new Error("Refusing to write outside output directory: " + realDestinationDir);
 				});
 			}).then(() => {
@@ -10092,7 +10105,7 @@ var import_decompress = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin((
 		return (typeof input === "string" ? fsP.readFile(input) : Promise.resolve(input)).then((buf) => extractFile(buf, output, opts));
 	};
 })))(), 1);
-var execAsync = (0, node_util.promisify)(node_child_process.exec);
+var execAsync$1 = (0, node_util.promisify)(node_child_process.exec);
 var logLevels = [
 	"silent",
 	"error",
@@ -10116,8 +10129,8 @@ async function killRunningCliProcesses(cliName, log) {
 	const platform = node_os.default.platform();
 	const exeName = platform === "win32" ? `${cliName}.exe` : cliName;
 	try {
-		if (platform === "win32") await execAsync(`taskkill /F /IM "${exeName}"`);
-		else await execAsync(`pkill -9 -f "${cliName}"`);
+		if (platform === "win32") await execAsync$1(`taskkill /F /IM "${exeName}"`);
+		else await execAsync$1(`pkill -9 -f "${cliName}"`);
 		log("debug", `Terminated running instances of ${exeName}`);
 	} catch {}
 }
@@ -12461,21 +12474,2328 @@ function isNil(value) {
 	return value == null;
 }
 //#endregion
+//#region extension/src/main/ProcessMonitorService.ts
+var execAsync = (0, node_util.promisify)(node_child_process.exec);
+var execFileAsync = (0, node_util.promisify)(node_child_process.execFile);
+var CACHE_TTL_MS$1 = 3e3;
+var ACTIVE_POLL_INTERVAL_MS = 3500;
+var WIN_POWERSHELL_SCRIPT = `
+$procMap = @{}
+Get-Process | ForEach-Object { $procMap[$_.Id] = @{ name = $_.ProcessName; ws = $_.WorkingSet64 } }
+
+$perfProcs = Get-CimInstance Win32_PerfFormattedData_PerfProc_Process | Where-Object { $_.Name -notin "_Total", "Idle" }
+
+$cpuCores = [System.Environment]::ProcessorCount
+if (-not $cpuCores -or $cpuCores -le 0) { $cpuCores = 1 }
+
+$cpuList = @($perfProcs | ForEach-Object {
+    $pidNum = [int]$_.IDProcess
+    $pInfo = $procMap[$pidNum]
+    $cleanName = if ($pInfo -and $pInfo.name) { $pInfo.name } else { ($_.Name -replace "#\\d+$","") }
+    $cpuPct = [math]::Round(([double]$_.PercentProcessorTime) / $cpuCores, 1)
+    $memBytes = if ($pInfo -and $pInfo.ws) { [int64]$pInfo.ws } else { [int64]$_.WorkingSetPrivate }
+    [PSCustomObject]@{
+        pid = $pidNum
+        name = $cleanName
+        cpu = $cpuPct
+        memory = $memBytes
+    }
+} | Sort-Object cpu -Descending | Select-Object -First 3)
+
+$memList = @($perfProcs | ForEach-Object {
+    $pidNum = [int]$_.IDProcess
+    $pInfo = $procMap[$pidNum]
+    $cleanName = if ($pInfo -and $pInfo.name) { $pInfo.name } else { ($_.Name -replace "#\\d+$","") }
+    $cpuPct = [math]::Round(([double]$_.PercentProcessorTime) / $cpuCores, 1)
+    $memBytes = if ($pInfo -and $pInfo.ws) { [int64]$pInfo.ws } else { [int64]$_.WorkingSetPrivate }
+    [PSCustomObject]@{
+        pid = $pidNum
+        name = $cleanName
+        cpu = $cpuPct
+        memory = $memBytes
+    }
+} | Sort-Object memory -Descending | Select-Object -First 3)
+
+$gpuMemMap = @{}
+try {
+  Get-CimInstance Win32_PerfFormattedData_GPUPerformanceCounters_GPUProcessMemory -ErrorAction SilentlyContinue |
+    Where-Object { $_.DedicatedUsage -gt 0 } |
+    ForEach-Object {
+      if ($_.Name -match "pid_(\\d+)_") {
+          $p = [int]$matches[1]
+          $gpuMemMap[$p] = ($gpuMemMap[$p] -as [int64]) + [int64]$_.DedicatedUsage
+      }
+  }
+} catch {}
+
+$gpuEngMap = @{}
+try {
+  Get-CimInstance Win32_PerfFormattedData_GPUPerformanceCounters_GPUEngine -ErrorAction SilentlyContinue |
+    Where-Object { $_.UtilizationPercentage -gt 0 } |
+    ForEach-Object {
+      if ($_.Name -match "pid_(\\d+)_") {
+          $p = [int]$matches[1]
+          $gpuEngMap[$p] = ($gpuEngMap[$p] -as [double]) + [double]$_.UtilizationPercentage
+      }
+  }
+} catch {}
+
+$allGpuPids = [System.Collections.Generic.HashSet[int]]::new()
+foreach ($p in $gpuMemMap.Keys) { [void]$allGpuPids.Add($p) }
+foreach ($p in $gpuEngMap.Keys) { [void]$allGpuPids.Add($p) }
+
+$gpuList = @($allGpuPids | ForEach-Object {
+    $pidNum = $_
+    $pInfo = $procMap[$pidNum]
+    $cleanName = if ($pInfo -and $pInfo.name) { $pInfo.name } else { "PID $pidNum" }
+    $gpuPct = if ($gpuEngMap[$pidNum]) { [math]::Round($gpuEngMap[$pidNum], 1) } else { 0 }
+    $vramBytes = if ($gpuMemMap[$pidNum]) { $gpuMemMap[$pidNum] } else { 0 }
+    [PSCustomObject]@{
+        pid = $pidNum
+        name = $cleanName
+        gpu = $gpuPct
+        vram = $vramBytes
+    }
+} | Sort-Object -Property @{Expression="gpu"; Descending=$true}, @{Expression="vram"; Descending=$true} |
+    Select-Object -First 3)
+
+@{ cpu = $cpuList; memory = $memList; gpu = $gpuList } | ConvertTo-Json -Compress
+`.trim();
+var processMonitorService = class ProcessMonitorService {
+	static instance;
+	cachedData;
+	lastSampleTime = 0;
+	activeSamplingInterval;
+	pendingSamplePromise;
+	updateListeners = [];
+	constructor() {}
+	static getInstance() {
+		if (!ProcessMonitorService.instance) ProcessMonitorService.instance = new ProcessMonitorService();
+		return ProcessMonitorService.instance;
+	}
+	getCachedData() {
+		return this.cachedData;
+	}
+	/**
+	* Samples top processes with cache-first behavior.
+	*/
+	async sampleTopProcesses(force = false) {
+		const now = Date.now();
+		if (!force && this.cachedData && now - this.lastSampleTime < CACHE_TTL_MS$1) return this.cachedData;
+		if (this.pendingSamplePromise) return this.pendingSamplePromise;
+		this.pendingSamplePromise = this.performSample().then((data) => {
+			this.cachedData = data;
+			this.lastSampleTime = Date.now();
+			this.notifyListeners(data);
+			return data;
+		}).catch((err) => {
+			console.error("[ProcessMonitorService] Error sampling processes:", err);
+			return this.cachedData || {
+				cpu: [],
+				gpu: [],
+				memory: [],
+				timestamp: Date.now()
+			};
+		}).finally(() => {
+			this.pendingSamplePromise = void 0;
+		});
+		return this.pendingSamplePromise;
+	}
+	/**
+	* Starts active sampling for when a flyout is currently open.
+	* Immediately polls once, then continues on interval.
+	*/
+	startActiveSampling(callback) {
+		if (callback && !this.updateListeners.includes(callback)) {
+			this.updateListeners.push(callback);
+			if (this.cachedData) callback(this.cachedData);
+		}
+		this.sampleTopProcesses();
+		if (!this.activeSamplingInterval) this.activeSamplingInterval = setInterval(() => {
+			this.sampleTopProcesses(true);
+		}, ACTIVE_POLL_INTERVAL_MS);
+		return () => {
+			if (callback) this.updateListeners = this.updateListeners.filter((cb) => cb !== callback);
+			if (this.updateListeners.length === 0) this.stopActiveSampling();
+		};
+	}
+	/**
+	* Stops active sampling immediately to ensure zero idle overhead.
+	*/
+	stopActiveSampling() {
+		if (this.activeSamplingInterval) {
+			clearInterval(this.activeSamplingInterval);
+			this.activeSamplingInterval = void 0;
+		}
+		this.updateListeners = [];
+	}
+	notifyListeners(data) {
+		this.updateListeners.forEach((listener) => {
+			try {
+				listener(data);
+			} catch (err) {
+				console.error("[ProcessMonitorService] Listener error:", err);
+			}
+		});
+	}
+	async performSample() {
+		const platform = process.platform;
+		if (platform === "win32") return this.sampleWindows();
+		if (platform === "linux") return this.sampleLinux();
+		if (platform === "darwin") return this.sampleMac();
+		return {
+			cpu: [],
+			gpu: [],
+			memory: [],
+			timestamp: Date.now()
+		};
+	}
+	async sampleWindows() {
+		try {
+			const { stdout } = await execFileAsync("powershell.exe", [
+				"-NoProfile",
+				"-NonInteractive",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				WIN_POWERSHELL_SCRIPT
+			], {
+				timeout: 4500,
+				maxBuffer: 1048576
+			});
+			const parsed = JSON.parse(stdout.trim());
+			const normalize = (items) => {
+				if (!Array.isArray(items)) return [];
+				return items.map((item) => ({
+					pid: Number(item.pid) || 0,
+					name: String(item.name || "Unknown"),
+					cpu: typeof item.cpu === "number" ? item.cpu : void 0,
+					memory: typeof item.memory === "number" ? item.memory : void 0,
+					gpu: typeof item.gpu === "number" ? item.gpu : void 0,
+					vram: typeof item.vram === "number" ? item.vram : void 0
+				}));
+			};
+			return {
+				cpu: normalize(parsed.cpu),
+				gpu: normalize(parsed.gpu),
+				memory: normalize(parsed.memory),
+				timestamp: Date.now()
+			};
+		} catch (err) {
+			console.error("[ProcessMonitorService] Windows sampling failed:", err);
+			return {
+				cpu: [],
+				gpu: [],
+				memory: [],
+				timestamp: Date.now()
+			};
+		}
+	}
+	async sampleLinux() {
+		try {
+			const [cpuOut, memOut, gpuData] = await Promise.all([
+				execAsync("ps -eo pid,pcpu,pmem,rss,comm --sort=-pcpu | head -n 4", { timeout: 3e3 }),
+				execAsync("ps -eo pid,pcpu,pmem,rss,comm --sort=-rss | head -n 4", { timeout: 3e3 }),
+				this.sampleLinuxNvidiaGpu()
+			]);
+			const parsePs = (stdout) => {
+				const lines = stdout.trim().split("\n").slice(1);
+				const results = [];
+				for (const line of lines) {
+					const parts = line.trim().split(/\s+/);
+					if (parts.length < 5) continue;
+					const pid = parseInt(parts[0], 10);
+					const cpu = parseFloat(parts[1]);
+					const rssKb = parseInt(parts[3], 10);
+					const name = parts.slice(4).join(" ");
+					results.push({
+						pid,
+						name,
+						cpu: isNaN(cpu) ? 0 : cpu,
+						memory: isNaN(rssKb) ? 0 : rssKb * 1024
+					});
+				}
+				return results;
+			};
+			return {
+				cpu: parsePs(cpuOut.stdout),
+				memory: parsePs(memOut.stdout),
+				gpu: gpuData,
+				timestamp: Date.now()
+			};
+		} catch (err) {
+			console.error("[ProcessMonitorService] Linux sampling failed:", err);
+			return {
+				cpu: [],
+				gpu: [],
+				memory: [],
+				timestamp: Date.now()
+			};
+		}
+	}
+	async sampleLinuxNvidiaGpu() {
+		try {
+			const { stdout } = await execAsync("nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits", { timeout: 2500 });
+			return stdout.trim().split("\n").filter(Boolean).slice(0, 3).map((line) => {
+				const [pidStr, nameStr, memStr] = line.split(",").map((s) => s.trim());
+				const pid = parseInt(pidStr, 10) || 0;
+				const vramMb = parseFloat(memStr) || 0;
+				return {
+					pid,
+					name: nameStr ? nameStr.split("/").pop() || nameStr : "GPU Process",
+					gpu: 0,
+					vram: vramMb * 1024 * 1024
+				};
+			});
+		} catch {
+			return [];
+		}
+	}
+	async sampleMac() {
+		try {
+			const [cpuOut, memOut] = await Promise.all([execAsync("ps -eo pid,pcpu,pmem,rss,comm -r | head -n 4", { timeout: 3e3 }), execAsync("ps -eo pid,pcpu,pmem,rss,comm -m | head -n 4", { timeout: 3e3 })]);
+			const parsePs = (stdout) => {
+				const lines = stdout.trim().split("\n").slice(1);
+				const results = [];
+				for (const line of lines) {
+					const parts = line.trim().split(/\s+/);
+					if (parts.length < 5) continue;
+					const pid = parseInt(parts[0], 10);
+					const cpu = parseFloat(parts[1]);
+					const rssKb = parseInt(parts[3], 10);
+					const rawName = parts.slice(4).join(" ");
+					const name = rawName.split("/").pop() || rawName;
+					results.push({
+						pid,
+						name,
+						cpu: isNaN(cpu) ? 0 : cpu,
+						memory: isNaN(rssKb) ? 0 : rssKb * 1024
+					});
+				}
+				return results;
+			};
+			return {
+				cpu: parsePs(cpuOut.stdout),
+				memory: parsePs(memOut.stdout),
+				gpu: [],
+				timestamp: Date.now()
+			};
+		} catch (err) {
+			console.error("[ProcessMonitorService] Mac sampling failed:", err);
+			return {
+				cpu: [],
+				gpu: [],
+				memory: [],
+				timestamp: Date.now()
+			};
+		}
+	}
+}.getInstance();
+//#endregion
+//#region extension/src/main/HardwareFlyoutView.ts
+var SECTION_WIDTHS = {
+	cpu: 400,
+	gpu: 400,
+	memory: 380,
+	network: 400,
+	ping: 380
+};
+var hardwareFlyoutView = class HardwareFlyoutView {
+	static instance;
+	mainWindow;
+	flyoutView;
+	isShowing = false;
+	activeSection;
+	currentAnchor;
+	hideTimer;
+	isMouseInsideFlyout = false;
+	isMouseInsideTrigger = false;
+	isViewLoaded = false;
+	pendingShowData;
+	activeRange = "minutes";
+	constructor() {}
+	static getInstance() {
+		if (!HardwareFlyoutView.instance) HardwareFlyoutView.instance = new HardwareFlyoutView();
+		return HardwareFlyoutView.instance;
+	}
+	setActiveRange(range) {
+		this.activeRange = range;
+	}
+	attach(mainWindow) {
+		this.mainWindow = mainWindow;
+		if (!this.flyoutView || this.flyoutView.webContents.isDestroyed()) {
+			const preloadPath = node_path.default.join(electron.app.getAppPath(), "out/preload/index.cjs");
+			this.flyoutView = new electron.WebContentsView({ webPreferences: {
+				preload: preloadPath,
+				sandbox: false
+			} });
+			this.flyoutView.webContents.setBackgroundThrottling(false);
+			this.flyoutView.setBorderRadius(16);
+			this.flyoutView.setBackgroundColor("#00000000");
+			this.flyoutView.setBounds({
+				x: -5e3,
+				y: -5e3,
+				width: 0,
+				height: 0
+			});
+			this.setupViewListeners();
+			this.loadFlyoutHtml();
+		}
+		try {
+			mainWindow.contentView.removeChildView(this.flyoutView);
+		} catch {}
+		mainWindow.contentView.addChildView(this.flyoutView);
+		this.setupWindowListeners(mainWindow);
+	}
+	setupViewListeners() {
+		if (!this.flyoutView) return;
+		this.flyoutView.webContents.on("did-finish-load", () => {
+			this.isViewLoaded = true;
+			if (this.pendingShowData) {
+				const data = this.pendingShowData;
+				this.pendingShowData = void 0;
+				this.show(data);
+			}
+		});
+		this.flyoutView.webContents.on("console-message", (_, level, message, line, sourceId) => {
+			if (level >= 2) console.error(`[HardwareFlyout] ${message} (line ${line}, ${sourceId})`);
+		});
+		this.flyoutView.webContents.on("before-input-event", (_, input) => {
+			if (input.key === "Escape") this.hide();
+		});
+	}
+	listeningWindow;
+	onWindowHideOrBlur = () => this.hide();
+	setupWindowListeners(window) {
+		if (this.listeningWindow === window) return;
+		this.cleanupWindowListeners();
+		this.listeningWindow = window;
+		window.on("blur", this.onWindowHideOrBlur);
+		window.on("hide", this.onWindowHideOrBlur);
+		window.on("minimize", this.onWindowHideOrBlur);
+	}
+	cleanupWindowListeners() {
+		if (this.listeningWindow && !this.listeningWindow.isDestroyed()) {
+			this.listeningWindow.removeListener("blur", this.onWindowHideOrBlur);
+			this.listeningWindow.removeListener("hide", this.onWindowHideOrBlur);
+			this.listeningWindow.removeListener("minimize", this.onWindowHideOrBlur);
+		}
+		this.listeningWindow = void 0;
+	}
+	loadFlyoutHtml() {
+		if (!this.flyoutView || this.flyoutView.webContents.isDestroyed()) return;
+		const html = `<!DOCTYPE html>
+<html lang="en" style="background: transparent !important; background-color: transparent !important;">
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      background: transparent !important; background-color: transparent !important;
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      user-select: none;
+    }
+    :root {
+      --bg: rgba(18, 18, 23, 0.96);
+      --border: rgba(255, 255, 255, 0.1);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --card-bg: rgba(255, 255, 255, 0.04);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #8b5cf6;
+      --accent-soft: rgba(139, 92, 246, 0.15);
+      --accent-glow: rgba(139, 92, 246, 0.35);
+      --success: #10b981;
+      --success-soft: rgba(16, 185, 129, 0.15);
+      --warning: #f59e0b;
+      --warning-soft: rgba(245, 158, 11, 0.15);
+      --danger: #ef4444;
+      --danger-soft: rgba(239, 68, 68, 0.15);
+      --cyan: #06b6d4;
+      --cyan-soft: rgba(6, 182, 212, 0.15);
+    }
+    body.light {
+      --bg: rgba(255, 255, 255, 0.96);
+      --border: rgba(0, 0, 0, 0.1);
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --card-bg: rgba(0, 0, 0, 0.03);
+      --card-border: rgba(0, 0, 0, 0.07);
+      --accent: #7c3aed;
+      --accent-soft: rgba(124, 58, 237, 0.12);
+      --accent-glow: rgba(124, 58, 237, 0.25);
+    }
+    .flyout-box {
+      width: 100%; height: auto;
+      background: var(--bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--border);
+      display: flex; flex-direction: column;
+      padding: 13px 15px;
+      overflow: hidden;
+      color: var(--text-main);
+    }
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px; padding-bottom: 7px;
+      border-bottom: 1px solid var(--border);
+    }
+    .header-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .header-badges { display: flex; align-items: center; gap: 6px; }
+    .badge {
+      font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 6px;
+      background: var(--accent-soft); color: var(--accent);
+    }
+    .badge-subtle {
+      font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 6px;
+      background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-muted);
+    }
+
+    /* Range Selector Segmented Control */
+    .range-selector {
+      display: flex;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 999px;
+      padding: 2px;
+      gap: 2px;
+      margin-bottom: 10px;
+    }
+    .range-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 4px 6px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      outline: none;
+      text-align: center;
+    }
+    .range-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .range-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    /* Unified 4-Card Stat Matrix */
+    .stat-matrix {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    /* 6-Card Stat Matrix for Extended Telemetry */
+    .stat-matrix-6 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .stat-card-micro {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 6px 4px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .stat-card-micro .stat-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+    .stat-card-micro .stat-val {
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1.2;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Modern SVG Chart Container */
+    .chart-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 8px 10px 6px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .chart-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .chart-legend {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .legend-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    .chart-svg-wrap {
+      position: relative;
+      width: 100%;
+      height: 72px;
+    }
+    .chart-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+    .chart-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 6px;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--text-main);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      transform: translate(-50%, -125%);
+      z-index: 20;
+    }
+    .chart-cursor-line {
+      position: absolute;
+      top: 0; bottom: 0; width: 1px;
+      background: var(--border);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    /* Subsections and Progress Bars */
+    .section-subtitle {
+      font-size: 10px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;
+    }
+    .progress-bar-bg {
+      width: 100%; height: 6px; background: var(--card-border); border-radius: 999px; overflow: hidden; margin-top: 4px;
+    }
+    .progress-bar-fill {
+      height: 100%; border-radius: 999px; transition: width 0.3s ease, background-color 0.3s ease;
+    }
+    .scroll-container {
+      max-height: 130px; overflow-y: auto; overflow-x: hidden; padding-right: 2px;
+    }
+    .scroll-container::-webkit-scrollbar { width: 4px; }
+    .scroll-container::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+    .core-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px;
+    }
+    .core-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 7px; padding: 4px 7px; font-size: 11px;
+    }
+    .core-label { color: var(--text-muted); font-weight: 500; font-size: 10px; }
+    .core-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 11px; }
+
+    .details-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 9px; padding: 8px 10px; margin-bottom: 6px;
+    }
+    .details-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .details-table td { padding: 3px 5px; }
+    .details-table tr:nth-child(even) { background: var(--card-bg); border-radius: 6px; }
+    .td-key { color: var(--text-muted); font-weight: 500; width: 35%; }
+    .td-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; text-align: right; }
+
+    /* Top Consuming Processes Section */
+    .top-proc-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 9px;
+      padding: 8px 10px;
+      margin-top: 6px;
+    }
+    .top-proc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .top-proc-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .top-proc-tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--card-border);
+      border-radius: 999px;
+      padding: 1px;
+      gap: 2px;
+    }
+    .top-proc-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      outline: none;
+    }
+    .top-proc-tab-btn:hover {
+      color: var(--text-main);
+    }
+    .top-proc-tab-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 1px 4px var(--accent-glow);
+    }
+    .top-proc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .top-proc-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 4px 6px;
+      font-size: 11px;
+      gap: 6px;
+    }
+    .top-proc-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      flex: 1;
+    }
+    .top-proc-rank {
+      font-size: 9px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 1px 4px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .top-proc-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .top-proc-name {
+      font-weight: 600;
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-main);
+    }
+    .top-proc-sub {
+      font-size: 9px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .top-proc-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      flex-shrink: 0;
+      gap: 2px;
+    }
+    .top-proc-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .top-proc-bar {
+      width: 48px;
+      height: 3px;
+      background: var(--card-border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .top-proc-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+    .top-proc-empty {
+      padding: 8px 4px;
+      text-align: center;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+  </style>
+</head>
+<body style="background: transparent !important; background-color: transparent !important;">
+  <div id="flyout" class="flyout-box"></div>
+  <script>
+    document.addEventListener('mouseenter', () => {
+      if (window.electron && window.electron.ipcRenderer) {
+        window.electron.ipcRenderer.send('${HMONITOR_IPC_FLYOUT_MOUSE_EVENT}', 'enter');
+      }
+    });
+    document.addEventListener('mouseleave', () => {
+      if (window.electron && window.electron.ipcRenderer) {
+        window.electron.ipcRenderer.send('${HMONITOR_IPC_FLYOUT_MOUSE_EVENT}', 'leave');
+      }
+    });
+
+    const reportResize = () => {
+      const el = document.getElementById('flyout');
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const height = Math.ceil(rect.height || el.offsetHeight || el.scrollHeight);
+      const width = Math.ceil(rect.width || el.offsetWidth);
+      if (height > 0 && window.electron && window.electron.ipcRenderer) {
+        window.electron.ipcRenderer.send('${HMONITOR_IPC_FLYOUT_RESIZE}', {width, height});
+      }
+    };
+
+    if (typeof ResizeObserver !== 'undefined') {
+      const ro = new ResizeObserver(() => {
+        reportResize();
+      });
+      const el = document.getElementById('flyout');
+      if (el) ro.observe(el);
+    }
+
+    // Active Range state
+    window.activeRange = 'minutes';
+    window.currentFlyoutData = null;
+    window.activeProcTab = null;
+    window.activeProcTabLocked = false;
+
+    window.setProcTab = function(tab) {
+      window.activeProcTab = tab;
+      window.activeProcTabLocked = true;
+      if (window.currentFlyoutData) {
+        window.renderFlyout(window.currentFlyoutData, true);
+      }
+    };
+
+    window.updateTopProcessesData = function(data) {
+      if (window.currentFlyoutData) {
+        window.currentFlyoutData.topProcesses = data;
+        const procBox = document.getElementById('flyout-top-procs');
+        if (procBox) {
+          const currentSection = window.currentFlyoutData.section;
+          const defaultCat = currentSection === 'gpu' ? 'gpu' : currentSection === 'memory' ? 'memory' : 'cpu';
+          const isProcEnabled = window.currentFlyoutData.showTopProcesses !== false;
+          procBox.outerHTML = renderTopProcessesHtml(data, defaultCat, isProcEnabled);
+          reportResize();
+        } else {
+          window.renderFlyout(window.currentFlyoutData, true);
+        }
+      }
+    };
+
+    window.setRange = function(range) {
+      window.activeRange = range;
+      if (window.electron && window.electron.ipcRenderer) {
+        window.electron.ipcRenderer.send('${HMONITOR_IPC_FLYOUT_SET_RANGE}', range);
+      }
+      if (window.currentFlyoutData) {
+        window.currentFlyoutData.range = range;
+        window.renderFlyout(window.currentFlyoutData, true);
+      }
+    };
+
+    window.refreshPublicNetwork = function() {
+      if (window.electron && window.electron.ipcRenderer) {
+        window.electron.ipcRenderer.send('${HMONITOR_IPC_REFRESH_PUBLIC_NETWORK}');
+      }
+    };
+
+    function renderTopProcessesHtml(topProcs, defaultCategory, isEnabled) {
+      if (isEnabled === false) return '';
+      const currentTab = window.activeProcTab || defaultCategory || 'cpu';
+
+      const procs = topProcs || {};
+      let list = [];
+      let label = 'Top Processes';
+      if (currentTab === 'cpu') {
+        list = procs.cpu || [];
+        label = 'Top CPU Consumers';
+      } else if (currentTab === 'gpu') {
+        list = procs.gpu || [];
+        label = 'Top GPU Consumers';
+      } else if (currentTab === 'memory') {
+        list = procs.memory || [];
+        label = 'Top RAM Consumers';
+      }
+
+      const cpuActive = currentTab === 'cpu' ? ' active' : '';
+      const gpuActive = currentTab === 'gpu' ? ' active' : '';
+      const memActive = currentTab === 'memory' ? ' active' : '';
+      const tabsHtml =
+        '<div class="top-proc-tabs">' +
+          '<button class="top-proc-tab-btn' + cpuActive + '" onclick="setProcTab(&apos;cpu&apos;)">CPU</button>' +
+          '<button class="top-proc-tab-btn' + gpuActive + '" onclick="setProcTab(&apos;gpu&apos;)">GPU</button>' +
+          '<button class="top-proc-tab-btn' + memActive + '" onclick="setProcTab(&apos;memory&apos;)">RAM</button>' +
+        '</div>';
+
+      let itemsHtml = '';
+      if (!list || list.length === 0) {
+        itemsHtml = '<div class="top-proc-empty">Sampling active system processes...</div>';
+      } else {
+        itemsHtml = '<div class="top-proc-list">' + list.slice(0, 3).map((item, idx) => {
+          const rank = '#' + (idx + 1);
+          const name = item.name || 'Unknown';
+          const pid = item.pid;
+          let mainValStr = '';
+          let subText = 'PID: ' + pid;
+          let barPct = 0;
+          let color = 'var(--accent)';
+
+          if (currentTab === 'cpu') {
+            const cpu = typeof item.cpu === 'number' ? item.cpu : 0;
+            mainValStr = cpu + '%';
+            barPct = Math.min(100, Math.max(2, cpu));
+            color = getColorForVal(cpu, 25, 60);
+            if (item.memory) subText += ' · ' + formatBytes(item.memory);
+          } else if (currentTab === 'gpu') {
+            const gpu = typeof item.gpu === 'number' ? item.gpu : 0;
+            const vram = item.vram ? formatBytes(item.vram) : '';
+            mainValStr = gpu > 0 ? gpu + '% GPU' : (vram || 'Active');
+            barPct = gpu > 0 ? Math.min(100, Math.max(2, gpu)) : 50;
+            color = 'var(--cyan)';
+            if (vram) subText += ' · ' + vram + ' VRAM';
+          } else if (currentTab === 'memory') {
+            const mem = item.memory ? formatBytes(item.memory) : '0 MB';
+            mainValStr = mem;
+            barPct = 60;
+            color = 'var(--warning)';
+            if (typeof item.cpu === 'number' && item.cpu > 0) subText += ' · ' + item.cpu + '% CPU';
+          }
+
+          return '<div class="top-proc-item">' +
+            '<div class="top-proc-left">' +
+              '<span class="top-proc-rank">' + rank + '</span>' +
+              '<div class="top-proc-info">' +
+                '<span class="top-proc-name" title="' + name + ' (PID: ' + pid + ')">' + name + '</span>' +
+                '<span class="top-proc-sub">' + subText + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="top-proc-right">' +
+              '<span class="top-proc-val" style="color:' + color + '">' + mainValStr + '</span>' +
+              '<div class="top-proc-bar">' +
+                '<div class="top-proc-bar-fill" style="width:' + barPct + '%; background:' + color + '"></div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('') + '</div>';
+      }
+
+      return '<div class="top-proc-card" id="flyout-top-procs">' +
+        '<div class="top-proc-header">' +
+          '<span class="top-proc-title">⚡ ' + label + '</span>' +
+          tabsHtml +
+        '</div>' +
+        itemsHtml +
+      '</div>';
+    }
+
+
+    function getColorForVal(val, low=60, med=80) {
+      if (val >= med) return 'var(--danger)';
+      if (val >= low) return 'var(--warning)';
+      return 'var(--success)';
+    }
+
+    function formatSpeed(bytesPerSec) {
+      if (!bytesPerSec || bytesPerSec <= 0) return '0.0 B/s';
+      const units = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
+      let idx = 0;
+      let val = bytesPerSec;
+      while (val >= 1024 && idx < units.length - 1) {
+        val /= 1024;
+        idx++;
+      }
+      return val.toFixed(1) + ' ' + units[idx];
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes || bytes <= 0) return '0.0 MB';
+      const mb = bytes / (1024 * 1024);
+      if (mb >= 1024) return (mb / 1024).toFixed(2) + ' GB';
+      return mb.toFixed(1) + ' MB';
+    }
+
+    function isMetricEnabled(metrics, metricId) {
+      if (!metrics || !Array.isArray(metrics.enabled)) return true;
+      return metrics.enabled.includes(metricId);
+    }
+
+    function filterHistoryByRange(history, range) {
+      if (!history || !Array.isArray(history) || history.length === 0) return [];
+      if (range === 'overall') return history;
+
+      const now = Date.now();
+      const cutoff = range === 'minutes' ? now - (5 * 60 * 1000) : now - (60 * 60 * 1000);
+      return history.filter(s => s.timestamp >= cutoff);
+    }
+
+    function formatTimeOffset(timestamp) {
+      const secAgo = Math.max(0, Math.round((Date.now() - timestamp) / 1000));
+      if (secAgo < 5) return 'just now';
+      if (secAgo < 60) return secAgo + 's ago';
+      const minAgo = Math.floor(secAgo / 60);
+      const remSec = secAgo % 60;
+      if (minAgo < 60) return minAgo + 'm ' + (remSec > 0 ? remSec + 's ' : '') + 'ago';
+      const hrAgo = Math.floor(minAgo / 60);
+      return hrAgo + 'h ago';
+    }
+
+    // Build smooth cubic Bezier path from points
+    function getSplinePath(points) {
+      if (!points || points.length === 0) return '';
+      if (points.length === 1) return 'M 0 ' + points[0].y.toFixed(1) + ' L 368 ' + points[0].y.toFixed(1);
+
+      let d = 'M ' + points[0].x.toFixed(1) + ' ' + points[0].y.toFixed(1);
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i === 0 ? 0 : i - 1];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
+
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+        d += ' C ' + cp1x.toFixed(1) + ' ' + cp1y.toFixed(1) + ', ' +
+             cp2x.toFixed(1) + ' ' + cp2y.toFixed(1) + ', ' +
+             p2.x.toFixed(1) + ' ' + p2.y.toFixed(1);
+      }
+      return d;
+    }
+
+    // Generate Masterpiece SVG Chart Markup
+    function renderSvgChart(seriesList, rawSamples, options) {
+      const W = 368;
+      const H = 72;
+      const padTop = 6;
+      const padBottom = 6;
+      const chartH = H - padTop - padBottom;
+      const chartId = 'chart_' + Math.random().toString(36).substr(2, 8);
+
+      let allVals = [];
+      seriesList.forEach(s => {
+        allVals = allVals.concat(s.values.filter(v => v != null && !isNaN(v)));
+      });
+
+      if (allVals.length === 0) allVals = [0];
+      const autoMin = options.minVal != null ? options.minVal : Math.min(0, ...allVals);
+      let autoMax = options.maxVal != null ? options.maxVal : Math.max(...allVals);
+      if (autoMax <= autoMin) autoMax = autoMin + 1;
+
+      let defs = '';
+      let pathsHtml = '';
+      let pulseDots = '';
+
+      seriesList.forEach((s, sIdx) => {
+        const gradId = chartId + '_grad_' + sIdx;
+        defs +=
+          '<linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1">' +
+            '<stop offset="0%" stop-color="' + s.color + '" stop-opacity="0.38"/>' +
+            '<stop offset="100%" stop-color="' + s.color + '" stop-opacity="0.0"/>' +
+          '</linearGradient>';
+
+        const vals = s.values;
+        const count = vals.length;
+        if (count === 0) return;
+
+        const points = vals.map((v, i) => {
+          const val = v != null ? v : autoMin;
+          const x = count === 1 ? W / 2 : (i / (count - 1)) * W;
+          const y = padTop + chartH - ((val - autoMin) / (autoMax - autoMin)) * chartH;
+          return {x, y, val};
+        });
+
+        const linePath = getSplinePath(points);
+        const lastP = points[points.length - 1];
+
+        if (s.isArea !== false && points.length > 1) {
+          const areaPath = linePath + ' L ' + W + ' ' + H + ' L 0 ' + H + ' Z';
+          pathsHtml += '<path d="' + areaPath + '" fill="url(#' + gradId + ')" />';
+        }
+
+        pathsHtml +=
+          '<path d="' + linePath + '" fill="none" stroke="' + s.color + '" stroke-width="2" ' +
+          'stroke-linecap="round" stroke-linejoin="round" />';
+
+        if (lastP) {
+          pulseDots +=
+            '<circle cx="' +
+            lastP.x.toFixed(1) +
+            '" cy="' +
+            lastP.y.toFixed(1) +
+            '" r="3" fill="' +
+            s.color +
+            '" />' +
+            '<circle cx="' +
+            lastP.x.toFixed(1) +
+            '" cy="' +
+            lastP.y.toFixed(1) +
+            '" r="6" fill="' +
+            s.color +
+            '" opacity="0.35" />';
+        }
+      });
+
+      // Subtle Reference Gridlines
+      const midValY = padTop + chartH * 0.5;
+      const gridHtml =
+        '<line x1="0" y1="' +
+        padTop +
+        '" x2="' +
+        W +
+        '" y2="' +
+        padTop +
+        '" stroke="var(--card-border)" stroke-dasharray="2,3" />' +
+        '<line x1="0" y1="' +
+        midValY +
+        '" x2="' +
+        W +
+        '" y2="' +
+        midValY +
+        '" stroke="var(--card-border)" stroke-dasharray="2,3" />' +
+        '<line x1="0" y1="' +
+        (H - padBottom) +
+        '" x2="' +
+        W +
+        '" y2="' +
+        (H - padBottom) +
+        '" stroke="var(--card-border)" />';
+
+
+      const legendHtml = seriesList.map(s => {
+        return (
+          '<div class="legend-item">' +
+            '<span class="legend-dot" style="background:' + s.color + '"></span>' +
+            '<span>' + s.name + '</span>' +
+          '</div>'
+        );
+      }).join('');
+
+      return {
+        chartId,
+        html:
+          '<div class="chart-box" id="' + chartId + '_box">' +
+            '<div class="chart-header">' +
+              '<span class="chart-title">' + (options.title || 'HISTORY') + '</span>' +
+              '<div class="chart-legend">' + legendHtml + '</div>' +
+            '</div>' +
+            '<div class="chart-svg-wrap" id="' + chartId + '_wrap">' +
+              '<svg class="chart-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">' +
+                '<defs>' + defs + '</defs>' +
+                gridHtml +
+                pathsHtml +
+                pulseDots +
+              '</svg>' +
+              '<div class="chart-cursor-line" id="' + chartId + '_cursor"></div>' +
+              '<div class="chart-tooltip" id="' + chartId + '_tip"></div>' +
+            '</div>' +
+          '</div>',
+        wireEvents: function() {
+          const wrap = document.getElementById(chartId + '_wrap');
+          const tip = document.getElementById(chartId + '_tip');
+          const cursor = document.getElementById(chartId + '_cursor');
+          if (!wrap || !tip || !cursor || !rawSamples || rawSamples.length === 0) return;
+
+          wrap.onmousemove = function(e) {
+            const rect = wrap.getBoundingClientRect();
+            const relX = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+            const ratio = relX / rect.width;
+            const idx = Math.min(
+              rawSamples.length - 1,
+              Math.max(0, Math.round(ratio * (rawSamples.length - 1)))
+            );
+            const sample = rawSamples[idx];
+            if (!sample) return;
+
+            cursor.style.left = relX + 'px';
+            cursor.style.opacity = '1';
+
+            let tooltipText = '';
+            seriesList.forEach(s => {
+              const val = s.values[idx];
+              if (val != null) {
+                const formatted = s.formatter ? s.formatter(val) : val + (s.unit || '');
+                tooltipText += '<span style="color:' + s.color + '">' + s.name + ': ' + formatted + '</span> ';
+              }
+            });
+            tooltipText +=
+              '<span style="color:var(--text-muted); font-size:9px;">(' +
+              formatTimeOffset(sample.timestamp) +
+              ')</span>';
+
+            tip.innerHTML = tooltipText;
+            tip.style.left = relX + 'px';
+            tip.style.top = '10px';
+            tip.style.opacity = '1';
+          };
+
+          wrap.onmouseleave = function() {
+            cursor.style.opacity = '0';
+            tip.style.opacity = '0';
+          };
+        }
+      };
+    }
+
+    // Main Render Function
+    window.renderFlyout = function(data, isRangeChange) {
+      if (!data) return {width: 0, height: 0};
+      window.currentFlyoutData = data;
+      document.body.className = data.darkMode === false ? 'light' : '';
+
+      const section = data.section;
+      const payload = data.payload || {};
+      const container = document.getElementById('flyout');
+      if (!container) return {width: 0, height: 0};
+
+      if (data.range && !isRangeChange) {
+        window.activeRange = data.range;
+      }
+      const range = window.activeRange || 'minutes';
+      const rawHistory = data.history || [];
+
+      if (!isRangeChange && !window.activeProcTabLocked) {
+        window.activeProcTab = section === 'gpu' ? 'gpu' : section === 'memory' ? 'memory' : 'cpu';
+      }
+
+      const history = filterHistoryByRange(rawHistory, range);
+
+      const rangeButtonsHtml =
+        '<div class="range-selector">' +
+          '<button class="range-btn' +
+          (range === 'minutes' ? ' active' : '') +
+          '" onclick="setRange(&apos;minutes&apos;)">Minutes</button>' +
+          '<button class="range-btn' +
+          (range === 'hour' ? ' active' : '') +
+          '" onclick="setRange(&apos;hour&apos;)">Hour</button>' +
+          '<button class="range-btn' +
+          (range === 'overall' ? ' active' : '') +
+          '" onclick="setRange(&apos;overall&apos;)">Overall</button>' +
+        '</div>';
+
+
+      let headerHtml = '';
+      let statMatrixHtml = '';
+      let chartObj = null;
+      let extraHtml = '';
+
+      if (section === 'cpu') {
+        const cpu = payload.cpu?.data || {};
+        const raw = payload.cpu?.rawSensorValues || [];
+        const metrics = payload.cpu?.metrics;
+        const name = cpu.name || 'Processor';
+        const currentUsage = cpu.usage != null ? cpu.usage : 0;
+        const currentTemp = cpu.temp != null ? cpu.temp : 0;
+
+        const powerSensor = raw.find(
+          s => s.Identifier.includes('power/0') || s.Identifier.toLowerCase().includes('package')
+        );
+        const powerW =
+          powerSensor && powerSensor.Value != null && powerSensor.Value > 0
+            ? Math.round(powerSensor.Value)
+            : null;
+
+        // Extract CPU history points
+        const usageVals = history.length > 0 ? history.map(h => h.usage ?? currentUsage) : [currentUsage];
+        const tempVals =
+          history.length > 0
+            ? history.map(h => h.temp ?? currentTemp)
+            : currentTemp > 0
+              ? [currentTemp]
+              : [];
+
+
+        const minUsage = Math.min(...usageVals);
+        const maxUsage = Math.max(...usageVals);
+        const avgUsage = Math.round(usageVals.reduce((a, b) => a + b, 0) / usageVals.length);
+
+        headerHtml =
+          '<div class="header">' +
+            '<div class="header-left"><span class="title">' + name + '</span></div>' +
+            '<div class="header-badges">' +
+              (powerW != null ? '<span class="badge">' + powerW + ' W</span>' : '') +
+              (currentTemp > 0 ? '<span class="badge-subtle">' + currentTemp + '°C</span>' : '') +
+              '<span class="badge">CPU</span>' +
+            '</div>' +
+          '</div>';
+
+        statMatrixHtml =
+          '<div class="stat-matrix">' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">CURRENT</span>' +
+              '<span class="stat-val" style="color:' + getColorForVal(currentUsage) + '">' + currentUsage + '%</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">MIN</span>' +
+              '<span class="stat-val" style="color:' + getColorForVal(minUsage) + '">' + minUsage + '%</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">AVG</span>' +
+              '<span class="stat-val" style="color:' + getColorForVal(avgUsage) + '">' + avgUsage + '%</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">MAX</span>' +
+              '<span class="stat-val" style="color:' + getColorForVal(maxUsage) + '">' + maxUsage + '%</span>' +
+            '</div>' +
+          '</div>';
+
+        const chartSeries = [
+          {name: 'Load', values: usageVals, color: 'var(--accent)', unit: '%', isArea: true}
+        ];
+        if (tempVals.length > 0 && currentTemp > 0) {
+          chartSeries.push({name: 'Temp', values: tempVals, color: 'var(--warning)', unit: '°C', isArea: false});
+        }
+
+        chartObj = renderSvgChart(chartSeries, history.length > 0 ? history : [{timestamp: Date.now()}], {
+          title: 'UTILIZATION & THERMAL HISTORY',
+          minVal: 0,
+          maxVal: Math.max(100, maxUsage)
+        });
+
+        const coreLoads = raw.filter(
+          s => s.Identifier.includes('load') &&
+            (s.Identifier.includes('cpu_core') || s.Identifier.includes('core/')) &&
+            s.Value != null
+        );
+        if (coreLoads.length > 0) {
+          const coreRowsHtml = coreLoads.slice(0, 16).map((c, i) => {
+            const v = Math.round(c.Value || 0);
+            return '<div class="core-row">' +
+              '<span class="core-label">Core ' + i + '</span>' +
+              '<span class="core-val" style="color:' + getColorForVal(v) + '">' + v + '%</span>' +
+            '</div>';
+          }).join('');
+          extraHtml =
+            '<div class="section-subtitle">PER-CORE UTILIZATION</div>' +
+            '<div class="scroll-container"><div class="core-grid">' + coreRowsHtml + '</div></div>';
+        }
+        extraHtml += renderTopProcessesHtml(data.topProcesses, 'cpu', data.showTopProcesses);
+      } else if (section === 'gpu') {
+        const gpu = payload.gpu?.data || {};
+        const raw = payload.gpu?.rawSensorValues || [];
+        const metrics = payload.gpu?.metrics;
+        const name = gpu.name || 'Graphics Card';
+        const currentLoad = gpu.usage != null ? gpu.usage : 0;
+        const currentTemp = gpu.temp != null ? gpu.temp : 0;
+        const usedVram = gpu.usedVram != null ? gpu.usedVram : 0;
+        const totalVram = gpu.totalVram != null ? gpu.totalVram : 0;
+        const vramPct = totalVram > 0 ? Math.round((usedVram / totalVram) * 100) : 0;
+
+        const powerSensor = raw.find(
+          s =>
+            s.Identifier.includes('power/0') ||
+            s.Identifier.toLowerCase().includes('gpu power') ||
+            s.Identifier.toLowerCase().includes('board power')
+        );
+        const powerW =
+          powerSensor && powerSensor.Value != null && powerSensor.Value > 0
+            ? Math.round(powerSensor.Value)
+            : null;
+
+
+        const loadVals = history.length > 0 ? history.map(h => h.usage ?? currentLoad) : [currentLoad];
+        const minLoad = Math.min(...loadVals);
+        const maxLoad = Math.max(...loadVals);
+        const avgLoad = Math.round(loadVals.reduce((a, b) => a + b, 0) / loadVals.length);
+
+        headerHtml =
+          '<div class="header">' +
+            '<div class="header-left"><span class="title">' + name + '</span></div>' +
+            '<div class="header-badges">' +
+              (powerW != null ? '<span class="badge">' + powerW + ' W</span>' : '') +
+              (currentTemp > 0 ? '<span class="badge-subtle">' + currentTemp + '°C</span>' : '') +
+              '<span class="badge">GPU</span>' +
+            '</div>' +
+          '</div>';
+
+        statMatrixHtml =
+          '<div class="stat-matrix">' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">CURRENT</span>' +
+              '<span class="stat-val" style="color:' + getColorForVal(currentLoad) + '">' + currentLoad + '%</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">MIN</span>' +
+              '<span class="stat-val" style="color:' + getColorForVal(minLoad) + '">' + minLoad + '%</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">AVG</span>' +
+              '<span class="stat-val" style="color:' + getColorForVal(avgLoad) + '">' + avgLoad + '%</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">MAX</span>' +
+              '<span class="stat-val" style="color:' + getColorForVal(maxLoad) + '">' + maxLoad + '%</span>' +
+            '</div>' +
+          '</div>';
+
+        const chartSeries = [
+          {name: 'Load', values: loadVals, color: 'var(--cyan)', unit: '%', isArea: true}
+        ];
+        const tempVals = history.length > 0 ? history.map(h => h.temp ?? currentTemp).filter(t => t > 0) : [];
+        if (tempVals.length > 0 && currentTemp > 0) {
+          chartSeries.push({name: 'Temp', values: tempVals, color: 'var(--warning)', unit: '°C', isArea: false});
+        }
+
+        chartObj = renderSvgChart(chartSeries, history.length > 0 ? history : [{timestamp: Date.now()}], {
+          title: 'GPU LOAD & TEMPERATURE',
+          minVal: 0,
+          maxVal: Math.max(100, maxLoad)
+        });
+
+        let vramHtml = '';
+        if (totalVram > 0) {
+          vramHtml =
+            '<div class="details-card">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">' +
+                '<span style="font-size:10px; font-weight:600; color:var(--text-muted);">DEDICATED VRAM</span>' +
+                '<span class="font-mono" style="font-size:11px; font-weight:700;">' +
+                  usedVram.toFixed(1) + ' / ' + totalVram.toFixed(1) + ' GB (' + vramPct + '%)' +
+                '</span>' +
+
+              '</div>' +
+              '<div class="progress-bar-bg" style="height:6px;">' +
+                '<div class="progress-bar-fill" style="width:' + vramPct + '%; background:var(--accent)"></div>' +
+              '</div>' +
+            '</div>';
+        }
+
+        extraHtml = vramHtml + renderTopProcessesHtml(data.topProcesses, 'gpu', data.showTopProcesses);
+      } else if (section === 'memory') {
+        const mem = payload.memory?.data || {};
+        const raw = payload.memory?.rawSensorValues || [];
+        const used = mem.used != null ? mem.used : 0;
+        const total = mem.total != null ? mem.total : 0;
+        const avail = mem.available != null ? mem.available : Math.max(0, total - used);
+        const ramPct = total > 0 ? Math.round((used / total) * 100) : 0;
+
+        const usedVals = history.length > 0 ? history.map(h => h.used ?? used) : [used];
+        const minUsed = Math.min(...usedVals);
+        const maxUsed = Math.max(...usedVals);
+        const avgUsed = Number((usedVals.reduce((a, b) => a + b, 0) / usedVals.length).toFixed(1));
+
+        headerHtml =
+          '<div class="header">' +
+            '<div class="header-left"><span class="title">System Memory</span></div>' +
+            '<div class="header-badges">' +
+              '<span class="badge-subtle">' + total.toFixed(1) + ' GB Total</span>' +
+              '<span class="badge">RAM</span>' +
+            '</div>' +
+          '</div>';
+
+        statMatrixHtml =
+          '<div class="stat-matrix">' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">CURRENT</span>' +
+              '<span class="stat-val" style="color:' + getColorForVal(ramPct) + '">' + used.toFixed(1) + ' GB</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">MIN</span>' +
+              '<span class="stat-val">' + minUsed.toFixed(1) + ' GB</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">AVG</span>' +
+              '<span class="stat-val">' + avgUsed.toFixed(1) + ' GB</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">MAX</span>' +
+              '<span class="stat-val">' + maxUsed.toFixed(1) + ' GB</span>' +
+            '</div>' +
+          '</div>';
+
+        const chartSeries = [
+          {
+            name: 'Used RAM',
+            values: usedVals,
+            color: 'var(--accent)',
+            unit: ' GB',
+            formatter: (v) => v.toFixed(1) + ' GB',
+            isArea: true
+          }
+        ];
+
+        chartObj = renderSvgChart(chartSeries, history.length > 0 ? history : [{timestamp: Date.now()}], {
+          title: 'RAM UTILIZATION PROFILE',
+          minVal: 0,
+          maxVal: Math.max(total, maxUsed)
+        });
+
+        const virtUsedSensor = raw.find(s => s.Identifier.includes('virtual') && s.Identifier.includes('data/0'));
+        const virtAvailSensor = raw.find(s => s.Identifier.includes('virtual') && s.Identifier.includes('data/1'));
+        const virtUsed = virtUsedSensor && virtUsedSensor.Value != null ? virtUsedSensor.Value : 0;
+        const virtAvail = virtAvailSensor && virtAvailSensor.Value != null ? virtAvailSensor.Value : 0;
+        const virtTotal = virtUsed + virtAvail;
+        const virtPct = virtTotal > 0 ? Math.round((virtUsed / virtTotal) * 100) : 0;
+
+        let virtualRamHtml = '';
+        if (virtTotal > 0) {
+          virtualRamHtml =
+            '<div class="details-card">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">' +
+                '<span style="font-size:10px; font-weight:600; color:var(--text-muted);">VIRTUAL / PAGE FILE</span>' +
+                '<span class="font-mono" style="font-size:11px; font-weight:700;">' +
+                  virtUsed.toFixed(1) + ' / ' + virtTotal.toFixed(1) + ' GB (' + virtPct + '%)' +
+                '</span>' +
+              '</div>' +
+              '<div class="progress-bar-bg" style="height:6px;">' +
+                '<div class="progress-bar-fill" style="width:' + virtPct + '%; background:var(--accent)"></div>' +
+              '</div>' +
+            '</div>';
+        }
+
+        extraHtml =
+          '<div class="details-card">' +
+            '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">' +
+              '<span style="font-size:10px; font-weight:600; color:var(--text-muted);">PHYSICAL ALLOCATION</span>' +
+              '<span class="font-mono" style="font-size:11px; font-weight:700;">' +
+              ramPct +
+              '% In Use</span>' +
+            '</div>' +
+            '<div class="progress-bar-bg" style="height:6px;">' +
+              '<div class="progress-bar-fill" style="width:' +
+              ramPct +
+              '%; background:' +
+              getColorForVal(ramPct) +
+              '"></div>' +
+            '</div>' +
+            '<div style="font-size:10px; color:var(--text-muted); margin-top:4px;">Free & Cache Available: ' +
+            avail.toFixed(1) +
+            ' GB</div>' +
+          '</div>' +
+          virtualRamHtml +
+          renderTopProcessesHtml(data.topProcesses, 'memory', data.showTopProcesses);
+
+
+      } else if (section === 'network') {
+        const net = payload.network?.data || {};
+        const details = (payload.network?.networkDetails || [])[0] || {};
+        const downSpeed = net.downloadSpeed != null ? net.downloadSpeed : 0;
+        const upSpeed = net.uploadSpeed != null ? net.uploadSpeed : 0;
+        const downTotal = net.downloadData != null ? net.downloadData : 0;
+        const upTotal = net.uploadData != null ? net.uploadData : 0;
+
+        const downVals = history.length > 0 ? history.map(h => h.downloadSpeed ?? downSpeed) : [downSpeed];
+        const upVals = history.length > 0 ? history.map(h => h.uploadSpeed ?? upSpeed) : [upSpeed];
+
+        const minDown = Math.min(...downVals);
+        const maxDown = Math.max(...downVals);
+        const avgDown = Math.round(downVals.reduce((a, b) => a + b, 0) / downVals.length);
+
+        const maxUp = Math.max(...upVals);
+        const avgUp = Math.round(upVals.reduce((a, b) => a + b, 0) / upVals.length);
+
+        const pubNet = payload.network?.publicNetwork;
+        const vpnBadge = pubNet
+          ? pubNet.isVpn
+            ? '<span class="badge" style="background:var(--success-soft); color:var(--success);' +
+              ' border:1px solid rgba(16,185,129,0.3);">🛡️ ' +
+              (pubNet.vpnName || 'VPN Active') +
+              '</span>'
+            : '<span class="badge-subtle">Direct</span>'
+          : '';
+
+        headerHtml =
+          '<div class="header">' +
+            '<div class="header-left"><span class="title">' +
+            (details.name || net.name || 'Network Interface') +
+            '</span></div>' +
+            '<div class="header-badges">' +
+              vpnBadge +
+              '<span class="badge">NETWORK</span>' +
+            '</div>' +
+          '</div>';
+
+        statMatrixHtml =
+          '<div class="stat-matrix">' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">CURRENT</span>' +
+              '<span class="stat-val" style="color:var(--success); font-size:11px;">' +
+              formatSpeed(downSpeed) +
+              '</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">MIN</span>' +
+              '<span class="stat-val" style="font-size:11px;">' +
+              formatSpeed(minDown) +
+              '</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">AVG</span>' +
+              '<span class="stat-val" style="color:var(--success); font-size:11px;">' +
+              formatSpeed(avgDown) +
+              '</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">MAX</span>' +
+              '<span class="stat-val" style="color:var(--cyan); font-size:11px;">' +
+              formatSpeed(maxDown) +
+              '</span>' +
+            '</div>' +
+          '</div>';
+
+        const chartSeries = [
+          {
+            name: 'Down',
+            values: downVals,
+            color: 'var(--success)',
+            formatter: (v) => formatSpeed(v),
+            isArea: true
+          },
+          {
+            name: 'Up',
+            values: upVals,
+            color: 'var(--accent)',
+            formatter: (v) => formatSpeed(v),
+            isArea: false
+          }
+        ];
+
+        chartObj = renderSvgChart(chartSeries, history.length > 0 ? history : [{timestamp: Date.now()}], {
+          title: 'BANDWIDTH THROUGHPUT',
+          minVal: 0,
+          maxVal: Math.max(1024, maxDown, maxUp)
+        });
+
+        const detailRows = [];
+        if (downTotal > 0 || upTotal > 0) {
+          detailRows.push(
+            '<tr><td class="td-key">Data Used</td><td class="td-val">↓ ' +
+              formatBytes(downTotal) +
+              ' · ↑ ' +
+              formatBytes(upTotal) +
+              '</td></tr>'
+          );
+        }
+        if (details.ipv4) {
+          detailRows.push('<tr><td class="td-key">IPv4</td><td class="td-val">' + details.ipv4 + '</td></tr>');
+        }
+        if (details.gateway) {
+          detailRows.push('<tr><td class="td-key">Gateway</td><td class="td-val">' + details.gateway + '</td></tr>');
+        }
+        if (details.dns && details.dns.length > 0) {
+          detailRows.push(
+            '<tr><td class="td-key">DNS</td><td class="td-val">' +
+              details.dns.slice(0, 2).join(', ') +
+              '</td></tr>'
+          );
+        }
+        if (details.mac) {
+          detailRows.push('<tr><td class="td-key">MAC</td><td class="td-val">' + details.mac + '</td></tr>');
+        }
+
+        let publicNetworkHtml = '';
+        if (pubNet) {
+          const locParts = [pubNet.city, pubNet.region, pubNet.country].filter(Boolean);
+          const locStr = locParts.length > 0 ? locParts.join(', ') : 'Unknown location';
+          const flag = pubNet.flagEmoji || '🌐';
+          publicNetworkHtml =
+            '<div class="details-card" style="margin-top:6px; padding:8px 10px;' +
+            ' background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px;">' +
+              '<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;">' +
+                '<div style="display:flex; align-items:center; gap:5px;">' +
+                  '<span style="font-size:12px;">' + flag + '</span>' +
+                  '<span style="font-size:10px; font-weight:700; text-transform:uppercase;' +
+                  ' letter-spacing:0.5px; color:var(--text-muted);">' +
+                    'Public IP & Geo' +
+                  '</span>' +
+                '</div>' +
+                '<button onclick="refreshPublicNetwork()" style="background:transparent; border:none;' +
+                ' color:var(--text-muted); cursor:pointer; font-size:10px; display:flex;' +
+                ' align-items:center; gap:3px;" title="Refresh Public IP & VPN status">' +
+                  '↻ Refresh' +
+                '</button>' +
+              '</div>' +
+              '<table class="details-table">' +
+                '<tr>' +
+                  '<td class="td-key">Public IP</td>' +
+                  '<td class="td-val font-mono" style="color:var(--accent); font-weight:700;">' +
+                    pubNet.ip +
+                  '</td>' +
+                '</tr>' +
+                '<tr>' +
+                  '<td class="td-key">Location</td>' +
+                  '<td class="td-val">' + locStr + '</td>' +
+                '</tr>' +
+                (pubNet.isp
+                  ? '<tr><td class="td-key">ISP / Org</td><td class="td-val">' + pubNet.isp + '</td></tr>'
+                  : '') +
+                '<tr>' +
+                  '<td class="td-key">VPN Status</td>' +
+                  '<td class="td-val" style="color:' +
+                  (pubNet.isVpn ? 'var(--success)' : 'var(--text-muted)') +
+                  '; font-weight:600;">' +
+                    (pubNet.isVpn ? 'Active (' + (pubNet.vpnName || 'VPN') + ')' : 'Direct Connection') +
+                  '</td>' +
+                '</tr>' +
+              '</table>' +
+            '</div>';
+        }
+
+        const tableHtml =
+          detailRows.length > 0 ? '<table class="details-table">' + detailRows.join('') + '</table>' : '';
+        extraHtml = tableHtml + publicNetworkHtml;
+      } else if (section === 'ping') {
+        const p = payload.ping || {};
+        const host = p.host || 'Target Host';
+        const pingData = p.data || {};
+        const lat = pingData.latency != null && pingData.latency >= 0 ? pingData.latency : null;
+
+        const pingSamples = history.length > 0 ? history : (payload.ping?.history || []);
+        const validLatencies = pingSamples.map(h => h.latency).filter(l => l != null && l >= 0);
+        const minPing = validLatencies.length > 0 ? Math.min(...validLatencies) : (lat || 0);
+        const maxPing = validLatencies.length > 0 ? Math.max(...validLatencies) : (lat || 0);
+        const avgPing = validLatencies.length > 0 ?
+          Math.round(validLatencies.reduce((a, b) => a + b, 0) / validLatencies.length) : (lat || 0);
+
+        const totalPackets = pingSamples.length;
+        const droppedPackets = pingSamples.filter(s => s.latency == null).length;
+        const lossPct = pingData.packetLoss != null ?
+          pingData.packetLoss : (totalPackets > 0 ? Math.round((droppedPackets / totalPackets) * 100) : 0);
+
+        let jitter = typeof pingData.jitter === 'number' ? pingData.jitter : 0;
+        if (jitter === 0 && validLatencies.length >= 2) {
+          let sumDiff = 0;
+          for (let i = 1; i < validLatencies.length; i++) {
+            sumDiff += Math.abs(validLatencies[i] - validLatencies[i - 1]);
+          }
+          jitter = Math.round((sumDiff / (validLatencies.length - 1)) * 10) / 10;
+        }
+
+        const isGateway = Boolean(pingData.isGateway || p.isGateway || host.toLowerCase().includes('gateway'));
+        const targetBadge = isGateway
+          ? '<span class="badge" style="background:var(--accent-soft); color:var(--accent);">LAN Gateway</span>'
+          : '<span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-muted);">WAN Target</span>';
+
+        const jitterColor = jitter < 5 ? 'var(--success)' : jitter < 20 ? 'var(--warning)' : 'var(--danger)';
+        const jitterBadge = lat != null ?
+          '<span class="badge" style="color:' + jitterColor + ';">±' + jitter + ' ms Jitter</span>' : '';
+
+        const lossBadge =
+          lossPct > 0
+            ? '<span class="badge" style="background:var(--danger-soft); color:var(--danger);">' +
+              lossPct +
+              '% Loss</span>'
+            : '';
+        const pingBadgeColor = lat != null ? getColorForVal(lat, 50, 100) : 'var(--danger)';
+
+        headerHtml =
+          '<div class="header">' +
+            '<div class="header-left" style="display:flex; align-items:center; gap:6px;">' +
+              targetBadge +
+              '<span class="title">Ping: ' + host + '</span>' +
+            '</div>' +
+            '<div class="header-badges">' +
+              jitterBadge +
+              lossBadge +
+              '<span class="badge" style="color:' + pingBadgeColor + '">' +
+                (lat != null ? lat + ' ms' : 'Offline') +
+              '</span>' +
+            '</div>' +
+          '</div>';
+
+        const reliabilityColor = lossPct > 0 ? 'var(--danger)' : 'var(--success)';
+
+        statMatrixHtml =
+          '<div class="stat-matrix-6">' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">CURRENT</span>' +
+              '<span class="stat-val" style="color:' + pingBadgeColor + '">' +
+                (lat != null ? lat + ' ms' : 'Offline') +
+              '</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">JITTER</span>' +
+              '<span class="stat-val" style="color:' + jitterColor + '">' + jitter + ' ms</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">LOSS</span>' +
+              '<span class="stat-val" style="color:' + reliabilityColor + '">' + lossPct + '%</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">MIN</span>' +
+              '<span class="stat-val">' + minPing + ' ms</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">AVG</span>' +
+              '<span class="stat-val" style="color:' + getColorForVal(avgPing, 50, 100) + '">' +
+                avgPing + ' ms' +
+              '</span>' +
+            '</div>' +
+            '<div class="stat-card-micro">' +
+              '<span class="stat-label">MAX</span>' +
+              '<span class="stat-val">' + maxPing + ' ms</span>' +
+            '</div>' +
+          '</div>';
+
+        const chartSeries = [
+          {
+            name: 'Latency',
+            values: validLatencies.length > 0 ? validLatencies : [lat || 0],
+            color: lat != null ? getColorForVal(avgPing, 50, 100) : 'var(--danger)',
+            unit: ' ms',
+            isArea: true
+          }
+        ];
+
+        chartObj = renderSvgChart(chartSeries, pingSamples.length > 0 ? pingSamples : [{timestamp: Date.now()}], {
+          title: 'NETWORK ROUND-TRIP TIME',
+          minVal: 0,
+          maxVal: Math.max(60, maxPing + 10)
+        });
+
+        let diagCardHtml = '';
+        const diag = p.diagnostic;
+        if (diag && diag.status !== 'unknown') {
+          const diagColors = {
+            'optimal': {bg: 'rgba(34, 197, 94, 0.1)', border: 'rgba(34, 197, 94, 0.3)', text: 'var(--success)'},
+            'lan-bottleneck': {bg: 'rgba(239, 68, 68, 0.12)', border: 'rgba(239, 68, 68, 0.35)', text: 'var(--danger)'},
+            'wan-lag': {bg: 'rgba(234, 179, 8, 0.12)', border: 'rgba(234, 179, 8, 0.35)', text: 'var(--warning)'},
+            'disconnected': {bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.4)', text: 'var(--danger)'}
+          };
+          const dc = diagColors[diag.status] || diagColors['optimal'];
+          diagCardHtml =
+            '<div class="details-card" style="display:flex; flex-direction:column; gap:4px;' +
+            ' margin-top:6px; padding:8px 10px; background:' +
+            dc.bg +
+            '; border:1px solid ' +
+            dc.border +
+            '; border-radius:8px;">' +
+              '<div style="display:flex; align-items:center; justify-content:space-between;">' +
+                '<span style="font-size:10px; font-weight:700; text-transform:uppercase;' +
+                ' letter-spacing:0.5px; color:' +
+                dc.text +
+                ';">Dual-Target Diagnostic</span>' +
+                '<span class="font-mono" style="font-size:10.5px; font-weight:700; color:' +
+                dc.text +
+                ';">' +
+                diag.title +
+                '</span>' +
+              '</div>' +
+              '<div style="font-size:11px; color:var(--text-muted); line-height:1.4;">' +
+              diag.description +
+              '</div>' +
+            '</div>';
+        }
+
+        extraHtml =
+          '<div class="details-card" style="display:flex; justify-content:space-between; ' +
+          'align-items:center; font-size:11px; margin-bottom:4px;">' +
+            '<span style="color:var(--text-muted)">Reliability (Packet Loss):</span>' +
+            '<span class="font-mono" style="font-weight:700; color:' +
+            reliabilityColor +
+            '">' +
+              lossPct +
+              '% loss (' +
+              (totalPackets - droppedPackets) +
+              '/' +
+              totalPackets +
+              ' received)</span>' +
+          '</div>' +
+          '<div class="details-card" style="display:flex; justify-content:space-between; ' +
+          'align-items:center; font-size:11px;">' +
+            '<span style="color:var(--text-muted)">Latency Jitter (Variance):</span>' +
+            '<span class="font-mono" style="font-weight:700; color:' +
+            jitterColor +
+            '">' +
+              jitter +
+              ' ms</span>' +
+          '</div>' +
+          diagCardHtml;
+      }
+
+
+      container.innerHTML =
+        headerHtml +
+        rangeButtonsHtml +
+        statMatrixHtml +
+        (chartObj ? chartObj.html : '') +
+        extraHtml;
+
+      if (chartObj && typeof chartObj.wireEvents === 'function') {
+        chartObj.wireEvents();
+      }
+
+      const rect = container.getBoundingClientRect();
+      const height = Math.ceil(rect.height || container.offsetHeight || container.scrollHeight);
+      const width = Math.ceil(rect.width || container.offsetWidth);
+      return {width, height};
+    };
+  <\/script>
+</body>
+</html>`;
+		this.flyoutView.webContents.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(html));
+	}
+	updateBounds(width, height) {
+		if (!this.mainWindow || this.mainWindow.isDestroyed()) return;
+		if (!this.flyoutView || this.flyoutView.webContents.isDestroyed()) return;
+		if (!this.currentAnchor) return;
+		const [winW, winH] = this.mainWindow.getContentSize();
+		let x = Math.floor(this.currentAnchor.x + this.currentAnchor.width / 2 - width / 2);
+		if (x < 10) x = 10;
+		if (x + width > winW - 10) x = winW - width - 10;
+		let y = Math.floor(this.currentAnchor.y - height - 8);
+		if (y < 40) y = Math.floor(this.currentAnchor.y + this.currentAnchor.height + 8);
+		if (y + height > winH - 10) y = Math.max(10, winH - height - 10);
+		this.flyoutView.setBounds({
+			x,
+			y,
+			width,
+			height
+		});
+		this.flyoutView.setBorderRadius(16);
+		this.flyoutView.setBackgroundColor("#00000000");
+	}
+	onResize(data) {
+		if (!this.isShowing || !this.currentAnchor) return;
+		const width = data.width || (this.activeSection ? SECTION_WIDTHS[this.activeSection] : 400);
+		if (data.height > 0) this.updateBounds(width, data.height);
+	}
+	async show(showData) {
+		if (!this.mainWindow || this.mainWindow.isDestroyed()) return;
+		if (!this.flyoutView || this.flyoutView.webContents.isDestroyed()) return;
+		if (!this.isViewLoaded) {
+			this.pendingShowData = showData;
+			return;
+		}
+		if (this.hideTimer) {
+			clearTimeout(this.hideTimer);
+			this.hideTimer = void 0;
+		}
+		this.isMouseInsideTrigger = true;
+		this.activeSection = showData.section;
+		this.currentAnchor = showData.anchor;
+		showData.range = this.activeRange;
+		const width = SECTION_WIDTHS[showData.section] || 400;
+		this.flyoutView.setBounds({
+			x: -5e3,
+			y: -5e3,
+			width,
+			height: 320
+		});
+		try {
+			this.mainWindow.contentView.removeChildView(this.flyoutView);
+		} catch {}
+		this.mainWindow.contentView.addChildView(this.flyoutView);
+		this.flyoutView.setBorderRadius(16);
+		this.flyoutView.setBackgroundColor("#00000000");
+		this.isShowing = true;
+		if (showData.showTopProcesses !== false && [
+			"cpu",
+			"gpu",
+			"memory"
+		].includes(showData.section)) processMonitorService.startActiveSampling((procs) => this.updateTopProcesses(procs));
+		try {
+			const script = `window.renderFlyout(${JSON.stringify(showData)})`;
+			const dims = await this.flyoutView.webContents.executeJavaScript(script);
+			if (this.isShowing && dims && typeof dims.height === "number" && dims.height > 0) this.updateBounds(width, dims.height);
+		} catch {
+			if (this.isShowing) this.updateBounds(width, 280);
+		}
+	}
+	updateTopProcesses(topProcesses) {
+		if (!this.isShowing || !this.flyoutView || this.flyoutView.webContents.isDestroyed()) return;
+		const script = `if (typeof window.updateTopProcessesData === 'function') { window.updateTopProcessesData(${JSON.stringify(topProcesses)}); }`;
+		this.flyoutView.webContents.executeJavaScript(script).catch(() => {});
+	}
+	update(updateData) {
+		if (!this.isShowing || !this.flyoutView || this.flyoutView.webContents.isDestroyed()) return;
+		if (this.activeSection !== updateData.section) return;
+		updateData.range = this.activeRange;
+		const script = `window.renderFlyout(${JSON.stringify(updateData)})`;
+		this.flyoutView.webContents.executeJavaScript(script).catch(() => {});
+	}
+	onTriggerLeave() {
+		this.isMouseInsideTrigger = false;
+		this.scheduleHideCheck();
+	}
+	onFlyoutMouseEvent(eventType) {
+		if (eventType === "enter") {
+			this.isMouseInsideFlyout = true;
+			if (this.hideTimer) {
+				clearTimeout(this.hideTimer);
+				this.hideTimer = void 0;
+			}
+		} else {
+			this.isMouseInsideFlyout = false;
+			this.scheduleHideCheck();
+		}
+	}
+	scheduleHideCheck() {
+		if (this.hideTimer) clearTimeout(this.hideTimer);
+		this.hideTimer = setTimeout(() => {
+			this.hideTimer = void 0;
+			if (!this.isMouseInsideTrigger && !this.isMouseInsideFlyout) this.hide();
+		}, 220);
+	}
+	hide() {
+		if (this.hideTimer) {
+			clearTimeout(this.hideTimer);
+			this.hideTimer = void 0;
+		}
+		processMonitorService.stopActiveSampling();
+		this.isShowing = false;
+		this.isMouseInsideFlyout = false;
+		this.isMouseInsideTrigger = false;
+		this.activeSection = void 0;
+		this.currentAnchor = void 0;
+		if (this.flyoutView && !this.flyoutView.webContents.isDestroyed()) {
+			this.flyoutView.setBounds({
+				x: -5e3,
+				y: -5e3,
+				width: 0,
+				height: 0
+			});
+			this.flyoutView.webContents.executeJavaScript("window.activeProcTabLocked = false;").catch(() => {});
+		}
+	}
+	destroy() {
+		processMonitorService.stopActiveSampling();
+		this.hide();
+		this.cleanupWindowListeners();
+		if (this.mainWindow && !this.mainWindow.isDestroyed() && this.flyoutView) try {
+			this.mainWindow.contentView.removeChildView(this.flyoutView);
+		} catch {}
+		if (this.flyoutView) {
+			const webContents = this.flyoutView.webContents;
+			if (webContents && !webContents.isDestroyed()) {
+				webContents.removeAllListeners();
+				try {
+					webContents.close?.();
+				} catch {}
+			}
+			this.flyoutView = void 0;
+		}
+		this.isViewLoaded = false;
+		this.pendingShowData = void 0;
+	}
+}.getInstance();
+//#endregion
+//#region extension/src/cross/sensorUtils.ts
+var CPU_TEMP_CANDIDATES = [
+	"CPU Package",
+	"Core (Tctl/Tdie)",
+	"CPU Tctl",
+	"CPU Tdie",
+	"CPU CCD1 Temperature",
+	"Core Max",
+	"Core Average",
+	"CPU Total",
+	"CPU Core"
+];
+var CPU_LOAD_CANDIDATES = [
+	"CPU Total",
+	"Total Load",
+	"CPU Core #1"
+];
+var GPU_TEMP_CANDIDATES = [
+	"GPU Core",
+	"GPU Temperature",
+	"GPU Hot Spot",
+	"GPU Edge"
+];
+var GPU_LOAD_CANDIDATES = [
+	"GPU Core",
+	"GPU Total",
+	"D3D 3D",
+	"Compute_0"
+];
+var GPU_VRAM_TOTAL_CANDIDATES = [
+	"GPU Memory Total",
+	"Dedicated Memory Total",
+	"D3D Dedicated Memory Total"
+];
+var GPU_VRAM_USED_CANDIDATES = [
+	"GPU Memory Used",
+	"D3D Dedicated Memory Used",
+	"Dedicated Memory Used"
+];
+var MEMORY_USED_CANDIDATES = ["Memory Used", "Used Memory"];
+var MEMORY_AVAILABLE_CANDIDATES = [
+	"Memory Available",
+	"Available Memory",
+	"Memory Free",
+	"Free Memory"
+];
+var NETWORK_UPLOAD_SPEED_CANDIDATES = [
+	"Upload Speed",
+	"Network Upload Speed",
+	"Upload"
+];
+var NETWORK_DOWNLOAD_SPEED_CANDIDATES = [
+	"Download Speed",
+	"Network Download Speed",
+	"Download"
+];
+/**
+* Finds a sensor value based on prioritized candidate names, with substring fallback.
+* Validates that reading is numerical and optionally strictly positive.
+*/
+var findSensorValue = (sensors = [], candidateNames, type, options) => {
+	const requirePositive = options?.requirePositive ?? false;
+	const isValidValue = (val) => typeof val === "number" && !Number.isNaN(val) && (!requirePositive || val > 0);
+	for (const name of candidateNames) {
+		const sensor = sensors.find((s) => s.Name === name && (!type || s.Type === type));
+		if (sensor && isValidValue(sensor.Value)) return sensor.Value;
+	}
+	for (const candidate of candidateNames) {
+		const lowerCandidate = candidate.toLowerCase();
+		const sensor = sensors.find((s) => (!type || s.Type === type) && s.Name && s.Name.toLowerCase().includes(lowerCandidate));
+		if (sensor && isValidValue(sensor.Value)) return sensor.Value;
+	}
+	if (type) {
+		const sensor = sensors.find((s) => s.Type === type && isValidValue(s.Value));
+		if (sensor && isValidValue(sensor.Value)) return sensor.Value;
+	}
+	return null;
+};
+/**
+* Resolves GPU load accurately across gaming (3D rasterization), AI/ML compute (CUDA/Tensor/DirectCompute),
+* and video processing workloads.
+*/
+var findGpuLoad = (sensors = []) => {
+	const loadSensors = sensors.filter((s) => s.Type === "Load" && typeof s.Value === "number" && !Number.isNaN(s.Value));
+	if (loadSensors.length === 0) return 0;
+	const coreSensor = loadSensors.find((s) => s.Name === "GPU Core" || s.Name === "GPU Total");
+	const engineSensors = loadSensors.filter((s) => {
+		if (!s.Name) return false;
+		const nameLower = s.Name.toLowerCase();
+		return nameLower.includes("d3d 3d") || nameLower.includes("compute") || nameLower.includes("cuda") || nameLower.includes("tensor");
+	});
+	const candidates = [...coreSensor ? [coreSensor.Value] : [], ...engineSensors.map((s) => s.Value)];
+	if (candidates.length > 0) return Math.min(100, Math.round(Math.max(...candidates, 0)));
+	const fallback = findSensorValue(sensors, GPU_LOAD_CANDIDATES, "Load") ?? 0;
+	return Math.min(100, Math.round(fallback));
+};
+//#endregion
+//#region extension/src/main/HardwareTelemetryHistory.ts
+var MAX_HIGH_RES_SAMPLES = 3600;
+var FIVE_MINUTES_MS = 3e5;
+var ONE_HOUR_MS = 36e5;
+var convertMBtoGB = (mb) => Number((mb / 1024).toFixed(2));
+var hardwareTelemetryHistory = class HardwareTelemetryHistory {
+	static instance;
+	cpuHistory = /* @__PURE__ */ new Map();
+	gpuHistory = /* @__PURE__ */ new Map();
+	memoryHistory = /* @__PURE__ */ new Map();
+	networkHistory = /* @__PURE__ */ new Map();
+	pingHistory = /* @__PURE__ */ new Map();
+	constructor() {}
+	static getInstance() {
+		if (!HardwareTelemetryHistory.instance) HardwareTelemetryHistory.instance = new HardwareTelemetryHistory();
+		return HardwareTelemetryHistory.instance;
+	}
+	recordHardwareReport(data) {
+		if (!data) return;
+		const now = Date.now();
+		if (data.CPU && data.CPU.length > 0) data.CPU.forEach((cpu) => {
+			const key = cpu.Name || "default";
+			const rawTemp = findSensorValue(cpu.Sensors, CPU_TEMP_CANDIDATES, "Temperature", { requirePositive: true });
+			const rawUsage = findSensorValue(cpu.Sensors, CPU_LOAD_CANDIDATES, "Load");
+			const sample = {
+				timestamp: now,
+				usage: rawUsage != null ? Math.round(rawUsage) : 0,
+				temp: rawTemp != null ? Math.round(rawTemp) : 0
+			};
+			const list = this.cpuHistory.get(key) || [];
+			list.push(sample);
+			if (list.length > MAX_HIGH_RES_SAMPLES) list.shift();
+			this.cpuHistory.set(key, list);
+		});
+		if (data.GPU && data.GPU.length > 0) data.GPU.forEach((gpu) => {
+			const key = gpu.Name || "default";
+			const rawTemp = findSensorValue(gpu.Sensors, GPU_TEMP_CANDIDATES, "Temperature", { requirePositive: true });
+			const rawTotalVram = findSensorValue(gpu.Sensors, GPU_VRAM_TOTAL_CANDIDATES);
+			const rawUsedVram = findSensorValue(gpu.Sensors, GPU_VRAM_USED_CANDIDATES);
+			const totalVram = convertMBtoGB(rawTotalVram ?? 0);
+			const usedVram = convertMBtoGB(rawUsedVram ?? 0);
+			const load = findGpuLoad(gpu.Sensors);
+			const sample = {
+				timestamp: now,
+				usage: load,
+				temp: rawTemp != null ? Math.round(rawTemp) : 0,
+				usedVram: totalVram > 0 ? usedVram : 0
+			};
+			const list = this.gpuHistory.get(key) || [];
+			list.push(sample);
+			if (list.length > MAX_HIGH_RES_SAMPLES) list.shift();
+			this.gpuHistory.set(key, list);
+		});
+		if (data.Memory && data.Memory.length > 0) data.Memory.forEach((mem) => {
+			const key = mem.Name || "default";
+			const used = findSensorValue(mem.Sensors, MEMORY_USED_CANDIDATES, "Data") ?? 0;
+			const total = used + (findSensorValue(mem.Sensors, MEMORY_AVAILABLE_CANDIDATES, "Data") ?? 0);
+			const pct = total > 0 ? Math.round(used / total * 100) : 0;
+			const sample = {
+				timestamp: now,
+				used: Number(used.toFixed(1)),
+				total: Number(total.toFixed(1)),
+				pct
+			};
+			const list = this.memoryHistory.get(key) || [];
+			list.push(sample);
+			if (list.length > MAX_HIGH_RES_SAMPLES) list.shift();
+			this.memoryHistory.set(key, list);
+		});
+		if (data.Network && data.Network.length > 0) data.Network.forEach((net) => {
+			const key = net.Name || "default";
+			const uploadSpeed = findSensorValue(net.Sensors, NETWORK_UPLOAD_SPEED_CANDIDATES) ?? 0;
+			const downloadSpeed = findSensorValue(net.Sensors, NETWORK_DOWNLOAD_SPEED_CANDIDATES) ?? 0;
+			const sample = {
+				timestamp: now,
+				downloadSpeed,
+				uploadSpeed
+			};
+			const list = this.networkHistory.get(key) || [];
+			list.push(sample);
+			if (list.length > MAX_HIGH_RES_SAMPLES) list.shift();
+			this.networkHistory.set(key, list);
+		});
+	}
+	recordPing(host, latency, alive, jitter, packetLoss) {
+		const sample = {
+			timestamp: Date.now(),
+			latency: alive && latency != null && latency >= 0 ? latency : null,
+			jitter,
+			packetLoss
+		};
+		const list = this.pingHistory.get(host) || [];
+		list.push(sample);
+		if (list.length > MAX_HIGH_RES_SAMPLES) list.shift();
+		this.pingHistory.set(host, list);
+	}
+	getHistory(section, targetKey) {
+		switch (section) {
+			case "cpu":
+				if (targetKey && this.cpuHistory.has(targetKey)) return this.cpuHistory.get(targetKey) || [];
+				return this.cpuHistory.values().next().value || [];
+			case "gpu":
+				if (targetKey && this.gpuHistory.has(targetKey)) return this.gpuHistory.get(targetKey) || [];
+				return this.gpuHistory.values().next().value || [];
+			case "memory":
+				if (targetKey && this.memoryHistory.has(targetKey)) return this.memoryHistory.get(targetKey) || [];
+				for (const [name, samples] of this.memoryHistory.entries()) if (!name.toLowerCase().includes("virtual")) return samples;
+				return this.memoryHistory.values().next().value || [];
+			case "network":
+				if (targetKey && this.networkHistory.has(targetKey)) return this.networkHistory.get(targetKey) || [];
+				return this.networkHistory.values().next().value || [];
+			case "ping":
+				if (targetKey && this.pingHistory.has(targetKey)) return this.pingHistory.get(targetKey) || [];
+				return this.pingHistory.values().next().value || [];
+			default: return [];
+		}
+	}
+	filterSamples(samples, range) {
+		if (!samples || samples.length === 0) return [];
+		if (range === "overall") return samples;
+		const now = Date.now();
+		const cutoff = range === "minutes" ? now - FIVE_MINUTES_MS : now - ONE_HOUR_MS;
+		return samples.filter((s) => s.timestamp >= cutoff);
+	}
+	clear() {
+		this.cpuHistory.clear();
+		this.gpuHistory.clear();
+		this.memoryHistory.clear();
+		this.networkHistory.clear();
+		this.pingHistory.clear();
+	}
+}.getInstance();
+//#endregion
 //#region extension/src/main/pinger.ts
 var Pinger = class {
 	config;
 	isWindows;
+	historySize;
 	running = false;
 	timer = null;
+	activeProcess = null;
+	sampleHistory = [];
 	host;
+	isGateway;
+	label;
 	onResult;
 	onError;
 	constructor(config) {
 		this.host = config.host;
+		this.isGateway = config.isGateway ?? false;
+		this.label = config.label;
+		this.historySize = config.historySize ?? 20;
 		this.config = {
 			host: config.host,
 			intervalMs: config.intervalMs,
-			timeoutMs: config.timeoutMs ?? 2e3
+			timeoutMs: config.timeoutMs ?? 2e3,
+			historySize: this.historySize,
+			isGateway: this.isGateway,
+			label: this.label ?? ""
 		};
 		this.isWindows = (0, node_os.platform)() === "win32";
 	}
@@ -12496,6 +14816,43 @@ var Pinger = class {
 			clearTimeout(this.timer);
 			this.timer = null;
 		}
+		if (this.activeProcess) {
+			try {
+				this.activeProcess.kill();
+			} catch {}
+			this.activeProcess = null;
+		}
+	}
+	/**
+	* Records a sample into the rolling window and calculates telemetry stats:
+	* Packet loss % and Jitter (mean consecutive absolute latency difference in ms).
+	*/
+	recordSample(latency) {
+		this.sampleHistory.push({
+			timestamp: Date.now(),
+			latency
+		});
+		if (this.sampleHistory.length > this.historySize) this.sampleHistory.shift();
+		const total = this.sampleHistory.length;
+		const dropped = this.sampleHistory.filter((s) => s.latency === null).length;
+		const packetLoss = total > 0 ? Math.round(dropped / total * 100) : 0;
+		const valid = this.sampleHistory.map((s) => s.latency).filter((l) => l !== null && l >= 0);
+		let jitter = 0;
+		if (valid.length >= 2) {
+			let sumDiff = 0;
+			for (let i = 1; i < valid.length; i++) sumDiff += Math.abs(valid[i] - valid[i - 1]);
+			jitter = Math.round(sumDiff / (valid.length - 1) * 10) / 10;
+		}
+		const min = valid.length > 0 ? Math.min(...valid) : void 0;
+		const max = valid.length > 0 ? Math.max(...valid) : void 0;
+		const avg = valid.length > 0 ? Math.round(valid.reduce((a, b) => a + b, 0) / valid.length * 10) / 10 : void 0;
+		return {
+			packetLoss,
+			jitter,
+			min,
+			max,
+			avg
+		};
 	}
 	/**
 	* Recursive loop to ensure pings do not overlap if the response
@@ -12508,6 +14865,7 @@ var Pinger = class {
 			const result = await this.ping();
 			if (this.running && this.onResult) this.onResult(result);
 		} catch (err) {
+			this.recordSample(null);
 			if (this.running && this.onError) this.onError(err instanceof Error ? err : new Error(String(err)));
 		}
 		const elapsed = Date.now() - startTime;
@@ -12519,20 +14877,38 @@ var Pinger = class {
 	*/
 	ping() {
 		return new Promise((resolve) => {
-			const command = this.buildCommand();
 			const timestamp = /* @__PURE__ */ new Date();
-			(0, node_child_process.exec)(command, (error, stdout, stderr) => {
+			const host = this.config.host.trim();
+			const args = this.buildArgs(host);
+			const child = (0, node_child_process.execFile)("ping", args, { windowsHide: true }, (error, stdout, stderr) => {
+				this.activeProcess = null;
 				const result = {
 					host: this.config.host,
 					alive: false,
 					timestamp
 				};
 				if (error) {
+					const stats = this.recordSample(null);
 					result.error = stderr || error.message;
 					result.rawOutput = stdout;
+					result.packetLoss = stats.packetLoss;
+					result.jitter = stats.jitter;
+					result.min = stats.min;
+					result.max = stats.max;
+					result.avg = stats.avg;
+					result.isGateway = this.isGateway;
+					result.label = this.label;
 					return resolve(result);
 				}
 				const latency = this.parseLatency(stdout);
+				const stats = this.recordSample(latency);
+				result.packetLoss = stats.packetLoss;
+				result.jitter = stats.jitter;
+				result.min = stats.min;
+				result.max = stats.max;
+				result.avg = stats.avg;
+				result.isGateway = this.isGateway;
+				result.label = this.label;
 				if (latency !== null) {
 					result.alive = true;
 					result.latency = latency;
@@ -12542,15 +14918,31 @@ var Pinger = class {
 				}
 				resolve(result);
 			});
+			this.activeProcess = child;
 		});
 	}
 	/**
-	* Generates the appropriate OS-specific ping command.
+	* Generates the appropriate OS-specific ping arguments.
 	*/
-	buildCommand() {
-		const { host, timeoutMs } = this.config;
-		if (this.isWindows) return `ping -n 1 -w ${timeoutMs} ${host}`;
-		else return `ping -c 1 -W ${Math.max(1, Math.ceil(timeoutMs / 1e3))} ${host}`;
+	buildArgs(host) {
+		const { timeoutMs } = this.config;
+		if (this.isWindows) return [
+			"-n",
+			"1",
+			"-w",
+			String(timeoutMs),
+			host
+		];
+		else {
+			const timeoutSec = Math.max(1, Math.ceil(timeoutMs / 1e3));
+			return [
+				"-c",
+				"1",
+				"-W",
+				String(timeoutSec),
+				host
+			];
+		}
 	}
 	/**
 	* Extract latency in milliseconds from standard ping output.
@@ -12564,6 +14956,244 @@ var Pinger = class {
 		return null;
 	}
 };
+//#endregion
+//#region extension/src/main/PublicNetworkService.ts
+var VPN_INTERFACE_PATTERN = new RegExp(`(${[
+	"vpn",
+	"wireguard",
+	"wintun",
+	"openvpn",
+	"tun",
+	"tap",
+	"nordlynx",
+	"proton",
+	"tailscale",
+	"zerotier",
+	"surfshark",
+	"expressvpn",
+	"mullvad",
+	"warp",
+	"sing-box",
+	"clash",
+	"anyconnect",
+	"fortinet",
+	"cisco",
+	"neorouter",
+	"hamachi"
+].join("|")})`, "i");
+var CACHE_TTL_MS = 3e5;
+var INTERFACE_CHECK_INTERVAL_MS = 15e3;
+var publicNetworkService = class PublicNetworkService {
+	static instance;
+	cachedInfo;
+	lastFetchTime = 0;
+	isFetching = false;
+	pendingFetchPromise;
+	checkIntervalTimer;
+	lastInterfaceFingerprint = "";
+	listeners = [];
+	constructor() {}
+	static getInstance() {
+		if (!PublicNetworkService.instance) PublicNetworkService.instance = new PublicNetworkService();
+		return PublicNetworkService.instance;
+	}
+	start() {
+		if (this.checkIntervalTimer) return;
+		this.lastInterfaceFingerprint = this.getInterfaceFingerprint();
+		this.getPublicNetworkInfo();
+		this.checkIntervalTimer = setInterval(() => {
+			this.checkInterfaceChange();
+		}, INTERFACE_CHECK_INTERVAL_MS);
+	}
+	stop() {
+		if (this.checkIntervalTimer) {
+			clearInterval(this.checkIntervalTimer);
+			this.checkIntervalTimer = void 0;
+		}
+		this.listeners = [];
+	}
+	onUpdate(callback) {
+		this.listeners.push(callback);
+		if (this.cachedInfo) callback(this.cachedInfo);
+		return () => {
+			this.listeners = this.listeners.filter((cb) => cb !== callback);
+		};
+	}
+	getCachedInfo() {
+		return this.cachedInfo;
+	}
+	notify(info) {
+		this.listeners.forEach((cb) => {
+			try {
+				cb(info);
+			} catch (err) {
+				console.error("[PublicNetworkService] Listener notification error:", err);
+			}
+		});
+	}
+	getInterfaceFingerprint() {
+		try {
+			const ifaces = (0, node_os.networkInterfaces)();
+			return Object.entries(ifaces).filter(([, addrs]) => addrs && addrs.some((a) => !a.internal)).map(([name, addrs]) => {
+				return `${name}:${(addrs || []).filter((a) => !a.internal).map((a) => a.address).sort().join(";")}`;
+			}).sort().join("|");
+		} catch {
+			return "";
+		}
+	}
+	checkInterfaceChange() {
+		const currentFingerprint = this.getInterfaceFingerprint();
+		if (currentFingerprint && this.lastInterfaceFingerprint && currentFingerprint !== this.lastInterfaceFingerprint) {
+			this.lastInterfaceFingerprint = currentFingerprint;
+			this.getPublicNetworkInfo(true);
+		} else this.lastInterfaceFingerprint = currentFingerprint;
+	}
+	/**
+	* Checks network interfaces for common VPN / tunnel virtual adapters.
+	*/
+	detectVpnInterfaces() {
+		try {
+			const ifaces = (0, node_os.networkInterfaces)();
+			for (const [name, addrs] of Object.entries(ifaces)) {
+				if (!addrs || addrs.length === 0) continue;
+				if (addrs.some((a) => !a.internal && a.address && a.address !== "0.0.0.0") && VPN_INTERFACE_PATTERN.test(name)) return {
+					isVpn: true,
+					vpnName: name
+				};
+			}
+		} catch {}
+		return { isVpn: false };
+	}
+	hasProxyConfigured() {
+		return Boolean(process.env.HTTP_PROXY || process.env.HTTPS_PROXY || process.env.ALL_PROXY || process.env.http_proxy || process.env.https_proxy || process.env.all_proxy);
+	}
+	/**
+	* Fetches public IP and Geo telemetry from external service with fallback.
+	*/
+	async getPublicNetworkInfo(forceRefresh = false) {
+		const now = Date.now();
+		if (!forceRefresh && this.cachedInfo && now - this.lastFetchTime < CACHE_TTL_MS) return this.cachedInfo;
+		if (this.isFetching && this.pendingFetchPromise) return this.pendingFetchPromise;
+		this.isFetching = true;
+		this.pendingFetchPromise = this.performFetch().then((info) => {
+			this.cachedInfo = info;
+			this.lastFetchTime = Date.now();
+			this.notify(info);
+			return info;
+		}).catch((err) => {
+			console.warn("[PublicNetworkService] Failed to query public network info:", err);
+			const fallback = this.buildFallbackInfo();
+			this.cachedInfo = fallback;
+			this.notify(fallback);
+			return fallback;
+		}).finally(() => {
+			this.isFetching = false;
+			this.pendingFetchPromise = void 0;
+		});
+		return this.pendingFetchPromise;
+	}
+	buildFallbackInfo() {
+		const localVpn = this.detectVpnInterfaces();
+		return {
+			ip: this.cachedInfo?.ip || "Offline",
+			country: this.cachedInfo?.country || void 0,
+			countryCode: this.cachedInfo?.countryCode || void 0,
+			flagEmoji: this.cachedInfo?.flagEmoji || void 0,
+			city: this.cachedInfo?.city || void 0,
+			region: this.cachedInfo?.region || void 0,
+			isp: this.cachedInfo?.isp || void 0,
+			org: this.cachedInfo?.org || void 0,
+			isVpn: localVpn.isVpn || Boolean(this.cachedInfo?.isVpn),
+			vpnName: localVpn.vpnName || this.cachedInfo?.vpnName || void 0,
+			isProxy: this.hasProxyConfigured() || Boolean(this.cachedInfo?.isProxy),
+			lastUpdated: Date.now()
+		};
+	}
+	async performFetch() {
+		const localVpn = this.detectVpnInterfaces();
+		const isProxy = this.hasProxyConfigured();
+		try {
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), 6e3);
+			const res = await fetch("https://ipwho.is/", {
+				signal: controller.signal,
+				headers: {
+					Accept: "application/json",
+					"User-Agent": "LynxHub-HardwareMonitor/1.0"
+				}
+			});
+			clearTimeout(timeoutId);
+			if (res.ok) {
+				const data = await res.json();
+				if (data && data.success !== false && data.ip) {
+					const isSecurityVpn = Boolean(data.security?.vpn || data.security?.tor || data.security?.proxy);
+					const isVpn = localVpn.isVpn || isSecurityVpn;
+					const vpnName = localVpn.vpnName || (isSecurityVpn ? data.connection?.isp || "VPN Active" : void 0);
+					return {
+						ip: data.ip,
+						country: data.country || void 0,
+						countryCode: data.country_code || void 0,
+						flagEmoji: data.flag?.emoji || void 0,
+						city: data.city || void 0,
+						region: data.region || void 0,
+						isp: data.connection?.isp || void 0,
+						org: data.connection?.org || void 0,
+						isVpn,
+						vpnName,
+						isProxy: isProxy || Boolean(data.security?.proxy),
+						lastUpdated: Date.now()
+					};
+				}
+			}
+		} catch {}
+		try {
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), 4e3);
+			const res = await fetch("https://1.1.1.1/cdn-cgi/trace", {
+				signal: controller.signal,
+				headers: { "User-Agent": "LynxHub-HardwareMonitor/1.0" }
+			});
+			clearTimeout(timeoutId);
+			if (res.ok) {
+				const text = await res.text();
+				const ipMatch = text.match(/ip=([^\r\n]+)/);
+				const locMatch = text.match(/loc=([^\r\n]+)/);
+				const warpMatch = text.match(/warp=([^\r\n]+)/);
+				if (ipMatch && ipMatch[1]) {
+					const isWarp = Boolean(warpMatch && warpMatch[1] === "on");
+					const isVpn = Boolean(localVpn.isVpn || isWarp);
+					const vpnName = localVpn.vpnName || (isWarp ? "Cloudflare WARP" : void 0);
+					return {
+						ip: ipMatch[1].trim(),
+						countryCode: locMatch ? locMatch[1].trim() : void 0,
+						isVpn,
+						vpnName,
+						isProxy,
+						lastUpdated: Date.now()
+					};
+				}
+			}
+		} catch {}
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), 4e3);
+		const res = await fetch("https://api64.ipify.org?format=json", {
+			signal: controller.signal,
+			headers: { "User-Agent": "LynxHub-HardwareMonitor/1.0" }
+		});
+		clearTimeout(timeoutId);
+		if (res.ok) {
+			const data = await res.json();
+			if (data && data.ip) return {
+				ip: data.ip,
+				isVpn: localVpn.isVpn,
+				vpnName: localVpn.vpnName,
+				isProxy,
+				lastUpdated: Date.now()
+			};
+		}
+		throw new Error("All public IP queries failed");
+	}
+}.getInstance();
 //#endregion
 //#region extension/src/main/utils.ts
 /**
@@ -12588,6 +15218,7 @@ var HARDWARE_REDISCOVERY_DELAY_MS = 1e4;
 var hardwareMonitorService = class HardwareMonitorService {
 	static instance;
 	storeManager;
+	mainWindow;
 	hwMonitor;
 	config = initialSettings;
 	webContents;
@@ -12596,7 +15227,73 @@ var hardwareMonitorService = class HardwareMonitorService {
 	pingers = [];
 	rediscoveryTimer;
 	discoveryPromise;
+	cachedNetworkDetails = [];
+	lastNetworkDetailsTime = 0;
 	constructor() {}
+	cachedDefaultGateway = "";
+	lastGatewayResolveTime = 0;
+	async resolveDefaultGateway() {
+		const now = Date.now();
+		if (this.cachedDefaultGateway && now - this.lastGatewayResolveTime < 3e4) return this.cachedDefaultGateway;
+		let defaultGateway = "";
+		const osPlatform = (0, node_os.platform)();
+		try {
+			if (osPlatform === "win32") {
+				const match = (await new Promise((resolve) => {
+					(0, node_child_process.exec)("route print 0.0.0.0", { windowsHide: true }, (_, out) => {
+						resolve(out || "");
+					});
+				})).match(/0\.0\.0\.0\s+0\.0\.0\.0\s+([\d.]+)/);
+				if (match && match[1]) defaultGateway = match[1];
+			} else if (osPlatform === "darwin") {
+				const match = (await new Promise((resolve) => {
+					(0, node_child_process.exec)("route -n get default", (_, out) => resolve(out || ""));
+				})).match(/gateway:\s*([\d.]+)/);
+				if (match && match[1]) defaultGateway = match[1];
+			} else if (osPlatform === "linux") {
+				const match = (await new Promise((resolve) => {
+					(0, node_child_process.exec)("ip route show default", (_, out) => resolve(out || ""));
+				})).match(/default\s+via\s+([\d.]+)/);
+				if (match && match[1]) defaultGateway = match[1];
+			}
+		} catch {}
+		if (defaultGateway) {
+			this.cachedDefaultGateway = defaultGateway;
+			this.lastGatewayResolveTime = now;
+		}
+		return defaultGateway;
+	}
+	async getNetworkDetails() {
+		const now = Date.now();
+		if (this.cachedNetworkDetails.length > 0 && now - this.lastNetworkDetailsTime < 3e4) return this.cachedNetworkDetails;
+		try {
+			const interfaces = (0, node_os.networkInterfaces)();
+			const dnsServers = (0, node_dns.getServers)();
+			const defaultGateway = await this.resolveDefaultGateway();
+			const details = [];
+			for (const [name, addrs] of Object.entries(interfaces)) {
+				if (!addrs || addrs.length === 0) continue;
+				const nonInternal = addrs.filter((a) => !a.internal);
+				if (nonInternal.length === 0) continue;
+				const ipv4 = nonInternal.find((a) => a.family === "IPv4")?.address;
+				const ipv6 = nonInternal.find((a) => a.family === "IPv6")?.address;
+				const mac = nonInternal.find((a) => a.mac && a.mac !== "00:00:00:00:00:00")?.mac;
+				details.push({
+					name,
+					ipv4,
+					ipv6,
+					gateway: defaultGateway || void 0,
+					dns: dnsServers.length > 0 ? dnsServers : void 0,
+					mac
+				});
+			}
+			this.cachedNetworkDetails = details;
+			this.lastNetworkDetailsTime = now;
+			return details;
+		} catch {
+			return [];
+		}
+	}
 	static getInstance() {
 		if (!HardwareMonitorService.instance) HardwareMonitorService.instance = new HardwareMonitorService();
 		return HardwareMonitorService.instance;
@@ -12610,39 +15307,88 @@ var hardwareMonitorService = class HardwareMonitorService {
 		this.loadConfig();
 		this.startPinging();
 		this.registerIpcHandlers();
+		this.registerLifecycleHandlers();
 		this.isInitialized = true;
+		publicNetworkService.start();
+		publicNetworkService.onUpdate((info) => {
+			this.sendToRenderer(HMONITOR_IPC_UPDATE_PUBLIC_NETWORK, info);
+		});
+		this.getNetworkDetails();
 		this.discoverHardware();
 	}
-	startPinging() {
-		const pingState = this.config.pingState;
+	stopPinging() {
 		const stopPinger = (pinger) => {
 			pinger.stop();
 			this.sendToRenderer(HMONITOR_IPC_STOP_PING, pinger.host);
 		};
 		this.pingers.forEach(stopPinger);
 		this.pingers = [];
-		if (pingState.isActive) Array.from(new Set(pingState.enabledHosts)).forEach((host) => {
+	}
+	startPinging() {
+		const pingState = this.config.pingState;
+		this.stopPinging();
+		if (pingState.isActive) this.spawnPingers();
+	}
+	async spawnPingers() {
+		const pingState = this.config.pingState;
+		if (!pingState.isActive) return;
+		let gatewayHost = null;
+		if (pingState.autoPingGateway !== false) {
+			const gw = await this.resolveDefaultGateway();
+			if (gw && gw !== "0.0.0.0" && gw !== "127.0.0.1") gatewayHost = gw;
+		}
+		const targets = [];
+		if (gatewayHost) targets.push({
+			host: gatewayHost,
+			isGateway: true,
+			label: "Gateway (LAN)"
+		});
+		Array.from(new Set(pingState.enabledHosts)).forEach((host) => {
+			if (host !== gatewayHost) targets.push({
+				host,
+				isGateway: false,
+				label: host
+			});
+		});
+		targets.forEach(({ host, isGateway, label }) => {
 			if (!this.pingers.some((p) => p.host === host)) {
 				const pinger = new Pinger({
 					host,
 					timeoutMs: pingState.timeout,
-					intervalMs: pingState.interval
+					intervalMs: pingState.interval,
+					isGateway,
+					label
 				});
 				pinger.onResult = (result) => {
 					const timeString = result.timestamp.toLocaleTimeString();
-					if (result.alive) {
-						const data = {
-							host,
-							timeString,
-							latency: result.latency
-						};
-						this.sendToRenderer(HMONITOR_IPC_UPDATE_PING, data);
-					} else this.sendToRenderer(HMONITOR_IPC_UPDATE_PING, host);
+					if (this.config.enableHoverDetails) hardwareTelemetryHistory.recordPing(host, result.latency, result.alive, result.jitter, result.packetLoss);
+					const data = {
+						host,
+						timeString,
+						latency: result.alive ? result.latency : void 0,
+						packetLoss: result.packetLoss,
+						jitter: result.jitter,
+						min: result.min,
+						max: result.max,
+						avg: result.avg,
+						isGateway: result.isGateway,
+						label: result.label
+					};
+					this.sendToRenderer(HMONITOR_IPC_UPDATE_PING, data);
 				};
 				pinger.onError = () => {
-					this.sendToRenderer(HMONITOR_IPC_UPDATE_PING, host);
+					if (this.config.enableHoverDetails) hardwareTelemetryHistory.recordPing(host, void 0, false, 0, 100);
+					const data = {
+						host,
+						timeString: (/* @__PURE__ */ new Date()).toLocaleTimeString(),
+						latency: void 0,
+						packetLoss: 100,
+						jitter: 0,
+						isGateway,
+						label
+					};
+					this.sendToRenderer(HMONITOR_IPC_UPDATE_PING, data);
 				};
-				electron.app.on("window-all-closed", () => pinger.stop());
 				pinger.start();
 				this.pingers.push(pinger);
 			}
@@ -12654,8 +15400,15 @@ var hardwareMonitorService = class HardwareMonitorService {
 	onMainWindowReady(utils) {
 		utils.getAppManager().then((appManager) => {
 			this.webContents = appManager.getWebContent();
+			const mainWindow = appManager.getMainWindow();
+			if (mainWindow) {
+				this.mainWindow = mainWindow;
+				if (this.config.enableHoverDetails) hardwareFlyoutView.attach(mainWindow);
+			}
 			if (this.lastError) this.sendToRenderer(HMONITOR_IPC_MONITORING_ERROR, this.lastError);
 			this.sendToRenderer(HMONITOR_IPC_CONFIG_UPDATE, this.config);
+			const cachedPublicNet = publicNetworkService.getCachedInfo();
+			if (cachedPublicNet) this.sendToRenderer(HMONITOR_IPC_UPDATE_PUBLIC_NETWORK, cachedPublicNet);
 			if (this.config.enabled) this.startMonitoring();
 		});
 	}
@@ -12677,7 +15430,9 @@ var hardwareMonitorService = class HardwareMonitorService {
 					showAliasCpu: storedConfig.showAliasCpu ?? initialSettings.showAliasCpu,
 					showAliasGpu: storedConfig.showAliasGpu ?? initialSettings.showAliasGpu,
 					showAliasMemory: storedConfig.showAliasMemory ?? initialSettings.showAliasMemory,
-					showAliasNetwork: storedConfig.showAliasNetwork ?? initialSettings.showAliasNetwork
+					showAliasNetwork: storedConfig.showAliasNetwork ?? initialSettings.showAliasNetwork,
+					maskPublicIp: storedConfig.maskPublicIp ?? initialSettings.maskPublicIp,
+					enableHoverDetails: storedConfig.enableHoverDetails ?? initialSettings.enableHoverDetails
 				},
 				configVersion: initialSettings.configVersion
 			};
@@ -12689,6 +15444,7 @@ var hardwareMonitorService = class HardwareMonitorService {
 			storedConfig = migratedConfig;
 		}
 		if (!storedConfig.pingState) storedConfig.pingState = initialSettings.pingState;
+		else if (storedConfig.pingState.autoPingGateway === void 0) storedConfig.pingState.autoPingGateway = true;
 		this.config = {
 			...storedConfig,
 			availableHardware: storedConfig.availableHardware ?? initialSettings.availableHardware,
@@ -12696,8 +15452,10 @@ var hardwareMonitorService = class HardwareMonitorService {
 			showAliasGpu: storedConfig.showAliasGpu ?? initialSettings.showAliasGpu,
 			showAliasMemory: storedConfig.showAliasMemory ?? initialSettings.showAliasMemory,
 			showAliasNetwork: storedConfig.showAliasNetwork ?? initialSettings.showAliasNetwork,
+			maskPublicIp: storedConfig.maskPublicIp ?? initialSettings.maskPublicIp,
 			sectionOrder: storedConfig.sectionOrder ?? initialSettings.sectionOrder,
-			uptimeOrder: storedConfig.uptimeOrder ?? initialSettings.uptimeOrder
+			uptimeOrder: storedConfig.uptimeOrder ?? initialSettings.uptimeOrder,
+			enableHoverDetails: storedConfig.enableHoverDetails ?? initialSettings.enableHoverDetails
 		};
 	}
 	saveConfig() {
@@ -12817,6 +15575,7 @@ var hardwareMonitorService = class HardwareMonitorService {
 			const targetDir = (0, node_path.join)(electron.app.getPath("downloads"), "LynxHub");
 			await this.hwMonitor.checkRequirements(targetDir);
 			this.hwMonitor.on("data", (data) => {
+				if (this.config.enableHoverDetails) hardwareTelemetryHistory.recordHardwareReport(data);
 				const rawSensors = [
 					...data.CPU ?? [],
 					...data.GPU ?? [],
@@ -12828,9 +15587,12 @@ var hardwareMonitorService = class HardwareMonitorService {
 				})) ?? []);
 				const reportWithRawSensors = {
 					...data,
-					rawSensors
+					rawSensors,
+					networkDetails: this.cachedNetworkDetails,
+					publicNetwork: publicNetworkService.getCachedInfo()
 				};
 				this.sendToRenderer(HMONITOR_IPC_DATA_UPDATE, reportWithRawSensors);
+				this.getNetworkDetails();
 			});
 			this.hwMonitor.on("error", (error) => {
 				console.error("Hardware Monitoring Error:", error.message, error.rawError ?? "");
@@ -12850,8 +15612,17 @@ var hardwareMonitorService = class HardwareMonitorService {
 	updateConfig(newConfig) {
 		const oldConfig = this.config;
 		const shouldRestart = !isEqual(newConfig.enabledMetrics, oldConfig.enabledMetrics) || !isEqual(newConfig.refreshInterval, oldConfig.refreshInterval);
+		const hoverDetailsChanged = newConfig.enableHoverDetails !== oldConfig.enableHoverDetails;
 		this.config = newConfig;
 		this.saveConfig();
+		if (hoverDetailsChanged) {
+			if (newConfig.enableHoverDetails) {
+				if (this.mainWindow) hardwareFlyoutView.attach(this.mainWindow);
+			} else {
+				hardwareFlyoutView.destroy();
+				hardwareTelemetryHistory.clear();
+			}
+		}
 		if (newConfig.enabled && shouldRestart) this.stopMonitoring();
 		if (newConfig.enabled !== oldConfig.enabled) newConfig.enabled ? this.startMonitoring() : this.stopMonitoring();
 		else if (newConfig.enabled && shouldRestart) this.startMonitoring();
@@ -12868,14 +15639,24 @@ var hardwareMonitorService = class HardwareMonitorService {
 			}
 		};
 		this.saveConfig();
+		if (this.config.enableHoverDetails) {
+			if (this.mainWindow) hardwareFlyoutView.attach(this.mainWindow);
+		} else {
+			hardwareFlyoutView.destroy();
+			hardwareTelemetryHistory.clear();
+		}
 		this.stopMonitoring();
-		const stopPinger = (pinger) => {
-			pinger.stop();
-			this.sendToRenderer(HMONITOR_IPC_STOP_PING, pinger.host);
-		};
-		this.pingers.forEach(stopPinger);
-		this.pingers = [];
+		this.stopPinging();
 		await this.discoverHardware();
+	}
+	registerLifecycleHandlers() {
+		electron.app.on("window-all-closed", () => {
+			hardwareFlyoutView.destroy();
+			hardwareTelemetryHistory.clear();
+			publicNetworkService.stop();
+			this.stopPinging();
+			this.stopMonitoring();
+		});
 	}
 	registerIpcHandlers() {
 		electron.ipcMain.on(HMONITOR_IPC_SET_CONFIG, (_, newConfig) => {
@@ -12884,6 +15665,51 @@ var hardwareMonitorService = class HardwareMonitorService {
 		});
 		electron.ipcMain.on(HMONITOR_IPC_RESET_CONFIG, () => {
 			this.resetConfig();
+		});
+		electron.ipcMain.on(HMONITOR_IPC_REFRESH_PUBLIC_NETWORK, () => {
+			publicNetworkService.getPublicNetworkInfo(true);
+		});
+		electron.ipcMain.on(HMONITOR_IPC_SHOW_FLYOUT, (_, data) => {
+			if (!this.config.enableHoverDetails) return;
+			let key;
+			if (data.section === "cpu") key = data.payload?.cpu?.data?.name;
+			else if (data.section === "gpu") key = data.payload?.gpu?.data?.name;
+			else if (data.section === "memory") key = data.payload?.memory?.data?.name;
+			else if (data.section === "network") {
+				key = data.payload?.network?.data?.name;
+				if (data.payload?.network) data.payload.network.publicNetwork = publicNetworkService.getCachedInfo();
+			} else if (data.section === "ping") key = data.payload?.ping?.host;
+			data.history = hardwareTelemetryHistory.getHistory(data.section, key);
+			data.topProcesses = processMonitorService.getCachedData();
+			data.showTopProcesses = this.config.showTopProcesses !== false;
+			hardwareFlyoutView.show(data);
+		});
+		electron.ipcMain.on(HMONITOR_IPC_UPDATE_FLYOUT, (_, data) => {
+			if (!this.config.enableHoverDetails) return;
+			let key;
+			if (data.section === "cpu") key = data.payload?.cpu?.data?.name;
+			else if (data.section === "gpu") key = data.payload?.gpu?.data?.name;
+			else if (data.section === "memory") key = data.payload?.memory?.data?.name;
+			else if (data.section === "network") {
+				key = data.payload?.network?.data?.name;
+				if (data.payload?.network) data.payload.network.publicNetwork = publicNetworkService.getCachedInfo();
+			} else if (data.section === "ping") key = data.payload?.ping?.host;
+			data.history = hardwareTelemetryHistory.getHistory(data.section, key);
+			data.topProcesses = processMonitorService.getCachedData();
+			data.showTopProcesses = this.config.showTopProcesses !== false;
+			hardwareFlyoutView.update(data);
+		});
+		electron.ipcMain.on(HMONITOR_IPC_HIDE_FLYOUT, () => {
+			hardwareFlyoutView.onTriggerLeave();
+		});
+		electron.ipcMain.on(HMONITOR_IPC_FLYOUT_MOUSE_EVENT, (_, eventType) => {
+			hardwareFlyoutView.onFlyoutMouseEvent(eventType);
+		});
+		electron.ipcMain.on(HMONITOR_IPC_FLYOUT_RESIZE, (_, data) => {
+			hardwareFlyoutView.onResize(data);
+		});
+		electron.ipcMain.on(HMONITOR_IPC_FLYOUT_SET_RANGE, (_, range) => {
+			hardwareFlyoutView.setActiveRange(range);
 		});
 	}
 }.getInstance();

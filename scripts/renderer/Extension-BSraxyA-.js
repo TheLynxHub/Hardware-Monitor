@@ -1,14 +1,14 @@
 (function() {
 	try {
 		var e = "undefined" != typeof window ? window : "undefined" != typeof global ? global : "undefined" != typeof globalThis ? globalThis : "undefined" != typeof self ? self : {};
-		e.SENTRY_RELEASE = { id: "f9f2e045fae8353a4c8417903eeca14e9c7534d6" };
+		e.SENTRY_RELEASE = { id: "ea803f2051806c332cf6a29b882a65ba1ae1bc76" };
 		var n = new e.Error().stack;
-		n && (e._sentryDebugIds = e._sentryDebugIds || {}, e._sentryDebugIds[n] = "e49341a5-8668-400e-ac34-4f8baa768dea", e._sentryDebugIdIdentifier = "sentry-dbid-e49341a5-8668-400e-ac34-4f8baa768dea");
+		n && (e._sentryDebugIds = e._sentryDebugIds || {}, e._sentryDebugIds[n] = "e96c6ab1-3be4-4db5-88d2-e8e3dd8ea099", e._sentryDebugIdIdentifier = "sentry-dbid-e96c6ab1-3be4-4db5-88d2-e8e3dd8ea099");
 	} catch (e) {}
 })();
-import { n as __commonJSMin, r as __toESM, t as require_react } from "./react-CAs43U7w.js";
-import { r as importShared } from "./_virtual___federation_fn_import-DeyyGZp8.js";
-import { t as require_jsx_runtime } from "./jsx-runtime-Cm1I7RBM.js";
+import { n as __commonJSMin, r as __toESM, t as require_react } from "./react-CHj91jrH.js";
+import { r as importShared } from "./_virtual___federation_fn_import-DQkStKZl.js";
+import { t as require_jsx_runtime } from "./jsx-runtime-wDj2f5rd.js";
 //#region extension/src/cross/constants.ts
 var HMONITOR_STORAGE_ID = "hmonitor_storage";
 var HMONITOR_IPC_DATA_UPDATE = "hmonitor-data-update";
@@ -18,12 +18,17 @@ var HMONITOR_IPC_SET_CONFIG = "hmonitor-set-config";
 var HMONITOR_IPC_RESET_CONFIG = "hmonitor-reset-config";
 var HMONITOR_IPC_UPDATE_PING = "hmonitor-update-ping";
 var HMONITOR_IPC_STOP_PING = "hmonitor-stop-ping";
+var HMONITOR_IPC_UPDATE_PUBLIC_NETWORK = "hmonitor-update-public-network";
+var HMONITOR_IPC_SHOW_FLYOUT = "hmonitor-show-flyout";
+var HMONITOR_IPC_UPDATE_FLYOUT = "hmonitor-update-flyout";
+var HMONITOR_IPC_HIDE_FLYOUT = "hmonitor-hide-flyout";
 var initialSettings = {
 	configVersion: .6,
 	refreshInterval: 1,
 	enabled: true,
 	displayStyle: "default",
 	showSectionLabel: true,
+	enableHoverDetails: true,
 	metricVisibility: {
 		icon: true,
 		label: true,
@@ -51,12 +56,15 @@ var initialSettings = {
 		hosts: [],
 		enabledHosts: [],
 		interval: 1e3,
-		timeout: 2e3
+		timeout: 2e3,
+		autoPingGateway: true
 	},
 	showAliasCpu: true,
 	showAliasGpu: true,
 	showAliasMemory: true,
 	showAliasNetwork: true,
+	maskPublicIp: true,
+	showTopProcesses: true,
 	sectionOrder: [
 		"cpu",
 		"gpu",
@@ -1248,6 +1256,46 @@ var ArrowUp = createLucideIcon("arrow-up", [["path", {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var ChartNoAxesColumn = createLucideIcon("chart-no-axes-column", [
+	["path", {
+		d: "M5 21v-6",
+		key: "1hz6c0"
+	}],
+	["path", {
+		d: "M12 21V3",
+		key: "1lcnhd"
+	}],
+	["path", {
+		d: "M19 21V9",
+		key: "unv183"
+	}]
+]);
+/**
+* @license lucide-react v1.33.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Check = createLucideIcon("check", [["path", {
+	d: "M20 6 9 17l-5-5",
+	key: "1gmf2c"
+}]]);
+/**
+* @license lucide-react v1.33.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ChevronDown = createLucideIcon("chevron-down", [["path", {
+	d: "m6 9 6 6 6-6",
+	key: "qrunsl"
+}]]);
+/**
+* @license lucide-react v1.33.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var ChevronRight = createLucideIcon("chevron-right", [["path", {
 	d: "m9 18 6-6-6-6",
 	key: "mthhwq"
@@ -1261,6 +1309,16 @@ var ChevronRight = createLucideIcon("chevron-right", [["path", {
 var ChevronLeft = createLucideIcon("chevron-left", [["path", {
 	d: "m15 18-6-6 6-6",
 	key: "1wnfg3"
+}]]);
+/**
+* @license lucide-react v1.33.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var ChevronUp = createLucideIcon("chevron-up", [["path", {
+	d: "m18 15-6-6-6 6",
+	key: "153udz"
 }]]);
 /**
 * @license lucide-react v1.33.0 - ISC
@@ -1378,6 +1436,21 @@ var Database = createLucideIcon("database", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Eye = createLucideIcon("eye", [["path", {
+	d: "M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0",
+	key: "1nclc0"
+}], ["circle", {
+	cx: "12",
+	cy: "12",
+	r: "3",
+	key: "1v7zrd"
+}]]);
+/**
+* @license lucide-react v1.33.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Gauge = createLucideIcon("gauge", [["path", {
 	d: "m12 14 4-4",
 	key: "9kzdfg"
@@ -1385,6 +1458,28 @@ var Gauge = createLucideIcon("gauge", [["path", {
 	d: "M3.34 19a10 10 0 1 1 17.32 0",
 	key: "19p75a"
 }]]);
+/**
+* @license lucide-react v1.33.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Globe = createLucideIcon("globe", [
+	["circle", {
+		cx: "12",
+		cy: "12",
+		r: "10",
+		key: "1mglay"
+	}],
+	["path", {
+		d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20",
+		key: "13o1zl"
+	}],
+	["path", {
+		d: "M2 12h20",
+		key: "9i4pu4"
+	}]
+]);
 /**
 * @license lucide-react v1.33.0 - ISC
 *
@@ -1545,6 +1640,46 @@ var Monitor = createLucideIcon("monitor", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Network = createLucideIcon("network", [
+	["rect", {
+		x: "16",
+		y: "16",
+		width: "6",
+		height: "6",
+		rx: "1",
+		key: "4q2zg0"
+	}],
+	["rect", {
+		x: "2",
+		y: "16",
+		width: "6",
+		height: "6",
+		rx: "1",
+		key: "8cvhb9"
+	}],
+	["rect", {
+		x: "9",
+		y: "2",
+		width: "6",
+		height: "6",
+		rx: "1",
+		key: "1egb70"
+	}],
+	["path", {
+		d: "M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3",
+		key: "1jsf9p"
+	}],
+	["path", {
+		d: "M12 12V8",
+		key: "2874zd"
+	}]
+]);
+/**
+* @license lucide-react v1.33.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Plus = createLucideIcon("plus", [["path", {
 	d: "M5 12h14",
 	key: "1ays0h"
@@ -1571,40 +1706,28 @@ var Power = createLucideIcon("power", [["path", {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var Radar = createLucideIcon("radar", [
+var Radio = createLucideIcon("radio", [
 	["path", {
-		d: "M19.07 4.93A10 10 0 0 0 6.99 3.34",
-		key: "z3du51"
+		d: "M16.247 7.761a6 6 0 0 1 0 8.478",
+		key: "1fwjs5"
 	}],
 	["path", {
-		d: "M4 6h.01",
-		key: "oypzma"
+		d: "M19.075 4.933a10 10 0 0 1 0 14.134",
+		key: "ehdyv1"
 	}],
 	["path", {
-		d: "M2.29 9.62A10 10 0 1 0 21.31 8.35",
-		key: "qzzz0"
+		d: "M4.925 19.067a10 10 0 0 1 0-14.134",
+		key: "1q22gi"
 	}],
 	["path", {
-		d: "M16.24 7.76A6 6 0 1 0 8.23 16.67",
-		key: "1yjesh"
-	}],
-	["path", {
-		d: "M12 18h.01",
-		key: "mhygvu"
-	}],
-	["path", {
-		d: "M17.99 11.66A6 6 0 0 1 15.77 16.67",
-		key: "1u2y91"
+		d: "M7.753 16.239a6 6 0 0 1 0-8.478",
+		key: "r2q7qm"
 	}],
 	["circle", {
 		cx: "12",
 		cy: "12",
 		r: "2",
 		key: "1c9p78"
-	}],
-	["path", {
-		d: "m13.41 10.59 5.66-5.66",
-		key: "mhq4k0"
 	}]
 ]);
 /**
@@ -1613,13 +1736,39 @@ var Radar = createLucideIcon("radar", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var RotateCcw = createLucideIcon("rotate-ccw", [["path", {
-	d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8",
-	key: "1357e3"
+var ShieldCheck = createLucideIcon("shield-check", [["path", {
+	d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
+	key: "oel41y"
 }], ["path", {
-	d: "M3 3v5h5",
-	key: "1xhq8a"
+	d: "m9 12 2 2 4-4",
+	key: "dzmm74"
 }]]);
+/**
+* @license lucide-react v1.33.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Sparkles = createLucideIcon("sparkles", [
+	["path", {
+		d: "M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z",
+		key: "1s2grr"
+	}],
+	["path", {
+		d: "M20 2v4",
+		key: "1rf3ol"
+	}],
+	["path", {
+		d: "M22 4h-4",
+		key: "gwowj6"
+	}],
+	["circle", {
+		cx: "4",
+		cy: "20",
+		r: "2",
+		key: "6kqj1y"
+	}]
+]);
 /**
 * @license lucide-react v1.33.0 - ISC
 *
@@ -1656,6 +1805,26 @@ var Timer = createLucideIcon("timer", [
 		cy: "14",
 		r: "8",
 		key: "1e1u0o"
+	}]
+]);
+/**
+* @license lucide-react v1.33.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Type = createLucideIcon("type", [
+	["path", {
+		d: "M12 4v16",
+		key: "1654pz"
+	}],
+	["path", {
+		d: "M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2",
+		key: "e0r10z"
+	}],
+	["path", {
+		d: "M9 20h6",
+		key: "s66wpe"
 	}]
 ]);
 /**
@@ -1706,8 +1875,115 @@ var Zap = createLucideIcon("zap", [["path", {
 	key: "1v7up4"
 }]]);
 //#endregion
+//#region extension/src/cross/sensorUtils.ts
+var CPU_TEMP_CANDIDATES = [
+	"CPU Package",
+	"Core (Tctl/Tdie)",
+	"CPU Tctl",
+	"CPU Tdie",
+	"CPU CCD1 Temperature",
+	"Core Max",
+	"Core Average",
+	"CPU Total",
+	"CPU Core"
+];
+var CPU_LOAD_CANDIDATES = [
+	"CPU Total",
+	"Total Load",
+	"CPU Core #1"
+];
+var GPU_TEMP_CANDIDATES = [
+	"GPU Core",
+	"GPU Temperature",
+	"GPU Hot Spot",
+	"GPU Edge"
+];
+var GPU_LOAD_CANDIDATES = [
+	"GPU Core",
+	"GPU Total",
+	"D3D 3D",
+	"Compute_0"
+];
+var GPU_VRAM_TOTAL_CANDIDATES = [
+	"GPU Memory Total",
+	"Dedicated Memory Total",
+	"D3D Dedicated Memory Total"
+];
+var GPU_VRAM_USED_CANDIDATES = [
+	"GPU Memory Used",
+	"D3D Dedicated Memory Used",
+	"Dedicated Memory Used"
+];
+var MEMORY_USED_CANDIDATES = ["Memory Used", "Used Memory"];
+var MEMORY_AVAILABLE_CANDIDATES = [
+	"Memory Available",
+	"Available Memory",
+	"Memory Free",
+	"Free Memory"
+];
+var NETWORK_UPLOAD_SPEED_CANDIDATES = [
+	"Upload Speed",
+	"Network Upload Speed",
+	"Upload"
+];
+var NETWORK_DOWNLOAD_SPEED_CANDIDATES = [
+	"Download Speed",
+	"Network Download Speed",
+	"Download"
+];
+var NETWORK_UPLOAD_DATA_CANDIDATES = [
+	"Data Uploaded",
+	"Bytes Uploaded",
+	"Total Upload"
+];
+var NETWORK_DOWNLOAD_DATA_CANDIDATES = [
+	"Data Downloaded",
+	"Bytes Downloaded",
+	"Total Download"
+];
+/**
+* Finds a sensor value based on prioritized candidate names, with substring fallback.
+* Validates that reading is numerical and optionally strictly positive.
+*/
+var findSensorValue = (sensors = [], candidateNames, type, options) => {
+	const requirePositive = options?.requirePositive ?? false;
+	const isValidValue = (val) => typeof val === "number" && !Number.isNaN(val) && (!requirePositive || val > 0);
+	for (const name of candidateNames) {
+		const sensor = sensors.find((s) => s.Name === name && (!type || s.Type === type));
+		if (sensor && isValidValue(sensor.Value)) return sensor.Value;
+	}
+	for (const candidate of candidateNames) {
+		const lowerCandidate = candidate.toLowerCase();
+		const sensor = sensors.find((s) => (!type || s.Type === type) && s.Name && s.Name.toLowerCase().includes(lowerCandidate));
+		if (sensor && isValidValue(sensor.Value)) return sensor.Value;
+	}
+	if (type) {
+		const sensor = sensors.find((s) => s.Type === type && isValidValue(s.Value));
+		if (sensor && isValidValue(sensor.Value)) return sensor.Value;
+	}
+	return null;
+};
+/**
+* Resolves GPU load accurately across gaming (3D rasterization), AI/ML compute (CUDA/Tensor/DirectCompute),
+* and video processing workloads.
+*/
+var findGpuLoad = (sensors = []) => {
+	const loadSensors = sensors.filter((s) => s.Type === "Load" && typeof s.Value === "number" && !Number.isNaN(s.Value));
+	if (loadSensors.length === 0) return 0;
+	const coreSensor = loadSensors.find((s) => s.Name === "GPU Core" || s.Name === "GPU Total");
+	const engineSensors = loadSensors.filter((s) => {
+		if (!s.Name) return false;
+		const nameLower = s.Name.toLowerCase();
+		return nameLower.includes("d3d 3d") || nameLower.includes("compute") || nameLower.includes("cuda") || nameLower.includes("tensor");
+	});
+	const candidates = [...coreSensor ? [coreSensor.Value] : [], ...engineSensors.map((s) => s.Value)];
+	if (candidates.length > 0) return Math.min(100, Math.round(Math.max(...candidates, 0)));
+	const fallback = findSensorValue(sensors, GPU_LOAD_CANDIDATES, "Load") ?? 0;
+	return Math.min(100, Math.round(fallback));
+};
+//#endregion
 //#region extension/src/renderer/hooks/useHardwareData.ts
-var { useEffect: useEffect$13, useState: useState$11 } = await importShared("react");
+var { useEffect: useEffect$14, useState: useState$13 } = await importShared("react");
 var convertMBtoGB = (mb) => Number((mb / 1024).toFixed(2));
 var initialData = {
 	gpu: [],
@@ -1725,51 +2001,72 @@ var initialData = {
 * It listens for IPC events from the main process and transforms the raw data.
 */
 function useHardwareData() {
-	const [hardwareData, setHardwareData] = useState$11(initialData);
-	const [isConnected, setIsConnected] = useState$11(false);
-	const [error, setError] = useState$11(null);
-	useEffect$13(() => {
+	const [hardwareData, setHardwareData] = useState$13(initialData);
+	const [isConnected, setIsConnected] = useState$13(false);
+	const [error, setError] = useState$13(null);
+	useEffect$14(() => {
 		const handleHardwareUpdate = (_, data) => {
 			if (!data) return;
-			const transformedData = {
-				cpu: data.CPU.map((item) => ({
-					name: item.Name,
-					temp: item.Sensors.find((s) => s.Name === "CPU Package" && s.Type === "Temperature")?.Value || 0,
-					usage: Math.round(item.Sensors.find((s) => s.Name === "CPU Total" && s.Type === "Load")?.Value || 0)
-				})),
-				gpu: data.GPU.map((item) => ({
-					name: item.Name,
-					temp: item.Sensors.find((s) => s.Name === "GPU Core" && s.Type === "Temperature")?.Value || 0,
-					usage: Math.round(item.Sensors.find((s) => s.Name === "D3D 3D" && s.Type === "Load")?.Value || 0),
-					totalVram: convertMBtoGB(item.Sensors.find((s) => s.Name === "GPU Memory Total")?.Value || 0),
-					usedVram: convertMBtoGB(item.Sensors.find((s) => s.Name === "GPU Memory Used")?.Value || 0)
-				})),
+			setHardwareData((prev) => ({
+				cpu: data.CPU.map((item) => {
+					const rawTemp = findSensorValue(item.Sensors, CPU_TEMP_CANDIDATES, "Temperature", { requirePositive: true });
+					const rawUsage = findSensorValue(item.Sensors, CPU_LOAD_CANDIDATES, "Load");
+					return {
+						name: item.Name,
+						temp: rawTemp != null ? Math.round(rawTemp) : 0,
+						usage: rawUsage != null ? Math.round(rawUsage) : 0,
+						sensors: item.Sensors
+					};
+				}),
+				gpu: data.GPU.map((item) => {
+					const rawTemp = findSensorValue(item.Sensors, GPU_TEMP_CANDIDATES, "Temperature", { requirePositive: true });
+					const rawTotalVram = findSensorValue(item.Sensors, GPU_VRAM_TOTAL_CANDIDATES);
+					const rawUsedVram = findSensorValue(item.Sensors, GPU_VRAM_USED_CANDIDATES);
+					return {
+						name: item.Name,
+						temp: rawTemp != null ? Math.round(rawTemp) : 0,
+						usage: findGpuLoad(item.Sensors),
+						totalVram: convertMBtoGB(rawTotalVram ?? 0),
+						usedVram: convertMBtoGB(rawUsedVram ?? 0),
+						sensors: item.Sensors
+					};
+				}),
 				memory: data.Memory.map((item) => {
-					const used = item.Sensors.find((s) => s.Name === "Memory Used" && s.Type === "Data")?.Value || 0;
-					const available = item.Sensors.find((s) => s.Name === "Memory Available" && s.Type === "Data")?.Value || 0;
+					const used = findSensorValue(item.Sensors, MEMORY_USED_CANDIDATES, "Data") ?? 0;
+					const available = findSensorValue(item.Sensors, MEMORY_AVAILABLE_CANDIDATES, "Data") ?? 0;
 					return {
 						name: item.Name,
 						used,
 						available,
-						total: used + available
+						total: used + available,
+						sensors: item.Sensors
 					};
 				}),
 				network: (data.Network ?? []).map((item) => ({
 					name: item.Name,
-					uploadSpeed: item.Sensors.find((s) => s.Name === "Upload Speed")?.Value || 0,
-					downloadSpeed: item.Sensors.find((s) => s.Name === "Download Speed")?.Value || 0,
-					uploadData: item.Sensors.find((s) => s.Name === "Data Uploaded")?.Value || 0,
-					downloadData: item.Sensors.find((s) => s.Name === "Data Downloaded")?.Value || 0
+					uploadSpeed: findSensorValue(item.Sensors, NETWORK_UPLOAD_SPEED_CANDIDATES) ?? 0,
+					downloadSpeed: findSensorValue(item.Sensors, NETWORK_DOWNLOAD_SPEED_CANDIDATES) ?? 0,
+					uploadData: findSensorValue(item.Sensors, NETWORK_UPLOAD_DATA_CANDIDATES) ?? 0,
+					downloadData: findSensorValue(item.Sensors, NETWORK_DOWNLOAD_DATA_CANDIDATES) ?? 0,
+					sensors: item.Sensors
 				})),
 				uptime: {
 					system: data.Uptime?.rawSeconds || 0,
 					app: data.ElapsedTime?.rawSeconds || 0
 				},
-				rawSensors: data.rawSensors || []
-			};
-			setHardwareData(transformedData);
+				rawSensors: data.rawSensors || [],
+				networkDetails: data.networkDetails,
+				publicNetwork: data.publicNetwork ?? prev.publicNetwork
+			}));
 			setIsConnected(true);
 			setError(null);
+		};
+		const handlePublicNetworkUpdate = (_, pubNet) => {
+			if (!pubNet) return;
+			setHardwareData((prev) => ({
+				...prev,
+				publicNetwork: pubNet
+			}));
 		};
 		const handleError = (_, err) => {
 			console.error("Received monitoring error:", err);
@@ -1777,9 +2074,11 @@ function useHardwareData() {
 			setIsConnected(false);
 		};
 		const clearDataListener = window.electron.ipcRenderer.on(HMONITOR_IPC_DATA_UPDATE, handleHardwareUpdate);
+		const clearPublicNetListener = window.electron.ipcRenderer.on(HMONITOR_IPC_UPDATE_PUBLIC_NETWORK, handlePublicNetworkUpdate);
 		const clearMonitorError = window.electron.ipcRenderer.on(HMONITOR_IPC_MONITORING_ERROR, handleError);
 		return () => {
 			clearDataListener();
+			clearPublicNetListener();
 			clearMonitorError();
 		};
 	}, []);
@@ -1791,29 +2090,29 @@ function useHardwareData() {
 }
 //#endregion
 //#region extension/src/renderer/hooks/useScrollManager.ts
-var { useCallback: useCallback$6, useEffect: useEffect$12, useRef: useRef$10, useState: useState$10 } = await importShared("react");
+var { useCallback: useCallback$7, useEffect: useEffect$13, useRef: useRef$12, useState: useState$12 } = await importShared("react");
 /**
 * A hook to manage the scrolling state and behavior of a container element.
 * @returns Functions and state to manage scrolling, including refs and scroll button visibility.
 */
 function useScrollManager() {
-	const [canScrollLeft, setCanScrollLeft] = useState$10(false);
-	const [canScrollRight, setCanScrollRight] = useState$10(false);
-	const ref = useRef$10(null);
-	const updateScrollState = useCallback$6(() => {
+	const [canScrollLeft, setCanScrollLeft] = useState$12(false);
+	const [canScrollRight, setCanScrollRight] = useState$12(false);
+	const ref = useRef$12(null);
+	const updateScrollState = useCallback$7(() => {
 		const element = ref.current;
 		if (!element) return;
 		const { scrollLeft, scrollWidth, clientWidth } = element;
 		setCanScrollLeft(scrollLeft > 0);
 		setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
 	}, []);
-	const scroll = useCallback$6((direction) => {
+	const scroll = useCallback$7((direction) => {
 		ref.current?.scrollBy({
 			left: direction === "left" ? -250 : 250,
 			behavior: "smooth"
 		});
 	}, []);
-	useEffect$12(() => {
+	useEffect$13(() => {
 		const element = ref.current;
 		if (!element) return;
 		const handleResize = () => updateScrollState();
@@ -1825,7 +2124,7 @@ function useScrollManager() {
 			element.removeEventListener("scroll", updateScrollState);
 		};
 	}, [updateScrollState]);
-	useEffect$12(() => {
+	useEffect$13(() => {
 		const element = ref.current;
 		if (!element) return;
 		const handleWheel = (event) => {
@@ -1837,7 +2136,7 @@ function useScrollManager() {
 		return () => element.removeEventListener("wheel", handleWheel);
 	}, []);
 	return {
-		containerRef: useCallback$6((node) => {
+		containerRef: useCallback$7((node) => {
 			if (node) {
 				ref.current = node;
 				updateScrollState();
@@ -4911,6 +5210,9 @@ var hmonitorSlice = createSlice({
 		setPingState: (state, action) => {
 			state.pingState = action.payload;
 		},
+		toggleMaskPublicIp: (state) => {
+			state.maskPublicIp = !state.maskPublicIp;
+		},
 		saveSettings: (state) => {
 			window.electron.ipcRenderer.send(HMONITOR_IPC_SET_CONFIG, JSON.stringify(omit(state, "modals")));
 		},
@@ -5063,15 +5365,85 @@ var getProgressColor = (value, isTemp = false) => {
 	return (isTemp ? TEMP_THRESHOLDS : USAGE_THRESHOLDS).find((d) => value < d.max).gradient;
 };
 //#endregion
+//#region extension/src/renderer/components/common/HardwareFlyoutTrigger.tsx
+var { memo: memo$17, useCallback: useCallback$6, useEffect: useEffect$12, useRef: useRef$11 } = await importShared("react");
+var HardwareFlyoutTrigger = memo$17(({ children, section, payload, className = "" }) => {
+	const containerRef = useRef$11(null);
+	const isHoveredRef = useRef$11(false);
+	const darkMode = useAppState("darkMode");
+	const enableHoverDetails = useHMonitorState("enableHoverDetails") ?? true;
+	const handleMouseEnter = useCallback$6(() => {
+		if (!enableHoverDetails) return;
+		isHoveredRef.current = true;
+		if (!containerRef.current) return;
+		const rect = containerRef.current.getBoundingClientRect();
+		window.electron.ipcRenderer.send(HMONITOR_IPC_SHOW_FLYOUT, {
+			section,
+			anchor: {
+				x: rect.x,
+				y: rect.y,
+				width: rect.width,
+				height: rect.height
+			},
+			payload,
+			darkMode
+		});
+	}, [
+		section,
+		payload,
+		darkMode,
+		enableHoverDetails
+	]);
+	const handleMouseLeave = useCallback$6(() => {
+		if (!enableHoverDetails) return;
+		isHoveredRef.current = false;
+		window.electron.ipcRenderer.send(HMONITOR_IPC_HIDE_FLYOUT);
+	}, [enableHoverDetails]);
+	useEffect$12(() => {
+		if (enableHoverDetails && isHoveredRef.current) window.electron.ipcRenderer.send(HMONITOR_IPC_UPDATE_FLYOUT, {
+			section,
+			payload,
+			darkMode
+		});
+	}, [
+		payload,
+		section,
+		darkMode,
+		enableHoverDetails
+	]);
+	useEffect$12(() => {
+		if (!enableHoverDetails && isHoveredRef.current) {
+			isHoveredRef.current = false;
+			window.electron.ipcRenderer.send(HMONITOR_IPC_HIDE_FLYOUT);
+		}
+	}, [enableHoverDetails]);
+	useEffect$12(() => {
+		return () => {
+			if (isHoveredRef.current) window.electron.ipcRenderer.send(HMONITOR_IPC_HIDE_FLYOUT);
+		};
+	}, []);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: "inline-flex items-center shrink-0 " + (enableHoverDetails ? `cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-accent ${className}` : `cursor-default ${className}`),
+		ref: containerRef,
+		onMouseEnter: handleMouseEnter,
+		onMouseLeave: handleMouseLeave,
+		tabIndex: enableHoverDetails ? 0 : -1,
+		role: enableHoverDetails ? "button" : void 0,
+		children
+	});
+});
+HardwareFlyoutTrigger.displayName = "HardwareFlyoutTrigger";
+//#endregion
 //#region extension/src/renderer/components/common/MetricItem.tsx
-var { memo: memo$11, useMemo: useMemo$16 } = await importShared("react");
-var ProgressBar = memo$11(({ value, max = 100, isTemp = false }) => {
+var { memo: memo$16, useMemo: useMemo$16 } = await importShared("react");
+var ProgressBar = memo$16(({ value, max = 100, isTemp = false }) => {
 	const displayStyle = useHMonitorState("displayStyle");
 	const isTwoColumn = displayStyle === "two-column";
+	const isSegmented = displayStyle === "segmented";
 	const isCompact = ["compact", "two-column"].includes(displayStyle);
 	const percentage = Math.min(value / max * 100, 100);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: `${isTwoColumn ? "w-7" : isCompact ? "w-8" : "w-12"} ${isCompact ? "h-1" : "h-1.5"} bg-white/10 rounded-full overflow-hidden shrink-0`,
+		className: `${isTwoColumn || isSegmented ? "w-7" : isCompact ? "w-8" : "w-12"} ${isCompact || isSegmented ? "h-1" : "h-1.5"} bg-foreground/10 rounded-full overflow-hidden shrink-0`,
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 			className: `h-full bg-linear-to-r ${getProgressColor(isTemp ? value : percentage, isTemp)} rounded-full transition-all duration-700 ease-out`,
 			style: { width: `${percentage}%` }
@@ -5079,21 +5451,27 @@ var ProgressBar = memo$11(({ value, max = 100, isTemp = false }) => {
 	});
 });
 ProgressBar.displayName = "ProgressBar";
-var MetricItem = memo$11(({ icon: Icon, label, value, unit = "", progress, colorClass, children }) => {
+var MetricItem = memo$16(({ icon: Icon, label, value, unit = "", progress, colorClass, children }) => {
 	const displayStyle = useHMonitorState("displayStyle");
 	const metricVisibility = useHMonitorState("metricVisibility");
 	const isRaw = ["raw", "raw-two-column"].includes(displayStyle);
 	const isTwoColumn = displayStyle === "two-column";
 	const isCompact = ["compact", "two-column"].includes(displayStyle);
+	const isSegmented = displayStyle === "segmented";
+	const isGhost = displayStyle === "ghost";
 	const renderProgress = useMemo$16(() => {
-		if (!progress || !metricVisibility.progressBar) return null;
+		if (!progress || !metricVisibility.progressBar || isGhost) return null;
 		const max = progress.max || 100;
 		const progressValue = Math.min(progress.value, max);
 		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ProgressBar, {
 			...progress,
 			value: progressValue
 		});
-	}, [progress, metricVisibility]);
+	}, [
+		progress,
+		metricVisibility,
+		isGhost
+	]);
 	if (isRaw) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
 		className: "inline-flex items-baseline gap-1 whitespace-nowrap",
 		children: [metricVisibility.label && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
@@ -5104,21 +5482,66 @@ var MetricItem = memo$11(({ icon: Icon, label, value, unit = "", progress, color
 			children: [value, unit]
 		})]
 	});
-	if (children) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: `flex items-center ${isCompact ? "px-2 py-0.5 gap-x-1.5" : "px-3 py-2 gap-x-2"} ${isTwoColumn ? "h-5 min-w-0" : ""} rounded-lg border backdrop-blur-sm transition-colors duration-200 text-foreground bg-surface border-surface-secondary`,
-		children
-	});
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: `flex items-center ${isCompact ? "px-2 py-0.5 gap-x-1.5" : "px-3 py-2 gap-x-2"} ${isTwoColumn ? "h-5 min-w-0" : ""} rounded-lg border backdrop-blur-sm transition-colors duration-200 ${colorClass || "text-semi-muted bg-surface border-surface-secondary"}`,
-		children: [metricVisibility.icon && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon, { className: `${isCompact ? "size-3" : "size-4"} shrink-0` }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: `flex items-center ${isTwoColumn ? "gap-1.5 min-w-0" : "gap-2"} text-xs font-medium`,
+	if (isSegmented) {
+		if (children) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "flex items-center shrink-0 gap-x-1.5 text-xs font-medium text-foreground",
+			children
+		});
+		const textColor = colorClass ? colorClass.split(" ").filter((c) => c.startsWith("text-")).join(" ") : "";
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex items-center shrink-0 gap-x-1.5 text-xs font-medium",
+			children: [metricVisibility.icon && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon, { className: `size-3 shrink-0 ${textColor || "text-foreground/70"}` }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center shrink-0 gap-1",
+				children: [
+					metricVisibility.label && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "text-foreground/60 shrink-0 whitespace-nowrap",
+						children: [label, ":"]
+					}),
+					metricVisibility.value && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: `shrink-0 whitespace-nowrap font-medium ${textColor || "text-foreground"}`,
+						children: [value, unit]
+					}),
+					renderProgress
+				]
+			})]
+		});
+	}
+	if (isGhost) {
+		if (children) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+			className: "inline-flex items-center gap-1 shrink-0 text-xs font-medium text-foreground leading-none",
+			children
+		});
+		const textColor = colorClass ? colorClass.split(" ").filter((c) => c.startsWith("text-")).join(" ") : "";
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+			className: "inline-flex items-center gap-1 shrink-0 text-xs font-medium leading-none",
 			children: [
+				metricVisibility.icon && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon, { className: `size-3 shrink-0 ${textColor || "text-foreground/70"}` }),
 				metricVisibility.label && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-					className: "opacity-80 shrink-0",
+					className: "text-foreground/60 shrink-0 whitespace-nowrap",
 					children: [label, ":"]
 				}),
 				metricVisibility.value && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-					className: "shrink-0",
+					className: `shrink-0 whitespace-nowrap font-medium ${textColor || "text-foreground"}`,
+					children: [value, unit]
+				})
+			]
+		});
+	}
+	if (children) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: `flex items-center shrink-0 ${isCompact ? "px-2 py-0.5 gap-x-1.5" : "px-3 py-2 gap-x-2"} ${isTwoColumn ? "h-5 min-w-0" : ""} rounded-lg border backdrop-blur-sm transition-colors duration-200 text-foreground bg-surface border-surface-secondary`,
+		children
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: `flex items-center shrink-0 ${isCompact ? "px-2 py-0.5 gap-x-1.5" : "px-3 py-2 gap-x-2"} ${isTwoColumn ? "h-5 min-w-0" : ""} rounded-lg border backdrop-blur-sm transition-colors duration-200 ${colorClass || "text-semi-muted bg-surface border-surface-secondary"}`,
+		children: [metricVisibility.icon && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon, { className: `${isCompact ? "size-3" : "size-4"} shrink-0` }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: `flex items-center shrink-0 ${isTwoColumn ? "gap-1.5 min-w-0" : "gap-2"} text-xs font-medium`,
+			children: [
+				metricVisibility.label && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+					className: "opacity-80 shrink-0 whitespace-nowrap",
+					children: [label, ":"]
+				}),
+				metricVisibility.value && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+					className: "shrink-0 whitespace-nowrap",
 					children: [value, unit]
 				}),
 				renderProgress
@@ -5129,13 +5552,53 @@ var MetricItem = memo$11(({ icon: Icon, label, value, unit = "", progress, color
 //#endregion
 //#region extension/src/renderer/components/common/Section.tsx
 var { Spinner: Spinner$1 } = await importShared("@heroui/react");
-var { Children: Children$1, Fragment: Fragment$5, memo: memo$10 } = await importShared("react");
-var Section = memo$10(({ title, icon: Icon, children }) => {
+var { Children: Children$1, Fragment: Fragment$5, memo: memo$15 } = await importShared("react");
+var Section = memo$15(({ title, icon: Icon, children }) => {
 	const displayStyle = useHMonitorState("displayStyle");
 	const showSectionLabel = useHMonitorState("showSectionLabel");
 	const isRaw = ["raw", "raw-two-column"].includes(displayStyle);
 	const isTwoColumn = ["two-column", "raw-two-column"].includes(displayStyle);
 	const isCompact = ["compact", "two-column"].includes(displayStyle);
+	const isSegmented = displayStyle === "segmented";
+	if (displayStyle === "ghost") {
+		const validChildren = Children$1.toArray(children).filter(Boolean);
+		if (!showSectionLabel && validChildren.length === 0) return null;
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex items-center shrink-0 hover:bg-surface-secondary/60 rounded-md px-1.5 py-0.5 gap-x-1.5 transition-colors duration-150 cursor-pointer",
+			children: [showSectionLabel ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center gap-x-1 shrink-0 text-foreground/80",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon, { className: "size-3.5 shrink-0 text-foreground/70" }), isEmpty(title) ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Spinner$1, {
+					size: "sm",
+					color: "current",
+					className: "text-muted"
+				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "font-semibold text-foreground/90 uppercase text-[11px] tracking-wide whitespace-nowrap",
+					children: title
+				})]
+			}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon, { className: "size-3.5 shrink-0 text-foreground/70" }), validChildren.map((child, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Fragment$5, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+				className: "text-foreground/30 select-none text-[10px]",
+				children: "•"
+			}), child] }, i))]
+		});
+	}
+	if (isSegmented) {
+		const validChildren = Children$1.toArray(children).filter(Boolean);
+		if (!showSectionLabel && validChildren.length === 0) return null;
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex items-center shrink-0 bg-surface-secondary/80 hover:bg-surface-secondary border border-surface-tertiary rounded-full px-2.5 py-1 gap-x-2 backdrop-blur-sm transition-colors duration-200",
+			children: [showSectionLabel && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center gap-x-1.5 shrink-0",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon, { className: "size-3.5 text-accent shrink-0" }), isEmpty(title) ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Spinner$1, {
+					size: "sm",
+					color: "current",
+					className: "text-muted"
+				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "text-xs font-semibold text-accent uppercase tracking-wider whitespace-nowrap",
+					children: title
+				})]
+			}), validChildren.map((child, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Fragment$5, { children: [(showSectionLabel || i > 0) && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-px h-3 bg-foreground/15 shrink-0" }), child] }, i))]
+		});
+	}
 	if (isRaw) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: `flex items-center shrink-0 ${isTwoColumn ? "gap-x-2" : "gap-x-1.5"} text-xs font-mono whitespace-nowrap text-foreground leading-none`,
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
@@ -5162,14 +5625,14 @@ var Section = memo$10(({ title, icon: Icon, children }) => {
 				children: title
 			})]
 		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: isTwoColumn ? `grid grid-flow-col grid-rows-2 auto-cols-max gap-x-1 gap-y-0.5 h-10 content-center items-center` : " flex items-center gap-x-2",
+			className: isTwoColumn ? `grid grid-flow-col grid-rows-2 auto-cols-max gap-x-1 gap-y-0.5 h-10 content-center items-center shrink-0` : " flex items-center gap-x-2 shrink-0",
 			children
 		})]
 	});
 });
 //#endregion
 //#region extension/src/renderer/components/status-bar/sections/CpuSection.tsx
-var { memo: memo$9, useMemo: useMemo$15 } = await importShared("react");
+var { memo: memo$14, useMemo: useMemo$15 } = await importShared("react");
 var getIconForSensorType$3 = (type) => {
 	switch (type) {
 		case "Temperature": return Thermometer;
@@ -5179,7 +5642,7 @@ var getIconForSensorType$3 = (type) => {
 		default: return Activity;
 	}
 };
-var CpuSection = memo$9(({ data, metrics, hardwareInfo, rawSensorValues }) => {
+var CpuSection = memo$14(({ data, metrics, hardwareInfo, rawSensorValues }) => {
 	const displayStyle = useHMonitorState("displayStyle");
 	const showAliasCpu = useHMonitorState("showAliasCpu");
 	const { temp, usage, name } = data || {
@@ -5213,7 +5676,12 @@ var CpuSection = memo$9(({ data, metrics, hardwareInfo, rawSensorValues }) => {
 				label: "Temp",
 				icon: Thermometer,
 				value: "Admin Required",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thermometer, { className: `${["compact", "two-column"].includes(displayStyle) ? "size-3" : "size-4"} shrink-0 text-danger` }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Thermometer, { className: `${[
+					"compact",
+					"two-column",
+					"segmented",
+					"ghost"
+				].includes(displayStyle) ? "size-3" : "size-4"} shrink-0 text-danger` }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 					className: "text-xs font-medium text-danger whitespace-nowrap",
 					children: "Admin Required"
 				})]
@@ -5267,15 +5735,31 @@ var CpuSection = memo$9(({ data, metrics, hardwareInfo, rawSensorValues }) => {
 		hardwareInfo,
 		sensorReadingMap
 	]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, {
-		title,
-		icon: Cpu,
-		children: renderedMetrics
+	const flyoutPayload = useMemo$15(() => ({
+		section: "cpu",
+		cpu: {
+			data,
+			rawSensorValues,
+			metrics
+		}
+	}), [
+		data,
+		rawSensorValues,
+		metrics
+	]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(HardwareFlyoutTrigger, {
+		section: "cpu",
+		payload: flyoutPayload,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, {
+			title,
+			icon: Cpu,
+			children: renderedMetrics
+		})
 	});
 });
 //#endregion
 //#region extension/src/renderer/components/status-bar/sections/GpuSection.tsx
-var { memo: memo$8, useMemo: useMemo$14 } = await importShared("react");
+var { memo: memo$13, useMemo: useMemo$14 } = await importShared("react");
 var getIconForSensorType$2 = (type) => {
 	switch (type) {
 		case "Temperature": return Thermometer;
@@ -5287,7 +5771,7 @@ var getIconForSensorType$2 = (type) => {
 		default: return Activity;
 	}
 };
-var GpuSection = memo$8(({ data, metrics, hardwareInfo, rawSensorValues }) => {
+var GpuSection = memo$13(({ data, metrics, hardwareInfo, rawSensorValues }) => {
 	const showAliasGpu = useHMonitorState("showAliasGpu");
 	const { temp, usage, name, totalVram, usedVram } = data || {
 		temp: 0,
@@ -5378,15 +5862,31 @@ var GpuSection = memo$8(({ data, metrics, hardwareInfo, rawSensorValues }) => {
 		hardwareInfo,
 		sensorReadingMap
 	]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, {
-		title,
-		icon: Monitor,
-		children: renderedMetrics
+	const flyoutPayload = useMemo$14(() => ({
+		section: "gpu",
+		gpu: {
+			data,
+			rawSensorValues,
+			metrics
+		}
+	}), [
+		data,
+		rawSensorValues,
+		metrics
+	]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(HardwareFlyoutTrigger, {
+		section: "gpu",
+		payload: flyoutPayload,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, {
+			title,
+			icon: Monitor,
+			children: renderedMetrics
+		})
 	});
 });
 //#endregion
 //#region extension/src/renderer/components/status-bar/sections/MemorySection.tsx
-var { memo: memo$7, useMemo: useMemo$13 } = await importShared("react");
+var { memo: memo$12, useMemo: useMemo$13 } = await importShared("react");
 var getIconForSensorType$1 = (type) => {
 	switch (type) {
 		case "Temperature": return Thermometer;
@@ -5398,7 +5898,7 @@ var getIconForSensorType$1 = (type) => {
 		default: return Activity;
 	}
 };
-var MemorySection = memo$7(({ data, metrics, hardwareInfo, rawSensorValues }) => {
+var MemorySection = memo$12(({ data, metrics, hardwareInfo, rawSensorValues }) => {
 	const showAliasMemory = useHMonitorState("showAliasMemory");
 	const { name, used, total } = data || {
 		name: "",
@@ -5465,10 +5965,26 @@ var MemorySection = memo$7(({ data, metrics, hardwareInfo, rawSensorValues }) =>
 		hardwareInfo,
 		sensorReadingMap
 	]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, {
-		title,
-		icon: MemoryStick,
-		children: renderedMetrics
+	const flyoutPayload = useMemo$13(() => ({
+		section: "memory",
+		memory: {
+			data,
+			rawSensorValues,
+			metrics
+		}
+	}), [
+		data,
+		rawSensorValues,
+		metrics
+	]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(HardwareFlyoutTrigger, {
+		section: "memory",
+		payload: flyoutPayload,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, {
+			title,
+			icon: MemoryStick,
+			children: renderedMetrics
+		})
 	});
 });
 //#endregion
@@ -5531,8 +6047,483 @@ function getFallbackString(value) {
 	return value.replace(/[^a-zA-Z0-9\s]/g, "").split(" ").map((item) => item.slice(0, 1).toUpperCase()).join("");
 }
 //#endregion
+//#region node_modules/@solar-icons/react/dist/lib/IconBase.mjs
+var { forwardRef: e } = await importShared("react");
+var r$19 = `solar`;
+function i$17(e) {
+	return e[`aria-label`] !== void 0 || e.title !== void 0;
+}
+var a = e(({ alt: e, color: a, size: o, strokeWidth: s, secondaryColor: c, secondaryOpacity: l, iconName: u, isolated: d, children: f, ...p }, m) => {
+	let h = u ? `${r$19} solar-${u}` : r$19, g = p.className, _ = g ? `${h} ${g}` : h, v = !!e || i$17(p), y = { ...p.style ?? {} };
+	if (d && (y[`--solar-secondary-color`] = `initial`, y[`--solar-secondary-opacity`] = `initial`), a !== void 0 && (y.color = a), o !== void 0) {
+		let e = typeof o == `number` ? `${o}px` : o;
+		y.width = e, y.height = e;
+	}
+	s !== void 0 && (y.strokeWidth = String(s)), c && (y[`--solar-secondary-color`] = c), l != null && (y[`--solar-secondary-opacity`] = String(l));
+	let b = o === void 0 ? d ? `24px` : `1em` : void 0, x = o === void 0 ? d ? `24px` : `1em` : void 0;
+	o === void 0 && !d && (`fontSize` in y || (y.fontSize = `var(--solar-size, 24px)`));
+	let S = a === void 0 ? d ? `currentColor` : `var(--solar-color, currentColor)` : void 0, C = s === void 0 ? d ? `1.5` : `var(--solar-stroke-width, 1.5)` : void 0;
+	return (0, import_jsx_runtime.jsxs)(`svg`, {
+		ref: m,
+		xmlns: `http://www.w3.org/2000/svg`,
+		fill: `none`,
+		viewBox: `0 0 24 24`,
+		...p,
+		className: _,
+		style: Object.keys(y).length > 0 ? y : void 0,
+		width: b,
+		height: x,
+		color: S,
+		strokeWidth: C,
+		...!v && { "aria-hidden": `true` },
+		children: [!!e && (0, import_jsx_runtime.jsx)(`title`, { children: e }), f]
+	});
+});
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/bolt.mjs
+var { forwardRef: t$18 } = await importShared("react");
+var i$16 = t$18((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `bolt-bold-duotone`,
+	children: [(0, import_jsx_runtime.jsx)(`path`, {
+		d: `M10.4527 16.4432L10.4527 16.7528C10.4527 20.0374 10.4527 21.6798 11.376 21.9627C12.2994 22.2457 13.2891 20.9067 15.2685 18.2286L18.3306 14.0856C19.6154 12.3474 20.2577 11.4783 19.9038 10.7949C19.8979 10.7836 19.8919 10.7724 19.8857 10.7613C19.5107 10.0883 18.4013 10.0883 16.1824 10.0883C14.9494 10.0883 14.3329 10.0883 13.9462 9.72461L10.0742 14.2946C10.4528 14.6661 10.4527 15.2585 10.4527 16.4432Z`,
+		fill: `currentColor`,
+		style: {
+			color: `var(--solar-secondary-color, currentColor)`,
+			opacity: `var(--solar-secondary-opacity, 0.5)`
+		}
+	}), (0, import_jsx_runtime.jsx)(`path`, {
+		fillRule: `evenodd`,
+		clipRule: `evenodd`,
+		d: `M8.73167 5.77133L5.66953 9.91436C4.3848 11.6526 3.74244 12.5217 4.09639 13.205C4.10225 13.2164 4.10829 13.2276 4.1145 13.2387C4.48945 13.9117 5.59888 13.9117 7.81775 13.9117C9.05079 13.9117 9.6673 13.9117 10.054 14.2754L10.074 14.2946L13.946 9.72466L13.926 9.70541C13.5474 9.33386 13.5474 8.74151 13.5474 7.55682V7.24712C13.5474 3.96249 13.5474 2.32018 12.6241 2.03721C11.7007 1.75425 10.711 3.09327 8.73167 5.77133Z`,
+		fill: `currentColor`
+	})]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/check-circle.mjs
+var { forwardRef: t$17 } = await importShared("react");
+var i$15 = t$17((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `check-circle-bold-duotone`,
+	children: [(0, import_jsx_runtime.jsx)(`path`, {
+		d: `M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z`,
+		fill: `currentColor`,
+		style: {
+			color: `var(--solar-secondary-color, currentColor)`,
+			opacity: `var(--solar-secondary-opacity, 0.5)`
+		}
+	}), (0, import_jsx_runtime.jsx)(`path`, {
+		d: `M16.0303 8.96967C16.3232 9.26256 16.3232 9.73744 16.0303 10.0303L11.0303 15.0303C10.7374 15.3232 10.2626 15.3232 9.96967 15.0303L7.96967 13.0303C7.67678 12.7374 7.67678 12.2626 7.96967 11.9697C8.26256 11.6768 8.73744 11.6768 9.03033 11.9697L10.5 13.4393L12.7348 11.2045L14.9697 8.96967C15.2626 8.67678 15.7374 8.67678 16.0303 8.96967Z`,
+		fill: `currentColor`
+	})]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/cpu-bolt.mjs
+var { forwardRef: t$16 } = await importShared("react");
+var i$14 = t$16((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `cpu-bolt-bold-duotone`,
+	children: [
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M9.18091 9.18091C9.23402 9.1278 9.32886 9.06211 9.63147 9.02143C9.95415 8.97804 10.3921 8.97656 11.0696 8.97656H12.9301C13.6075 8.97656 14.0455 8.97804 14.3682 9.02143C14.6708 9.06211 14.7656 9.1278 14.8187 9.18091C14.8718 9.23402 14.9375 9.32886 14.9782 9.63147C15.0216 9.95415 15.0231 10.3921 15.0231 11.0696V12.9301C15.0231 13.6075 15.0216 14.0455 14.9782 14.3682C14.9375 14.6708 14.8718 14.7656 14.8187 14.8187C14.7656 14.8718 14.6708 14.9375 14.3682 14.9782C14.0455 15.0216 13.6075 15.0231 12.9301 15.0231H11.0696C10.3921 15.0231 9.95415 15.0216 9.63147 14.9782C9.32886 14.9375 9.23402 14.8718 9.18091 14.8187C9.1278 14.7656 9.06211 14.6708 9.02143 14.3682C8.97804 14.0455 8.97656 13.6075 8.97656 12.9301V11.0696C8.97656 10.3921 8.97804 9.95415 9.02143 9.63147C9.06211 9.32886 9.1278 9.23402 9.18091 9.18091Z`,
+			fill: `currentColor`,
+			style: {
+				color: `var(--solar-secondary-color, currentColor)`,
+				opacity: `var(--solar-secondary-opacity, 0.5)`
+			}
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			fillRule: `evenodd`,
+			clipRule: `evenodd`,
+			d: `M12.6977 2.69767C12.6977 2.31236 12.3853 2 12 2C11.6147 2 11.3023 2.31236 11.3023 2.69767V5.48837C10.7916 5.48944 10.3283 5.49342 9.90678 5.50495L9.90698 5.48837V2.69767C9.90698 2.31236 9.59462 2 9.2093 2C8.82399 2 8.51163 2.31236 8.51163 2.69767V5.48837C8.51163 5.52487 8.51443 5.56072 8.51984 5.5957C7.58381 5.71067 6.93517 5.94879 6.44198 6.44198C5.94879 6.93517 5.71067 7.58381 5.5957 8.51984C5.56071 8.51443 5.52487 8.51163 5.48837 8.51163H2.69767C2.31236 8.51163 2 8.82399 2 9.2093C2 9.59462 2.31236 9.90698 2.69767 9.90698H5.48837L5.50495 9.90678C5.49342 10.3283 5.48991 10.7916 5.48884 11.3023L2.69767 11.3023C2.31236 11.3023 2 11.6147 2 12C2 12.3853 2.31236 12.6977 2.69767 12.6977H5.48837C5.48944 13.2084 5.49342 13.6717 5.50495 14.0932L5.48837 14.093H2.69767C2.31236 14.093 2 14.4054 2 14.7907C2 15.176 2.31236 15.4884 2.69767 15.4884H5.48837C5.52487 15.4884 5.56071 15.4856 5.5957 15.4802C5.71067 16.4162 5.94879 17.0648 6.44198 17.558C6.93517 18.0512 7.58381 18.2893 8.51984 18.4043C8.51443 18.4393 8.51163 18.4751 8.51163 18.5116V21.3023C8.51163 21.6876 8.82399 22 9.2093 22C9.59462 22 9.90698 21.6876 9.90698 21.3023V18.5116L9.90678 18.495C10.3283 18.5066 10.7916 18.5101 11.3023 18.5112L11.3023 21.3023C11.3023 21.6876 11.6147 22 12 22C12.3853 22 12.6977 21.6876 12.6977 21.3023V18.5116C13.2084 18.5106 13.6717 18.5066 14.0932 18.495L14.093 18.5116V21.3023C14.093 21.6876 14.4054 22 14.7907 22C15.176 22 15.4884 21.6876 15.4884 21.3023V18.5116C15.4884 18.4751 15.4856 18.4393 15.4802 18.4043C16.4162 18.2893 17.0648 18.0512 17.558 17.558C18.0512 17.0648 18.2893 16.4162 18.4043 15.4802C18.4393 15.4856 18.4751 15.4884 18.5116 15.4884H21.3023C21.6876 15.4884 22 15.176 22 14.7907C22 14.4054 21.6876 14.093 21.3023 14.093H18.5116L18.495 14.0932C18.5066 13.6717 18.5101 13.2084 18.5112 12.6977L21.3023 12.6977C21.6876 12.6977 22 12.3853 22 12C22 11.6147 21.6876 11.3023 21.3023 11.3023H18.5116C18.5106 10.7916 18.5066 10.3283 18.495 9.90678L18.5116 9.90698H21.3023C21.6876 9.90698 22 9.59462 22 9.2093C22 8.82399 21.6876 8.51163 21.3023 8.51163H18.5116C18.4751 8.51163 18.4393 8.51443 18.4043 8.51984C18.2893 7.58381 18.0512 6.93517 17.558 6.44198C17.0648 5.94879 16.4162 5.71067 15.4802 5.5957C15.4856 5.56072 15.4884 5.52487 15.4884 5.48837V2.69767C15.4884 2.31236 15.176 2 14.7907 2C14.4054 2 14.093 2.31236 14.093 2.69767V5.48837L14.0932 5.50495C13.6717 5.49342 13.2084 5.48991 12.6977 5.48884V2.69767ZM9.44573 7.63871C9.87247 7.58133 10.4054 7.58136 11.0238 7.5814H12.9762C13.5947 7.58136 14.1275 7.58133 14.5543 7.63871C15.0116 7.70019 15.45 7.83885 15.8056 8.19443C16.1612 8.55001 16.2998 8.98839 16.3613 9.44573C16.4187 9.87246 16.4186 10.4053 16.4186 11.0238V12.9762C16.4186 13.5946 16.4187 14.1275 16.3613 14.5543C16.2998 15.0116 16.1612 15.45 15.8056 15.8056C15.45 16.1612 15.0116 16.2998 14.5543 16.3613C14.1275 16.4187 13.5947 16.4186 12.9762 16.4186H11.0238C10.4054 16.4186 9.87246 16.4187 9.44573 16.3613C8.98839 16.2998 8.55001 16.1612 8.19443 15.8056C7.83885 15.45 7.70019 15.0116 7.63871 14.5543C7.58133 14.1275 7.58136 13.5946 7.5814 12.9762V11.0238C7.58136 10.4054 7.58133 9.87247 7.63871 9.44573C7.70019 8.98839 7.83885 8.55001 8.19443 8.19443C8.55001 7.83885 8.98839 7.70019 9.44573 7.63871Z`,
+			fill: `currentColor`
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M12.9664 10.5446C13.1903 10.2311 13.1177 9.79537 12.8042 9.57141C12.4906 9.34745 12.0549 9.42008 11.8309 9.73362L10.502 11.5941C10.3501 11.8067 10.3298 12.0865 10.4494 12.3188C10.569 12.5512 10.8084 12.6973 11.0697 12.6973H11.5745L11.0336 13.4545C10.8096 13.7681 10.8822 14.2038 11.1958 14.4278C11.5093 14.6517 11.9451 14.5791 12.169 14.2656L13.4979 12.4051C13.6498 12.1925 13.6701 11.9127 13.5506 11.6804C13.431 11.448 13.1916 11.3019 12.9302 11.3019H12.4255L12.9664 10.5446Z`,
+			fill: `currentColor`
+		})
+	]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/diskette.mjs
+var { forwardRef: t$15 } = await importShared("react");
+var i$13 = t$15((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `diskette-bold-duotone`,
+	children: [
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M20.5355 20.5355C22 19.0711 22 16.714 22 12C22 11.6585 22 11.4878 21.9848 11.3142C21.9142 10.5049 21.586 9.71257 21.0637 9.09034C20.9516 8.95687 20.828 8.83317 20.5806 8.58578L15.4142 3.41944C15.1668 3.17206 15.0431 3.04835 14.9097 2.93631C14.2874 2.414 13.4951 2.08581 12.6858 2.01515C12.5122 2 12.3415 2 12 2C7.28595 2 4.92893 2 3.46447 3.46447C2 4.92893 2 7.28595 2 12C2 16.714 2 19.0711 3.46447 20.5355C4.1485 21.2196 5.02727 21.5841 6.25 21.7784L7.75 21.9313C8.9058 22 10.2996 22 12 22C13.7004 22 15.0942 22 16.25 21.9313L17.75 21.7784C18.9727 21.5841 19.8515 21.2196 20.5355 20.5355Z`,
+			fill: `currentColor`,
+			style: {
+				color: `var(--solar-secondary-color, currentColor)`,
+				opacity: `var(--solar-secondary-opacity, 0.5)`
+			}
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M7 7.25C6.58579 7.25 6.25 7.58579 6.25 8C6.25 8.41421 6.58579 8.75 7 8.75H13C13.4142 8.75 13.75 8.41421 13.75 8C13.75 7.58579 13.4142 7.25 13 7.25H7Z`,
+			fill: `currentColor`
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M13.052 16.25C13.9505 16.25 14.6997 16.2499 15.2945 16.3299C15.9223 16.4143 16.4891 16.6 16.9445 17.0555C17.4 17.5109 17.5857 18.0777 17.6701 18.7055C17.7501 19.3003 17.75 20.0495 17.75 20.948V20.948L17.75 21.7812L16.25 21.9219V21C16.25 20.036 16.2484 19.3884 16.1835 18.9054C16.1214 18.4439 16.0142 18.2464 15.8839 18.1161C15.7536 17.9858 15.5561 17.8786 15.0946 17.8165C14.6116 17.7516 13.964 17.75 13 17.75H11C10.036 17.75 9.38843 17.7516 8.90539 17.8165C8.44393 17.8786 8.24644 17.9858 8.11612 18.1161C7.9858 18.2464 7.87858 18.4439 7.81654 18.9054C7.7516 19.3884 7.75 20.036 7.75 21V21.9258L6.25 21.7773L6.25 20.948V20.948C6.24997 20.0495 6.24995 19.3003 6.32991 18.7055C6.41432 18.0777 6.59999 17.5109 7.05546 17.0555C7.51093 16.6 8.07773 16.4143 8.70552 16.3299C9.3003 16.2499 10.0495 16.25 10.948 16.25H10.948H13.052H13.052Z`,
+			fill: `currentColor`
+		})
+	]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/global.mjs
+var { forwardRef: t$14 } = await importShared("react");
+var i$12 = t$14((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `global-bold-duotone`,
+	children: [
+		(0, import_jsx_runtime.jsxs)(`g`, {
+			style: {
+				color: `var(--solar-secondary-color, currentColor)`,
+				opacity: `var(--solar-secondary-opacity, 0.5)`
+			},
+			children: [(0, import_jsx_runtime.jsx)(`path`, {
+				d: `M12.0002 3.39551C11.7252 3.39551 11.3699 3.51252 10.9568 3.89058C10.5406 4.27142 10.124 4.86831 9.7559 5.68153C9.39025 6.48936 9.09334 7.46456 8.88902 8.55435C8.72811 9.41258 8.62829 10.3223 8.59326 11.2502H15.4071C15.3721 10.3223 15.2723 9.41258 15.1113 8.55435C14.907 7.46457 14.6101 6.48937 14.2445 5.68153C13.8764 4.86831 13.4597 4.27142 13.0436 3.89058C12.6305 3.51252 12.2752 3.39551 12.0002 3.39551Z`,
+				fill: `currentColor`
+			}), (0, import_jsx_runtime.jsx)(`path`, {
+				d: `M8.88902 15.446C9.09334 16.5358 9.39025 17.511 9.7559 18.3188C10.124 19.132 10.5406 19.7289 10.9568 20.1097C11.3699 20.4878 11.7252 20.6048 12.0002 20.6048C12.2752 20.6048 12.6305 20.4878 13.0436 20.1097C13.4597 19.7289 13.8764 19.132 14.2445 18.3188C14.6101 17.511 14.907 16.5358 15.1113 15.446C15.2723 14.5877 15.3721 13.678 15.4071 12.7502H8.59326C8.62829 13.678 8.72811 14.5877 8.88902 15.446Z`,
+				fill: `currentColor`
+			})]
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			fillRule: `evenodd`,
+			clipRule: `evenodd`,
+			d: `M2.02783 11.25C2.41136 6.07745 6.72957 2 12.0001 2C11.1693 2 10.4295 2.36421 9.82093 2.92113C9.21541 3.47525 8.70371 4.24878 8.28983 5.16315C7.87352 6.08292 7.55013 7.15868 7.33126 8.32611C7.1558 9.26194 7.04903 10.2485 7.01344 11.25H2.02783ZM2.02783 12.75H7.01344C7.04903 13.7515 7.1558 14.7381 7.33126 15.6739C7.55013 16.8413 7.87351 17.9171 8.28983 18.8368C8.70371 19.7512 9.21541 20.5247 9.82093 21.0789C10.4295 21.6358 11.1693 22 12.0001 22C6.72957 22 2.41136 17.9226 2.02783 12.75Z`,
+			fill: `currentColor`
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M12.0001 2C12.831 2 13.5708 2.36421 14.1793 2.92113C14.7849 3.47525 15.2966 4.24878 15.7104 5.16315C16.1267 6.08292 16.4501 7.15868 16.669 8.32612C16.8445 9.26194 16.9512 10.2485 16.9868 11.25H21.9724C21.5889 6.07745 17.2707 2 12.0001 2Z`,
+			fill: `currentColor`
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M16.669 15.6739C16.4501 16.8413 16.1267 17.9171 15.7104 18.8368C15.2966 19.7512 14.7849 20.5247 14.1793 21.0789C13.5708 21.6358 12.831 22 12.0001 22C17.2707 22 21.5889 17.9226 21.9724 12.75H16.9868C16.9512 13.7515 16.8445 14.7381 16.669 15.6739Z`,
+			fill: `currentColor`
+		})
+	]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/monitor.mjs
+var { forwardRef: t$13 } = await importShared("react");
+var i$11 = t$13((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `monitor-bold-duotone`,
+	children: [(0, import_jsx_runtime.jsx)(`path`, {
+		d: `M10 2H14C17.7712 2 19.6569 2 20.8284 3.17157C22 4.34315 22 6.22876 22 10V11C22 11.5516 22 12.5494 21.9935 13H2.00652C2 12.5494 2 11.5516 2 11V10C2 6.22876 2 4.34315 3.17157 3.17157C4.34315 2 6.22876 2 10 2Z`,
+		fill: `currentColor`,
+		style: {
+			color: `var(--solar-secondary-color, currentColor)`,
+			opacity: `var(--solar-secondary-opacity, 0.5)`
+		}
+	}), (0, import_jsx_runtime.jsx)(`path`, {
+		d: `M7.9846 17.5C5.14528 17.5 3.72562 17.5 2.84356 16.6213C2.27207 16.052 2.07085 15.2579 2 14V13H22V14C21.9292 15.2579 21.7279 16.052 21.1564 16.6213C20.2744 17.5 18.8547 17.5 16.0154 17.5H12.7529V21.5H16.0154C16.4312 21.5 16.7683 21.8358 16.7683 22.25C16.7683 22.6642 16.4312 23 16.0154 23H7.9846C7.56879 23 7.23171 22.6642 7.23171 22.25C7.23171 21.8358 7.56879 21.5 7.9846 21.5H11.2471V17.5H7.9846Z`,
+		fill: `currentColor`
+	})]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/radar-2.mjs
+var { forwardRef: t$12 } = await importShared("react");
+var i$10 = t$12((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `radar-2-bold-duotone`,
+	children: [(0, import_jsx_runtime.jsx)(`path`, {
+		d: `M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z`,
+		fill: `currentColor`,
+		style: {
+			color: `var(--solar-secondary-color, currentColor)`,
+			opacity: `var(--solar-secondary-opacity, 0.5)`
+		}
+	}), (0, import_jsx_runtime.jsx)(`path`, {
+		d: `M11.1256 6.82338C11.846 6.70116 12.6041 6.72817 13.3586 6.93033C16.1585 7.68056 17.8201 10.5585 17.0699 13.3584C16.3196 16.1583 13.4417 17.8199 10.6418 17.0697C7.84187 16.3194 6.18028 13.4415 6.93051 10.6416C7.05878 10.1629 7.24878 9.7184 7.48934 9.31389L8.19792 9.8874C7.84968 10.5131 7.65108 11.2339 7.65108 12C7.65108 14.4019 9.59824 16.3491 12.0002 16.3491C14.4021 16.3491 16.3493 14.4019 16.3493 12C16.3493 9.59805 14.4021 7.65089 12.0002 7.65089C11.586 7.65089 11.2502 7.98668 11.2502 8.40089C11.2502 8.81511 11.586 9.15089 12.0002 9.15089C13.5737 9.15089 14.8493 10.4265 14.8493 12C14.8493 13.5735 13.5737 14.8491 12.0002 14.8491C10.4267 14.8491 9.15108 13.5735 9.15108 12C9.15108 11.5916 9.23669 11.2038 9.3911 10.8531L11.5283 12.583C11.8503 12.8436 12.3226 12.7938 12.5832 12.4718C12.8438 12.1499 12.794 11.6776 12.472 11.417L8.27423 8.01941C7.7127 7.56491 6.80868 7.60723 6.3558 8.29795C5.97114 8.8846 5.67251 9.54098 5.48162 10.2534C4.51698 13.8535 6.65344 17.5539 10.2535 18.5186C13.8536 19.4832 17.5541 17.3467 18.5187 13.7466C19.4834 10.1465 17.3469 6.44608 13.7468 5.48144C12.7798 5.22232 11.8035 5.18693 10.8747 5.34452C10.4664 5.41381 10.1915 5.80103 10.2608 6.20941C10.33 6.61779 10.7173 6.89267 11.1256 6.82338Z`,
+		fill: `currentColor`
+	})]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/refresh-circle.mjs
+var { forwardRef: t$11 } = await importShared("react");
+var i$9 = t$11((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `refresh-circle-bold-duotone`,
+	children: [
+		(0, import_jsx_runtime.jsx)(`circle`, {
+			cx: `12`,
+			cy: `12`,
+			r: `10`,
+			fill: `currentColor`,
+			style: {
+				color: `var(--solar-secondary-color, currentColor)`,
+				opacity: `var(--solar-secondary-opacity, 0.5)`
+			}
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M7.37756 11.6296H6.62756H7.37756ZM7.37756 12.5556L6.81609 13.0528C6.95137 13.2056 7.14306 13.2966 7.34695 13.3049C7.55084 13.3133 7.74932 13.2382 7.89662 13.0969L7.37756 12.5556ZM9.51905 11.5414C9.81805 11.2547 9.82804 10.7799 9.54137 10.4809C9.2547 10.182 8.77994 10.172 8.48095 10.4586L9.51905 11.5414ZM6.56148 10.5028C6.28686 10.1927 5.81286 10.1639 5.50277 10.4385C5.19267 10.7131 5.16391 11.1871 5.43852 11.4972L6.56148 10.5028ZM14.9317 9.0093C15.213 9.31337 15.6875 9.33184 15.9915 9.05055C16.2956 8.76927 16.3141 8.29476 16.0328 7.9907L14.9317 9.0093ZM12.0437 6.25C9.05802 6.25 6.62756 8.653 6.62756 11.6296H8.12756C8.12756 9.49251 9.87531 7.75 12.0437 7.75V6.25ZM6.62756 11.6296L6.62756 12.5556H8.12756L8.12756 11.6296H6.62756ZM7.89662 13.0969L9.51905 11.5414L8.48095 10.4586L6.85851 12.0142L7.89662 13.0969ZM7.93904 12.0583L6.56148 10.5028L5.43852 11.4972L6.81609 13.0528L7.93904 12.0583ZM16.0328 7.9907C15.0431 6.9209 13.6212 6.25 12.0437 6.25V7.75C13.1879 7.75 14.2154 8.23504 14.9317 9.0093L16.0328 7.9907Z`,
+			fill: `currentColor`
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M16.6188 11.4453L17.1795 10.9472C17.044 10.7947 16.8523 10.704 16.6485 10.6959C16.4447 10.6878 16.2464 10.7631 16.0993 10.9044L16.6188 11.4453ZM14.4805 12.4591C14.1817 12.746 14.1722 13.2208 14.4591 13.5195C14.746 13.8183 15.2208 13.8278 15.5195 13.5409L14.4805 12.4591ZM17.4393 13.4981C17.7144 13.8078 18.1885 13.8358 18.4981 13.5607C18.8078 13.2856 18.8358 12.8115 18.5607 12.5019L17.4393 13.4981ZM9.04688 15.0057C8.76342 14.7037 8.28879 14.6886 7.98675 14.9721C7.68472 15.2555 7.66966 15.7302 7.95312 16.0322L9.04688 15.0057ZM11.9348 17.7509C14.9276 17.7509 17.3688 15.3506 17.3688 12.3712H15.8688C15.8688 14.5057 14.1158 16.2509 11.9348 16.2509V17.7509ZM17.3688 12.3712V11.4453H15.8688V12.3712H17.3688ZM16.0993 10.9044L14.4805 12.4591L15.5195 13.5409L17.1383 11.9862L16.0993 10.9044ZM16.0581 11.9434L17.4393 13.4981L18.5607 12.5019L17.1795 10.9472L16.0581 11.9434ZM7.95312 16.0322C8.94543 17.0895 10.3635 17.7509 11.9348 17.7509V16.2509C10.792 16.2509 9.76546 15.7714 9.04688 15.0057L7.95312 16.0322Z`,
+			fill: `currentColor`
+		})
+	]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/restart.mjs
+var { forwardRef: t$10 } = await importShared("react");
+var i$8 = t$10((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `restart-bold-duotone`,
+	children: [(0, import_jsx_runtime.jsx)(`path`, {
+		fillRule: `evenodd`,
+		clipRule: `evenodd`,
+		d: `M6.87348 7.87338C9.01606 5.7308 12.1674 5.20902 14.8007 6.31041L15.9309 5.18019C12.6515 3.53111 8.55119 4.07435 5.81282 6.81272C2.39573 10.2298 2.39573 15.77 5.81282 19.1871C9.2299 22.6042 14.7701 22.6042 18.1872 19.1871C20.1746 17.1997 21.0057 14.4933 20.6819 11.9072C20.6304 11.4962 20.2555 11.2048 19.8445 11.2562C19.4335 11.3077 19.142 11.6826 19.1935 12.0936C19.4622 14.24 18.7727 16.4802 17.1265 18.1264C14.2952 20.9577 9.70478 20.9577 6.87348 18.1264C4.04217 15.2951 4.04217 10.7047 6.87348 7.87338Z`,
+		fill: `currentColor`,
+		style: {
+			color: `var(--solar-secondary-color, currentColor)`,
+			opacity: `var(--solar-secondary-opacity, 0.5)`
+		}
+	}), (0, import_jsx_runtime.jsx)(`path`, {
+		d: `M18.7212 4.20119C18.7212 3.89785 18.5384 3.62437 18.2582 3.50828C17.9779 3.3922 17.6553 3.45637 17.4408 3.67086L15.9314 5.18028L14.8012 6.3105L13.1982 7.9135C12.9837 8.128 12.9195 8.45059 13.0356 8.73085C13.1517 9.0111 13.4252 9.19383 13.7285 9.19383H17.9712C18.3854 9.19383 18.7212 8.85805 18.7212 8.44383V4.20119Z`,
+		fill: `currentColor`
+	})]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/server-path.mjs
+var { forwardRef: t$9 } = await importShared("react");
+var i$7 = t$9((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `server-path-bold-duotone`,
+	children: [(0, import_jsx_runtime.jsx)(`path`, {
+		d: `M22 18.211C22 17.8404 21.6876 17.5399 21.3023 17.5399H13.7252C13.5364 17.0914 13.164 16.7332 12.6977 16.5516V13.7373H11.3023V16.5516C10.836 16.7332 10.4636 17.0914 10.2748 17.5399H2.69767C2.31236 17.5399 2 17.8404 2 18.211C2 18.5816 2.31236 18.882 2.69767 18.882H10.2748C10.5508 19.5378 11.2192 20.0005 12 20.0005C12.7808 20.0005 13.4492 19.5378 13.7252 18.882H21.3023C21.6876 18.882 22 18.5816 22 18.211Z`,
+		fill: `currentColor`,
+		style: {
+			color: `var(--solar-secondary-color, currentColor)`,
+			opacity: `var(--solar-secondary-opacity, 0.5)`
+		}
+	}), (0, import_jsx_runtime.jsx)(`path`, {
+		fillRule: `evenodd`,
+		clipRule: `evenodd`,
+		d: `M11.3019 13.7368H12.6973H18.5112C20.0525 13.7368 21.3019 12.5351 21.3019 11.0526C21.3019 9.57018 20.0525 8.36842 18.5112 8.36842C20.0525 8.36842 21.3019 7.16666 21.3019 5.68421C21.3019 4.20176 20.0525 3 18.5112 3H5.48796C3.9467 3 2.69727 4.20176 2.69727 5.68421C2.69727 7.16666 3.9467 8.36842 5.48796 8.36842C3.9467 8.36842 2.69727 9.57018 2.69727 11.0526C2.69727 12.5351 3.9467 13.7368 5.48796 13.7368H11.3019ZM12.9298 5.01316C12.5445 5.01316 12.2321 5.3136 12.2321 5.68421C12.2321 6.05482 12.5445 6.35526 12.9298 6.35526H18.5112C18.8965 6.35526 19.2089 6.05482 19.2089 5.68421C19.2089 5.3136 18.8965 5.01316 18.5112 5.01316H12.9298ZM12.9298 10.3816C12.5445 10.3816 12.2321 10.682 12.2321 11.0526C12.2321 11.4232 12.5445 11.7237 12.9298 11.7237H18.5112C18.8965 11.7237 19.2089 11.4232 19.2089 11.0526C19.2089 10.682 18.8965 10.3816 18.5112 10.3816H12.9298ZM7.34843 5.68421C7.34843 6.17836 6.93195 6.57895 6.4182 6.57895C5.90444 6.57895 5.48796 6.17836 5.48796 5.68421C5.48796 5.19006 5.90444 4.78947 6.4182 4.78947C6.93195 4.78947 7.34843 5.19006 7.34843 5.68421ZM7.34843 11.0526C7.34843 11.5468 6.93195 11.9474 6.4182 11.9474C5.90444 11.9474 5.48796 11.5468 5.48796 11.0526C5.48796 10.5585 5.90444 10.1579 6.4182 10.1579C6.93195 10.1579 7.34843 10.5585 7.34843 11.0526Z`,
+		fill: `currentColor`
+	})]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/settings-minimalistic.mjs
+var { forwardRef: t$8 } = await importShared("react");
+var i$6 = t$8((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `settings-minimalistic-bold-duotone`,
+	children: [(0, import_jsx_runtime.jsx)(`path`, {
+		fillRule: `evenodd`,
+		clipRule: `evenodd`,
+		d: `M12.4277 2C11.3139 2 10.2995 2.6007 8.27081 3.80211L7.58466 4.20846C5.55594 5.40987 4.54158 6.01057 3.98466 7C3.42773 7.98943 3.42773 9.19084 3.42773 11.5937V12.4063C3.42773 14.8092 3.42773 16.0106 3.98466 17C4.54158 17.9894 5.55594 18.5901 7.58466 19.7915L8.27081 20.1979C10.2995 21.3993 11.3139 22 12.4277 22C13.5416 22 14.5559 21.3993 16.5847 20.1979L17.2708 19.7915C19.2995 18.5901 20.3139 17.9894 20.8708 17C21.4277 16.0106 21.4277 14.8092 21.4277 12.4063V11.5937C21.4277 9.19084 21.4277 7.98943 20.8708 7C20.3139 6.01057 19.2995 5.40987 17.2708 4.20846L16.5847 3.80211C14.5559 2.6007 13.5416 2 12.4277 2Z`,
+		fill: `currentColor`,
+		style: {
+			color: `var(--solar-secondary-color, currentColor)`,
+			opacity: `var(--solar-secondary-opacity, 0.5)`
+		}
+	}), (0, import_jsx_runtime.jsx)(`path`, {
+		d: `M12.4277 8.25C10.3567 8.25 8.67773 9.92893 8.67773 12C8.67773 14.0711 10.3567 15.75 12.4277 15.75C14.4988 15.75 16.1777 14.0711 16.1777 12C16.1777 9.92893 14.4988 8.25 12.4277 8.25Z`,
+		fill: `currentColor`
+	})]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/shield-check.mjs
+var { forwardRef: t$7 } = await importShared("react");
+var i$5 = t$7((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `shield-check-bold-duotone`,
+	children: [(0, import_jsx_runtime.jsx)(`path`, {
+		d: `M3.37752 5.08241C3 5.62028 3 7.21907 3 10.4167V11.9914C3 17.6294 7.23896 20.3655 9.89856 21.5273C10.62 21.8424 10.9807 22 12 22C13.0193 22 13.38 21.8424 14.1014 21.5273C16.761 20.3655 21 17.6294 21 11.9914V10.4167C21 7.21907 21 5.62028 20.6225 5.08241C20.245 4.54454 18.7417 4.02996 15.7351 3.00079L15.1623 2.80472C13.595 2.26824 12.8114 2 12 2C11.1886 2 10.405 2.26824 8.83772 2.80472L8.26491 3.00079C5.25832 4.02996 3.75503 4.54454 3.37752 5.08241Z`,
+		fill: `currentColor`,
+		style: {
+			color: `var(--solar-secondary-color, currentColor)`,
+			opacity: `var(--solar-secondary-opacity, 0.5)`
+		}
+	}), (0, import_jsx_runtime.jsx)(`path`, {
+		d: `M15.0595 10.4995C15.3353 10.1905 15.3085 9.71643 14.9995 9.44055C14.6905 9.16468 14.2164 9.19152 13.9406 9.5005L10.9286 12.8739L10.0595 11.9005C9.78359 11.5915 9.30947 11.5647 9.0005 11.8406C8.69152 12.1164 8.66468 12.5905 8.94055 12.8995L10.3691 14.4995C10.5114 14.6589 10.7149 14.75 10.9286 14.75C11.1422 14.75 11.3457 14.6589 11.488 14.4995L15.0595 10.4995Z`,
+		fill: `currentColor`
+	})]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/shield-cross.mjs
+var { forwardRef: t$6 } = await importShared("react");
+var i$4 = t$6((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `shield-cross-bold-duotone`,
+	children: [(0, import_jsx_runtime.jsx)(`path`, {
+		d: `M3 10.4167C3 7.21907 3 5.62028 3.37752 5.08241C3.75503 4.54454 5.25832 4.02996 8.26491 3.00079L8.83772 2.80472C10.405 2.26824 11.1886 2 12 2C12.8114 2 13.595 2.26824 15.1623 2.80472L15.7351 3.00079C18.7417 4.02996 20.245 4.54454 20.6225 5.08241C21 5.62028 21 7.21907 21 10.4167V11.9914C21 17.6294 16.761 20.3655 14.1014 21.5273C13.38 21.8424 13.0193 22 12 22C10.9807 22 10.62 21.8424 9.89856 21.5273C7.23896 20.3655 3 17.6294 3 11.9914V10.4167Z`,
+		fill: `currentColor`,
+		style: {
+			color: `var(--solar-secondary-color, currentColor)`,
+			opacity: `var(--solar-secondary-opacity, 0.5)`
+		}
+	}), (0, import_jsx_runtime.jsx)(`path`, {
+		d: `M10.0303 8.96967C9.73744 8.67678 9.26256 8.67678 8.96967 8.96967C8.67678 9.26256 8.67678 9.73744 8.96967 10.0303L10.9394 12L8.96969 13.9697C8.6768 14.2626 8.6768 14.7374 8.96969 15.0303C9.26258 15.3232 9.73746 15.3232 10.0304 15.0303L12 13.0607L13.9696 15.0303C14.2625 15.3232 14.7374 15.3232 15.0303 15.0303C15.3232 14.7374 15.3232 14.2625 15.0303 13.9696L13.0607 12L15.0303 10.0303C15.3232 9.73746 15.3232 9.26258 15.0303 8.96969C14.7374 8.6768 14.2626 8.6768 13.9697 8.96969L12 10.9394L10.0303 8.96967Z`,
+		fill: `currentColor`
+	})]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/wi-fi-router.mjs
+var { forwardRef: t$5 } = await importShared("react");
+var i$3 = t$5((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `wi-fi-router-bold-duotone`,
+	children: [
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M3.65131 4.37802C3.4458 4.01839 2.98766 3.89344 2.62802 4.09895C2.26839 4.30445 2.14344 4.76259 2.34895 5.12223L6.13624 11.75H7.85985L7.65131 11.378L3.65131 4.37802Z`,
+			fill: `currentColor`,
+			style: {
+				color: `var(--solar-secondary-color, currentColor)`,
+				opacity: `var(--solar-secondary-opacity, 0.5)`
+			}
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M20.3492 4.37802C20.5547 4.01839 21.0128 3.89344 21.3724 4.09895C21.7321 4.30445 21.857 4.76259 21.6515 5.12223L17.8642 11.75H16.1406L16.3492 11.378L20.3492 4.37802Z`,
+			fill: `currentColor`,
+			style: {
+				color: `var(--solar-secondary-color, currentColor)`,
+				opacity: `var(--solar-secondary-opacity, 0.5)`
+			}
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			fillRule: `evenodd`,
+			clipRule: `evenodd`,
+			d: `M12.0838 3.5C10.1049 3.5 8.40696 4.71031 7.69312 6.43399C7.53464 6.81668 7.09592 6.99844 6.71323 6.83995C6.33054 6.68146 6.14878 6.24275 6.30727 5.86005C7.24515 3.5954 9.47729 2 12.0838 2C14.6904 2 16.9225 3.5954 17.8604 5.86005C18.0189 6.24275 17.8371 6.68146 17.4544 6.83995C17.0717 6.99844 16.633 6.81668 16.4745 6.43399C15.7607 4.71032 14.0627 3.5 12.0838 3.5Z`,
+			fill: `currentColor`,
+			style: {
+				color: `var(--solar-secondary-color, currentColor)`,
+				opacity: `var(--solar-secondary-opacity, 0.5)`
+			}
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			fillRule: `evenodd`,
+			clipRule: `evenodd`,
+			d: `M12.0846 6C11.0622 6 10.1973 6.68244 9.92427 7.6182C9.80824 8.01583 9.39183 8.24411 8.9942 8.12808C8.59657 8.01205 8.36829 7.59564 8.48432 7.19801C8.93906 5.63969 10.3777 4.5 12.0846 4.5C13.7914 4.5 15.2301 5.63969 15.6848 7.19801C15.8008 7.59564 15.5725 8.01205 15.1749 8.12808C14.7773 8.24411 14.3609 8.01583 14.2448 7.6182C13.9718 6.68244 13.1069 6 12.0846 6Z`,
+			fill: `currentColor`,
+			style: {
+				color: `var(--solar-secondary-color, currentColor)`,
+				opacity: `var(--solar-secondary-opacity, 0.5)`
+			}
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			fillRule: `evenodd`,
+			clipRule: `evenodd`,
+			d: `M2.58579 12.3358C2 12.9216 2 13.8644 2 15.75C2 17.6356 2 18.5784 2.58579 19.1642C3.17157 19.75 4.11438 19.75 6 19.75H18C19.8856 19.75 20.8284 19.75 21.4142 19.1642C22 18.5784 22 17.6356 22 15.75C22 13.8644 22 12.9216 21.4142 12.3358C20.8284 11.75 19.8856 11.75 18 11.75H6C4.11438 11.75 3.17157 11.75 2.58579 12.3358ZM6 16.75C6.55228 16.75 7 16.3023 7 15.75C7 15.1977 6.55228 14.75 6 14.75C5.44772 14.75 5 15.1977 5 15.75C5 16.3023 5.44772 16.75 6 16.75ZM10 15.75C10 16.3023 9.55228 16.75 9 16.75C8.44772 16.75 8 16.3023 8 15.75C8 15.1977 8.44772 14.75 9 14.75C9.55228 14.75 10 15.1977 10 15.75ZM14 15C13.5858 15 13.25 15.3358 13.25 15.75C13.25 16.1642 13.5858 16.5 14 16.5H18C18.4142 16.5 18.75 16.1642 18.75 15.75C18.75 15.3358 18.4142 15 18 15H14Z`,
+			fill: `currentColor`
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M13.084 7.75C13.084 8.30228 12.6363 8.75 12.084 8.75C11.5317 8.75 11.084 8.30228 11.084 7.75C11.084 7.19772 11.5317 6.75 12.084 6.75C12.6363 6.75 13.084 7.19772 13.084 7.75Z`,
+			fill: `currentColor`
+		})
+	]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/widget-2.mjs
+var { forwardRef: t$4 } = await importShared("react");
+var i$2 = t$4((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `widget-2-bold-duotone`,
+	children: [
+		(0, import_jsx_runtime.jsx)(`path`, {
+			fillRule: `evenodd`,
+			clipRule: `evenodd`,
+			d: `M12.7324 17.3658C12.7324 14.8065 14.8072 12.7317 17.3666 12.7317C19.9259 12.7317 22.0007 14.8065 22.0007 17.3658C22.0007 19.9252 19.9259 22 17.3666 22C14.8072 22 12.7324 19.9252 12.7324 17.3658Z`,
+			fill: `currentColor`,
+			style: {
+				color: `var(--solar-secondary-color, currentColor)`,
+				opacity: `var(--solar-secondary-opacity, 0.5)`
+			}
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M13 6.5C13 4.37868 13 3.31802 13.659 2.65901C14.318 2 15.3787 2 17.5 2C19.6213 2 20.682 2 21.341 2.65901C22 3.31802 22 4.37868 22 6.5C22 8.62132 22 9.68198 21.341 10.341C20.682 11 19.6213 11 17.5 11C15.3787 11 14.318 11 13.659 10.341C13 9.68198 13 8.62132 13 6.5Z`,
+			fill: `currentColor`,
+			style: {
+				color: `var(--solar-secondary-color, currentColor)`,
+				opacity: `var(--solar-secondary-opacity, 0.5)`
+			}
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			fillRule: `evenodd`,
+			clipRule: `evenodd`,
+			d: `M2 6.63415C2 4.07478 4.07478 2 6.63415 2C9.19351 2 11.2683 4.07478 11.2683 6.63415C11.2683 9.19351 9.19351 11.2683 6.63415 11.2683C4.07478 11.2683 2 9.19351 2 6.63415Z`,
+			fill: `currentColor`
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M2 17.5C2 15.3787 2 14.318 2.65901 13.659C3.31802 13 4.37868 13 6.5 13C8.62132 13 9.68198 13 10.341 13.659C11 14.318 11 15.3787 11 17.5C11 19.6213 11 20.682 10.341 21.341C9.68198 22 8.62132 22 6.5 22C4.37868 22 3.31802 22 2.65901 21.341C2 20.682 2 19.6213 2 17.5Z`,
+			fill: `currentColor`
+		})
+	]
+}));
+//#endregion
+//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/window-frame.mjs
+var { forwardRef: t$3 } = await importShared("react");
+var i$1 = t$3((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+	ref: i,
+	...t,
+	iconName: `window-frame-bold-duotone`,
+	children: [
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M11.9999 2C16.714 2 19.071 2 20.5355 3.46447C21.6157 4.54472 21.8991 6.11064 21.9735 8.75L21.9999 9.5H9.74992H8.99992H2.02637V8.75C2.10072 6.11064 2.38413 4.54472 3.46439 3.46447C4.92885 2 7.28588 2 11.9999 2Z`,
+			fill: `currentColor`,
+			style: {
+				color: `var(--solar-secondary-color, currentColor)`,
+				opacity: `var(--solar-secondary-opacity, 0.5)`
+			}
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M2 12C2 16.714 2 19.0711 3.46447 20.5355C4.47468 21.5458 5.90962 21.8591 8.25 21.9563L9 22V10.25V9.5H2.02645L2.00339 10.25C2 10.7944 2 11.3766 2 12Z`,
+			fill: `currentColor`,
+			style: {
+				color: `var(--solar-secondary-color, currentColor)`,
+				opacity: `var(--solar-secondary-opacity, 0.5)`
+			}
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M2 12C2 16.714 2 19.0711 3.46447 20.5355C4.47468 21.5458 5.90962 21.8591 8.25 21.9563L9 22V10.25V9.5H2.02645L2.00339 10.25C2 10.7944 2 11.3766 2 12Z`,
+			fill: `currentColor`,
+			style: {
+				color: `var(--solar-secondary-color, currentColor)`,
+				opacity: `var(--solar-secondary-opacity, 0.5)`
+			}
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M13 6C13 6.55228 12.5523 7 12 7C11.4477 7 11 6.55228 11 6C11 5.44772 11.4477 5 12 5C12.5523 5 13 5.44772 13 6Z`,
+			fill: `currentColor`
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M10 6C10 6.55228 9.55228 7 9 7C8.44772 7 8 6.55228 8 6C8 5.44772 8.44772 5 9 5C9.55228 5 10 5.44772 10 6Z`,
+			fill: `currentColor`
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M7 6C7 6.55228 6.55228 7 6 7C5.44772 7 5 6.55228 5 6C5 5.44772 5.44772 5 6 5C6.55228 5 7 5.44772 7 6Z`,
+			fill: `currentColor`
+		}),
+		(0, import_jsx_runtime.jsx)(`path`, {
+			d: `M22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C11.1815 22 9.68405 22 9 21.9923V21L9 10.25V9.5L22 9.5L21.9966 10.25C22 10.7944 22 11.3766 22 12Z`,
+			fill: `currentColor`
+		})
+	]
+}));
+//#endregion
 //#region extension/src/renderer/components/status-bar/sections/NetworkSection.tsx
-var { memo: memo$6, useMemo: useMemo$12 } = await importShared("react");
+var { memo: memo$11, useMemo: useMemo$12, useState: useState$11 } = await importShared("react");
 var getIconForSensorType = (type) => {
 	switch (type) {
 		case "Temperature": return Thermometer;
@@ -5544,8 +6535,17 @@ var getIconForSensorType = (type) => {
 		default: return Activity;
 	}
 };
-var NetworkSection = memo$6(({ data, metrics, hardwareInfo, rawSensorValues }) => {
+var maskIp = (ip) => {
+	if (!ip || ip === "Resolving..." || ip === "Offline") return ip;
+	const parts = ip.split(".");
+	if (parts.length === 4) return `${parts[0]}.${parts[1]}.•••.•••`;
+	return ip.length > 8 ? `${ip.slice(0, 8)}••••` : "••••••••";
+};
+var NetworkSection = memo$11(({ data, metrics, hardwareInfo, rawSensorValues, networkDetails, publicNetwork }) => {
 	const showAliasNetwork = useHMonitorState("showAliasNetwork");
+	const maskPublicIp = useHMonitorState("maskPublicIp") ?? true;
+	const [isTemporarilyUnmasked, setIsTemporarilyUnmasked] = useState$11(false);
+	const isMasked = maskPublicIp && !isTemporarilyUnmasked;
 	const { name, uploadSpeed, downloadSpeed, uploadData, downloadData } = data || {
 		name: "",
 		uploadSpeed: 0,
@@ -5557,6 +6557,8 @@ var NetworkSection = memo$6(({ data, metrics, hardwareInfo, rawSensorValues }) =
 	const hasDownloadSpeed = useMemo$12(() => metrics.enabled.includes("downloadSpeed"), [metrics.enabled]);
 	const hasUploadData = useMemo$12(() => metrics.enabled.includes("uploadData"), [metrics.enabled]);
 	const hasDownloadData = useMemo$12(() => metrics.enabled.includes("downloadData"), [metrics.enabled]);
+	const hasPublicIp = useMemo$12(() => metrics.enabled.includes("publicIp"), [metrics.enabled]);
+	const hasVpnStatus = useMemo$12(() => metrics.enabled.includes("vpnStatus"), [metrics.enabled]);
 	const sensorReadingMap = useMemo$12(() => {
 		const map = /* @__PURE__ */ new Map();
 		rawSensorValues.forEach((val) => map.set(val.Identifier, val));
@@ -5588,7 +6590,33 @@ var NetworkSection = memo$6(({ data, metrics, hardwareInfo, rawSensorValues }) =
 				label: "Down Data",
 				value: formatSize(convertStorageUnit(downloadData?.toString() ?? "0", "GB", "B") || 0)
 			}, "downloadData"));
-			else {
+			else if (metricId === "publicIp") {
+				const rawIp = publicNetwork?.ip || "Resolving...";
+				const displayIp = isMasked ? maskIp(rawIp) : rawIp;
+				const ipLabel = publicNetwork?.countryCode ? `${publicNetwork.countryCode} IP` : "Public IP";
+				list.push(/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					onClick: (e) => {
+						e.stopPropagation();
+						setIsTemporarilyUnmasked((prev) => !prev);
+					},
+					title: (isMasked ? "Click to reveal Public IP" : "Click to mask Public IP") + (publicNetwork?.isp ? ` • ISP: ${publicNetwork.isp}` : "") + (publicNetwork?.city ? ` • ${publicNetwork.city}` : "") + (publicNetwork?.country ? ` • ${publicNetwork.country}` : ""),
+					className: "cursor-pointer select-none inline-flex shrink-0",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MetricItem, {
+						label: ipLabel,
+						icon: i$12,
+						value: displayIp
+					})
+				}, "publicIp"));
+			} else if (metricId === "vpnStatus") {
+				const isVpn = Boolean(publicNetwork?.isVpn);
+				const vpnName = publicNetwork?.vpnName || (isVpn ? "Active" : "Direct");
+				list.push(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MetricItem, {
+					colorClass: isVpn ? "text-success bg-success/10 border-success/30" : "text-semi-muted bg-surface border-surface-secondary",
+					label: "VPN",
+					value: vpnName,
+					icon: isVpn ? i$5 : i$4
+				}, "vpnStatus"));
+			} else {
 				const customMetric = metrics.custom?.find((m) => m.id === metricId);
 				if (customMetric) {
 					const sensorInfo = hardwareInfo?.sensors.find((s) => s.Identifier === customMetric.sensorIdentifier);
@@ -5605,7 +6633,7 @@ var NetworkSection = memo$6(({ data, metrics, hardwareInfo, rawSensorValues }) =
 				}
 			}
 		});
-		if (!hasUploadSpeed && !hasDownloadSpeed && !hasUploadData && !hasDownloadData) return null;
+		if (!(hasUploadSpeed || hasDownloadSpeed || hasUploadData || hasDownloadData || hasPublicIp || hasVpnStatus) && (!metrics.custom || metrics.custom.length === 0)) return null;
 		metrics.custom?.forEach((customMetric) => {
 			if (processedIds.has(customMetric.id)) return;
 			const sensorInfo = hardwareInfo?.sensors.find((s) => s.Identifier === customMetric.sensorIdentifier);
@@ -5628,52 +6656,204 @@ var NetworkSection = memo$6(({ data, metrics, hardwareInfo, rawSensorValues }) =
 		downloadSpeed,
 		uploadData,
 		downloadData,
+		publicNetwork,
+		isMasked,
+		hasUploadSpeed,
+		hasDownloadSpeed,
+		hasUploadData,
+		hasDownloadData,
+		hasPublicIp,
+		hasVpnStatus,
 		hardwareInfo,
 		sensorReadingMap
 	]);
+	const flyoutPayload = useMemo$12(() => ({
+		section: "network",
+		network: {
+			data,
+			networkDetails,
+			publicNetwork,
+			rawSensorValues,
+			metrics
+		}
+	}), [
+		data,
+		networkDetails,
+		publicNetwork,
+		rawSensorValues,
+		metrics
+	]);
 	if (renderedMetrics?.length === 0) return null;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, {
-		icon: Wifi,
-		title,
-		children: renderedMetrics
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(HardwareFlyoutTrigger, {
+		section: "network",
+		payload: flyoutPayload,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, {
+			icon: Wifi,
+			title,
+			children: renderedMetrics
+		})
 	});
 });
 //#endregion
 //#region extension/src/renderer/components/status-bar/sections/PingSection.tsx
-var { memo: memo$5, useEffect: useEffect$11, useMemo: useMemo$11, useState: useState$9 } = await importShared("react");
+var { memo: memo$10, useEffect: useEffect$11, useMemo: useMemo$11, useState: useState$10 } = await importShared("react");
 function PingSection() {
 	const pingState = useHMonitorState("pingState");
-	const [hostResults, setHostResults] = useState$9({});
+	const [hostResults, setHostResults] = useState$10({});
+	const [hostHistory, setHostHistory] = useState$10({});
 	const renderElements = useMemo$11(() => {
-		return Array.from(new Set(pingState.enabledHosts)).map((host) => {
+		const allHosts = /* @__PURE__ */ new Set();
+		if (pingState.autoPingGateway !== false) Object.keys(hostResults).forEach((h) => {
+			if (hostResults[h]?.isGateway) allHosts.add(h);
+		});
+		(pingState.enabledHosts || []).forEach((h) => {
+			allHosts.add(h);
+		});
+		const hostList = Array.from(allHosts);
+		let lanItem = null;
+		let wanItem = null;
+		for (const h of hostList) {
+			const item = hostResults[h];
+			if (!item) continue;
+			if (item.isGateway && !lanItem) lanItem = item;
+			else if (!item.isGateway && !wanItem && item.latency !== void 0) wanItem = item;
+		}
+		let diagnostic;
+		if (lanItem && wanItem) {
+			const lanLat = lanItem.latency ?? -1;
+			const wanLat = wanItem.latency ?? -1;
+			const lanLoss = lanItem.packetLoss ?? 0;
+			const wanLoss = wanItem.packetLoss ?? 0;
+			if (wanLat === -1 && lanLat !== -1) diagnostic = {
+				status: "disconnected",
+				title: "Internet Disconnected",
+				description: `Local gateway responds (${lanLat} ms), but WAN host (${wanItem.host}) is unreachable. Check your ISP connection or modem.`,
+				lanLatency: lanLat,
+				wanLatency: void 0,
+				lanLoss,
+				wanLoss: 100
+			};
+			else if (lanLat > 40 || lanLoss >= 5) diagnostic = {
+				status: "lan-bottleneck",
+				title: "Local LAN Congestion",
+				description: `High local gateway ping (${lanLat} ms, ${lanLoss}% loss). The bottleneck is on your local Wi-Fi or Ethernet network.`,
+				lanLatency: lanLat,
+				wanLatency: wanLat >= 0 ? wanLat : void 0,
+				lanLoss,
+				wanLoss
+			};
+			else if (wanLat > 120 || wanLoss >= 5) diagnostic = {
+				status: "wan-lag",
+				title: "ISP / Internet Lag",
+				description: `Local gateway is fast (${lanLat} ms, 0% loss), but WAN latency is elevated (${wanLat} ms). Lag is external to your local network.`,
+				lanLatency: lanLat,
+				wanLatency: wanLat,
+				lanLoss,
+				wanLoss
+			};
+			else diagnostic = {
+				status: "optimal",
+				title: "Connection Optimal",
+				description: `Both local gateway (${lanLat} ms) and external Internet (${wanLat} ms) have low latency and zero packet loss.`,
+				lanLatency: lanLat,
+				wanLatency: wanLat,
+				lanLoss,
+				wanLoss
+			};
+		}
+		return hostList.map((host) => {
 			const item = hostResults[host];
-			const value = !item || !item.latency ? "-1" : `${item.latency} ms`;
-			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MetricItem, {
-				icon: Zap,
-				label: host,
-				value,
-				colorClass: value === "-1" ? "text-warning" : void 0
+			const isGw = Boolean(item?.isGateway || host.toLowerCase().includes("gateway"));
+			const label = item?.label || (isGw ? `LAN (${host})` : host);
+			let value;
+			let colorClass;
+			if (!item || item.latency == null) {
+				value = "-1";
+				colorClass = "text-warning";
+			} else {
+				value = `${item.latency} ms`;
+				if (item.packetLoss && item.packetLoss > 0) {
+					value += ` (${item.packetLoss}% loss)`;
+					colorClass = item.packetLoss >= 20 ? "text-danger" : "text-warning";
+				}
+			}
+			const flyoutPayload = {
+				section: "ping",
+				ping: {
+					host,
+					data: item,
+					history: hostHistory[host] || [],
+					diagnostic
+				}
+			};
+			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(HardwareFlyoutTrigger, {
+				section: "ping",
+				payload: flyoutPayload,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MetricItem, {
+					label,
+					value,
+					icon: isGw ? i$7 : i$16,
+					colorClass
+				})
 			}, host);
 		});
-	}, [hostResults, pingState]);
+	}, [
+		hostResults,
+		hostHistory,
+		pingState
+	]);
 	useEffect$11(() => {
 		const clearListener = window.electron.ipcRenderer.on(HMONITOR_IPC_UPDATE_PING, (_, result) => {
-			if (typeof result === "string") setHostResults((prevResults) => ({
-				...prevResults,
-				[result]: null
-			}));
-			else {
+			const now = Date.now();
+			if (typeof result === "string") {
+				const host = result;
+				setHostResults((prevResults) => ({
+					...prevResults,
+					[host]: {
+						host,
+						timeString: (/* @__PURE__ */ new Date()).toLocaleTimeString(),
+						latency: void 0,
+						packetLoss: 100
+					}
+				}));
+				setHostHistory((prev) => {
+					const current = prev[host] || [];
+					return {
+						...prev,
+						[host]: [...current, {
+							timestamp: now,
+							latency: null
+						}].slice(-60)
+					};
+				});
+			} else {
 				const data = result;
 				setHostResults((prevResults) => ({
 					...prevResults,
 					[data.host]: data
 				}));
+				setHostHistory((prev) => {
+					const current = prev[data.host] || [];
+					return {
+						...prev,
+						[data.host]: [...current, {
+							timestamp: now,
+							latency: data.latency ?? null,
+							jitter: data.jitter,
+							packetLoss: data.packetLoss
+						}].slice(-60)
+					};
+				});
 			}
 		});
 		const clearStopListener = window.electron.ipcRenderer.on(HMONITOR_IPC_STOP_PING, (_, host) => {
 			setHostResults((prevState) => {
 				const { [host]: _, ...remainingHosts } = prevState;
 				return remainingHosts;
+			});
+			setHostHistory((prevHistory) => {
+				const { [host]: _, ...remainingHistory } = prevHistory;
+				return remainingHistory;
 			});
 		});
 		return () => {
@@ -5683,11 +6863,11 @@ function PingSection() {
 	}, []);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Section, {
 		title: "Ping",
-		icon: Radar,
+		icon: i$10,
 		children: renderElements
 	});
 }
-var PingSection_default = memo$5(PingSection);
+var PingSection_default = memo$10(PingSection);
 //#endregion
 //#region extension/src/renderer/utils/formatUtils.ts
 /**
@@ -5706,7 +6886,7 @@ var formatUptime = (totalSeconds) => {
 };
 //#endregion
 //#region extension/src/renderer/components/status-bar/sections/UptimeSection.tsx
-var { memo: memo$4, useMemo: useMemo$10 } = await importShared("react");
+var { memo: memo$9, useMemo: useMemo$10 } = await importShared("react");
 function UpTimeSection({ data, metrics }) {
 	const uptimeOrder = useHMonitorState("uptimeOrder") || ["uptimeSystem", "uptimeApp"];
 	const { hasApp, hasSystem } = useMemo$10(() => ({
@@ -5739,11 +6919,11 @@ function UpTimeSection({ data, metrics }) {
 		children: items
 	});
 }
-var UptimeSection_default = memo$4(UpTimeSection);
+var UptimeSection_default = memo$9(UpTimeSection);
 //#endregion
 //#region extension/src/renderer/components/status-bar/HardwareStatusBar.tsx
-var { Link, Separator: Separator$1 } = await importShared("@heroui/react");
-var { memo: memo$3, useMemo: useMemo$9 } = await importShared("react");
+var { Link, Separator } = await importShared("@heroui/react");
+var { memo: memo$8, useMemo: useMemo$9 } = await importShared("react");
 var SECTIONS_CONFIG = [
 	{
 		type: "cpu",
@@ -5851,15 +7031,17 @@ function HardwareStatusBar() {
 						data,
 						metrics: metric,
 						hardwareInfo,
-						rawSensorValues: hardwareData.rawSensors
+						rawSensorValues: hardwareData.rawSensors,
+						publicNetwork: hardwareData.publicNetwork,
+						networkDetails: hardwareData.networkDetails
 					}, `${sectionType}_${metric.name}_${index}`));
 				});
 			}
 		});
 		return elements.reduce((acc, element, index) => {
-			if (index > 0) acc.push(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Separator$1, {
-				orientation: "vertical",
-				className: displayStyle.includes("two-column") ? "my-1 h-10" : "my-2"
+			if (index > 0 && displayStyle !== "segmented") acc.push(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Separator, {
+				className: `shrink-0 ` + (displayStyle === "ghost" ? "my-1.5 h-3.5 bg-foreground/20" : displayStyle.includes("two-column") ? "my-1 h-10" : "my-2"),
+				orientation: "vertical"
 			}, `sep_${index}`));
 			acc.push(element);
 			return acc;
@@ -5875,12 +7057,17 @@ function HardwareStatusBar() {
 		sectionOrder
 	]);
 	if (!enabled) return null;
-	const isSmallStyle = ["compact", "raw"].includes(displayStyle);
+	const isSmallStyle = [
+		"compact",
+		"raw",
+		"segmented",
+		"ghost"
+	].includes(displayStyle);
 	const isTwoColumn = ["two-column", "raw-two-column"].includes(displayStyle);
-	const heightClass = displayStyle === "raw" ? "h-8" : isSmallStyle ? "h-7" : isTwoColumn ? "h-11" : "h-12";
+	const heightClass = displayStyle === "raw" || displayStyle === "segmented" ? "h-8" : isSmallStyle ? "h-7" : isTwoColumn ? "h-11" : "h-12";
 	const buttonSizeClass = isSmallStyle ? "size-5" : "size-8";
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: `relative ${heightClass} w-full bg-surface`,
+		className: `relative ${heightClass} w-full ${displayStyle === "ghost" ? "bg-transparent" : "bg-surface"}`,
 		children: [
 			canScrollLeft && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
 				className: `absolute left-2 top-1/2 -translate-y-1/2 z-10 ${buttonSizeClass} rounded-full bg-surface-secondary border border-foreground/30 flex items-center justify-center hover:bg-surface-tertiary transition-all duration-200 backdrop-blur-sm`,
@@ -5893,7 +7080,7 @@ function HardwareStatusBar() {
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronRight, { className: "size-4 text-foreground" })
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: `h-full flex items-center ${isSmallStyle ? "px-2" : "px-3"} ${displayStyle.includes("raw") ? "gap-x-3" : "gap-x-2"} overflow-x-auto`,
+				className: `h-full flex items-center ${isSmallStyle ? "px-2" : "px-3"} ${displayStyle.includes("raw") ? "gap-x-3" : displayStyle === "segmented" ? "gap-x-2.5" : "gap-x-2"} overflow-x-auto`,
 				ref: initRef,
 				style: {
 					scrollbarWidth: "none",
@@ -5907,17 +7094,17 @@ function HardwareStatusBar() {
 		]
 	});
 }
-var HardwareStatusBar_default = memo$3(HardwareStatusBar);
+var HardwareStatusBar_default = memo$8(HardwareStatusBar);
 //#endregion
 //#region extension/src/renderer/integrations/ConfigProvider.tsx
 var { Fragment: Fragment$4, useEffect: useEffect$10 } = await importShared("react");
-var { useDispatch: useDispatch$4 } = await importShared("react-redux");
+var { useDispatch: useDispatch$5 } = await importShared("react-redux");
 /**
 * A provider component that listens for configuration updates from the main process
 * and syncs them with the Redux state. This is registered via LynxHub's `addCustomHook`.
 */
 function ConfigProviderWrapper() {
-	const dispatch = useDispatch$4();
+	const dispatch = useDispatch$5();
 	useEffect$10(() => {
 		const handleConfigUpdate = (_, newConfig) => {
 			if (newConfig) dispatch(hmonitorActions.setConfig(newConfig));
@@ -6490,7 +7677,7 @@ settingsSlice.actions;
 settingsSlice.reducer;
 //#endregion
 //#region src/renderer/mainWindow/utils/hooks.tsx
-var { Fragment: Fragment$3, useEffect: useEffect$9, useState: useState$8 } = await importShared("react");
+var { Fragment: Fragment$3, useEffect: useEffect$9, useState: useState$9 } = await importShared("react");
 /**
 * Hook to check if a card is pinned.
 * @param cardId - The ID of the card to check
@@ -6624,7 +7811,7 @@ var actionChannels = { logAction: "actions:logAction" };
 var actionsIpc = { logAction: (payload) => lynxIpc.send(actionChannels.logAction, payload) };
 //#endregion
 //#region src/renderer/shared/sentry/Breadcrumbs.tsx
-var { useEffect: useEffect$8, useRef: useRef$9 } = await importShared("react");
+var { useEffect: useEffect$8, useRef: useRef$10 } = await importShared("react");
 var isEnabled = true;
 /**
 * Adds an informational renderer breadcrumb when breadcrumb collection is enabled.
@@ -6637,42 +7824,9 @@ function AddBreadcrumb_Renderer(message) {
 	});
 }
 //#endregion
-//#region node_modules/@solar-icons/react/dist/lib/IconBase.mjs
-var { forwardRef: e } = await importShared("react");
-var r$5 = `solar`;
-function i$3(e) {
-	return e[`aria-label`] !== void 0 || e.title !== void 0;
-}
-var a = e(({ alt: e, color: a, size: o, strokeWidth: s, secondaryColor: c, secondaryOpacity: l, iconName: u, isolated: d, children: f, ...p }, m) => {
-	let h = u ? `${r$5} solar-${u}` : r$5, g = p.className, _ = g ? `${h} ${g}` : h, v = !!e || i$3(p), y = { ...p.style ?? {} };
-	if (d && (y[`--solar-secondary-color`] = `initial`, y[`--solar-secondary-opacity`] = `initial`), a !== void 0 && (y.color = a), o !== void 0) {
-		let e = typeof o == `number` ? `${o}px` : o;
-		y.width = e, y.height = e;
-	}
-	s !== void 0 && (y.strokeWidth = String(s)), c && (y[`--solar-secondary-color`] = c), l != null && (y[`--solar-secondary-opacity`] = String(l));
-	let b = o === void 0 ? d ? `24px` : `1em` : void 0, x = o === void 0 ? d ? `24px` : `1em` : void 0;
-	o === void 0 && !d && (`fontSize` in y || (y.fontSize = `var(--solar-size, 24px)`));
-	let S = a === void 0 ? d ? `currentColor` : `var(--solar-color, currentColor)` : void 0, C = s === void 0 ? d ? `1.5` : `var(--solar-stroke-width, 1.5)` : void 0;
-	return (0, import_jsx_runtime.jsxs)(`svg`, {
-		ref: m,
-		xmlns: `http://www.w3.org/2000/svg`,
-		fill: `none`,
-		viewBox: `0 0 24 24`,
-		...p,
-		className: _,
-		style: Object.keys(y).length > 0 ? y : void 0,
-		width: b,
-		height: x,
-		color: S,
-		strokeWidth: C,
-		...!v && { "aria-hidden": `true` },
-		children: [!!e && (0, import_jsx_runtime.jsx)(`title`, { children: e }), f]
-	});
-});
-//#endregion
 //#region node_modules/@solar-icons/react/dist/icons/bold/pin.mjs
-var { forwardRef: t$4 } = await importShared("react");
-var r$4 = t$4((t, r) => (0, import_jsx_runtime.jsx)(a, {
+var { forwardRef: t$2 } = await importShared("react");
+var r$2 = t$2((t, r) => (0, import_jsx_runtime.jsx)(a, {
 	ref: r,
 	...t,
 	iconName: `pin-bold`,
@@ -6683,8 +7837,8 @@ var r$4 = t$4((t, r) => (0, import_jsx_runtime.jsx)(a, {
 }));
 //#endregion
 //#region node_modules/@solar-icons/react/dist/icons/line-duotone/pin.mjs
-var { forwardRef: t$3 } = await importShared("react");
-var i$2 = t$3((t, i) => (0, import_jsx_runtime.jsxs)(a, {
+var { forwardRef: t$1 } = await importShared("react");
+var i = t$1((t, i) => (0, import_jsx_runtime.jsxs)(a, {
 	ref: i,
 	...t,
 	iconName: `pin-line-duotone`,
@@ -6704,13 +7858,14 @@ var i$2 = t$3((t, i) => (0, import_jsx_runtime.jsxs)(a, {
 }));
 //#endregion
 //#region src/renderer/mainWindow/components/ToolsCard.tsx
-var { Avatar, Button: Button$2, Card: Card$3, Description: Description$3, Label: Label$3 } = await importShared("@heroui/react");
+var { Avatar, Button: Button$4, Card: Card$1, Description: Description$3, Label: Label$4 } = await importShared("@heroui/react");
 /**
 * A card component for the Tools page, featuring a spotlight effect and hover animations.
 */
-function ToolsCard({ id, title, description, icon, onPress, footer, avatarClassName }) {
-	const isPinned = useIsPinnedCard(id || "");
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card$3, {
+function ToolsCard({ id, title, description, icon, onPress, footer, avatarClassName, isPinned: isPinnedProp, onPinPress, hidePin = false }) {
+	const isPinnedFromHook = useIsPinnedCard(id || "");
+	const isPinned = isPinnedProp !== void 0 ? isPinnedProp : isPinnedFromHook;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card$1, {
 		className: "w-75 h-46 relative group transform border border-surface  hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer",
 		onClick: () => {
 			AddBreadcrumb_Renderer(`Card Interaction: Clicked ToolsCard "${title}"`);
@@ -6718,7 +7873,7 @@ function ToolsCard({ id, title, description, icon, onPress, footer, avatarClassN
 			onPress?.();
 		},
 		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card$3.Header, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card$1.Header, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				className: "inline-flex items-center gap-2",
 				children: [typeof icon === "string" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Avatar, {
 					className: `size-12 shrink-0 ring-LynxPurple ring-2 ${avatarClassName}`,
@@ -6731,525 +7886,37 @@ function ToolsCard({ id, title, description, icon, onPress, footer, avatarClassN
 					children: icon
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "flex flex-col pointer-events-none",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$3, { children: title })
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$4, { children: title })
 				})]
 			}) }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card$3.Content, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description$3, {
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card$1.Content, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description$3, {
 				className: "line-clamp-3 text-xs",
 				children: description
 			}) }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card$3.Footer, {
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card$1.Footer, {
 				className: "justify-between flex items-center",
-				children: [id ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				children: [!hidePin && (id || onPinPress || isPinnedProp !== void 0) ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					onClick: (e) => e.stopPropagation(),
 					className: "flex items-center gap-x-2",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$2, {
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$4, {
 						className: "shrink-0 -translate-x-2 opacity-0 transition duration-200 group-hover:translate-x-0 group-hover:opacity-100",
 						onPress: () => {
-							AddBreadcrumb_Renderer(`Pin ToolsCard: id:${id} , ${isPinned ? "remove" : "add"}`);
-							storageUtilsIpc.invoke.pinnedCards(isPinned ? "remove" : "add", id);
+							if (onPinPress) {
+								AddBreadcrumb_Renderer(`Pin ToolsCard: id:${id || title} , ${isPinned ? "remove" : "add"}`);
+								onPinPress();
+							} else if (id) {
+								AddBreadcrumb_Renderer(`Pin ToolsCard: id:${id} , ${isPinned ? "remove" : "add"}`);
+								storageUtilsIpc.invoke.pinnedCards(isPinned ? "remove" : "add", id);
+							}
 						},
 						size: "sm",
 						variant: "ghost",
 						isIconOnly: true,
-						children: isPinned ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(r$4, { className: "size-3" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$2, { className: "size-3" })
+						children: isPinned ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(r$2, { className: "size-3" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i, { className: "size-3" })
 					})
 				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {}), footer]
 			})
 		]
-	});
-}
-//#endregion
-//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/cpu-bolt.mjs
-var { forwardRef: t$2 } = await importShared("react");
-var i$1 = t$2((t, i) => (0, import_jsx_runtime.jsxs)(a, {
-	ref: i,
-	...t,
-	iconName: `cpu-bolt-bold-duotone`,
-	children: [
-		(0, import_jsx_runtime.jsx)(`path`, {
-			d: `M9.18091 9.18091C9.23402 9.1278 9.32886 9.06211 9.63147 9.02143C9.95415 8.97804 10.3921 8.97656 11.0696 8.97656H12.9301C13.6075 8.97656 14.0455 8.97804 14.3682 9.02143C14.6708 9.06211 14.7656 9.1278 14.8187 9.18091C14.8718 9.23402 14.9375 9.32886 14.9782 9.63147C15.0216 9.95415 15.0231 10.3921 15.0231 11.0696V12.9301C15.0231 13.6075 15.0216 14.0455 14.9782 14.3682C14.9375 14.6708 14.8718 14.7656 14.8187 14.8187C14.7656 14.8718 14.6708 14.9375 14.3682 14.9782C14.0455 15.0216 13.6075 15.0231 12.9301 15.0231H11.0696C10.3921 15.0231 9.95415 15.0216 9.63147 14.9782C9.32886 14.9375 9.23402 14.8718 9.18091 14.8187C9.1278 14.7656 9.06211 14.6708 9.02143 14.3682C8.97804 14.0455 8.97656 13.6075 8.97656 12.9301V11.0696C8.97656 10.3921 8.97804 9.95415 9.02143 9.63147C9.06211 9.32886 9.1278 9.23402 9.18091 9.18091Z`,
-			fill: `currentColor`,
-			style: {
-				color: `var(--solar-secondary-color, currentColor)`,
-				opacity: `var(--solar-secondary-opacity, 0.5)`
-			}
-		}),
-		(0, import_jsx_runtime.jsx)(`path`, {
-			fillRule: `evenodd`,
-			clipRule: `evenodd`,
-			d: `M12.6977 2.69767C12.6977 2.31236 12.3853 2 12 2C11.6147 2 11.3023 2.31236 11.3023 2.69767V5.48837C10.7916 5.48944 10.3283 5.49342 9.90678 5.50495L9.90698 5.48837V2.69767C9.90698 2.31236 9.59462 2 9.2093 2C8.82399 2 8.51163 2.31236 8.51163 2.69767V5.48837C8.51163 5.52487 8.51443 5.56072 8.51984 5.5957C7.58381 5.71067 6.93517 5.94879 6.44198 6.44198C5.94879 6.93517 5.71067 7.58381 5.5957 8.51984C5.56071 8.51443 5.52487 8.51163 5.48837 8.51163H2.69767C2.31236 8.51163 2 8.82399 2 9.2093C2 9.59462 2.31236 9.90698 2.69767 9.90698H5.48837L5.50495 9.90678C5.49342 10.3283 5.48991 10.7916 5.48884 11.3023L2.69767 11.3023C2.31236 11.3023 2 11.6147 2 12C2 12.3853 2.31236 12.6977 2.69767 12.6977H5.48837C5.48944 13.2084 5.49342 13.6717 5.50495 14.0932L5.48837 14.093H2.69767C2.31236 14.093 2 14.4054 2 14.7907C2 15.176 2.31236 15.4884 2.69767 15.4884H5.48837C5.52487 15.4884 5.56071 15.4856 5.5957 15.4802C5.71067 16.4162 5.94879 17.0648 6.44198 17.558C6.93517 18.0512 7.58381 18.2893 8.51984 18.4043C8.51443 18.4393 8.51163 18.4751 8.51163 18.5116V21.3023C8.51163 21.6876 8.82399 22 9.2093 22C9.59462 22 9.90698 21.6876 9.90698 21.3023V18.5116L9.90678 18.495C10.3283 18.5066 10.7916 18.5101 11.3023 18.5112L11.3023 21.3023C11.3023 21.6876 11.6147 22 12 22C12.3853 22 12.6977 21.6876 12.6977 21.3023V18.5116C13.2084 18.5106 13.6717 18.5066 14.0932 18.495L14.093 18.5116V21.3023C14.093 21.6876 14.4054 22 14.7907 22C15.176 22 15.4884 21.6876 15.4884 21.3023V18.5116C15.4884 18.4751 15.4856 18.4393 15.4802 18.4043C16.4162 18.2893 17.0648 18.0512 17.558 17.558C18.0512 17.0648 18.2893 16.4162 18.4043 15.4802C18.4393 15.4856 18.4751 15.4884 18.5116 15.4884H21.3023C21.6876 15.4884 22 15.176 22 14.7907C22 14.4054 21.6876 14.093 21.3023 14.093H18.5116L18.495 14.0932C18.5066 13.6717 18.5101 13.2084 18.5112 12.6977L21.3023 12.6977C21.6876 12.6977 22 12.3853 22 12C22 11.6147 21.6876 11.3023 21.3023 11.3023H18.5116C18.5106 10.7916 18.5066 10.3283 18.495 9.90678L18.5116 9.90698H21.3023C21.6876 9.90698 22 9.59462 22 9.2093C22 8.82399 21.6876 8.51163 21.3023 8.51163H18.5116C18.4751 8.51163 18.4393 8.51443 18.4043 8.51984C18.2893 7.58381 18.0512 6.93517 17.558 6.44198C17.0648 5.94879 16.4162 5.71067 15.4802 5.5957C15.4856 5.56072 15.4884 5.52487 15.4884 5.48837V2.69767C15.4884 2.31236 15.176 2 14.7907 2C14.4054 2 14.093 2.31236 14.093 2.69767V5.48837L14.0932 5.50495C13.6717 5.49342 13.2084 5.48991 12.6977 5.48884V2.69767ZM9.44573 7.63871C9.87247 7.58133 10.4054 7.58136 11.0238 7.5814H12.9762C13.5947 7.58136 14.1275 7.58133 14.5543 7.63871C15.0116 7.70019 15.45 7.83885 15.8056 8.19443C16.1612 8.55001 16.2998 8.98839 16.3613 9.44573C16.4187 9.87246 16.4186 10.4053 16.4186 11.0238V12.9762C16.4186 13.5946 16.4187 14.1275 16.3613 14.5543C16.2998 15.0116 16.1612 15.45 15.8056 15.8056C15.45 16.1612 15.0116 16.2998 14.5543 16.3613C14.1275 16.4187 13.5947 16.4186 12.9762 16.4186H11.0238C10.4054 16.4186 9.87246 16.4187 9.44573 16.3613C8.98839 16.2998 8.55001 16.1612 8.19443 15.8056C7.83885 15.45 7.70019 15.0116 7.63871 14.5543C7.58133 14.1275 7.58136 13.5946 7.5814 12.9762V11.0238C7.58136 10.4054 7.58133 9.87247 7.63871 9.44573C7.70019 8.98839 7.83885 8.55001 8.19443 8.19443C8.55001 7.83885 8.98839 7.70019 9.44573 7.63871Z`,
-			fill: `currentColor`
-		}),
-		(0, import_jsx_runtime.jsx)(`path`, {
-			d: `M12.9664 10.5446C13.1903 10.2311 13.1177 9.79537 12.8042 9.57141C12.4906 9.34745 12.0549 9.42008 11.8309 9.73362L10.502 11.5941C10.3501 11.8067 10.3298 12.0865 10.4494 12.3188C10.569 12.5512 10.8084 12.6973 11.0697 12.6973H11.5745L11.0336 13.4545C10.8096 13.7681 10.8822 14.2038 11.1958 14.4278C11.5093 14.6517 11.9451 14.5791 12.169 14.2656L13.4979 12.4051C13.6498 12.1925 13.6701 11.9127 13.5506 11.6804C13.431 11.448 13.1916 11.3019 12.9302 11.3019H12.4255L12.9664 10.5446Z`,
-			fill: `currentColor`
-		})
-	]
-}));
-//#endregion
-//#region node_modules/@solar-icons/react/dist/icons/bold-duotone/diskette.mjs
-var { forwardRef: t$1 } = await importShared("react");
-var i = t$1((t, i) => (0, import_jsx_runtime.jsxs)(a, {
-	ref: i,
-	...t,
-	iconName: `diskette-bold-duotone`,
-	children: [
-		(0, import_jsx_runtime.jsx)(`path`, {
-			d: `M20.5355 20.5355C22 19.0711 22 16.714 22 12C22 11.6585 22 11.4878 21.9848 11.3142C21.9142 10.5049 21.586 9.71257 21.0637 9.09034C20.9516 8.95687 20.828 8.83317 20.5806 8.58578L15.4142 3.41944C15.1668 3.17206 15.0431 3.04835 14.9097 2.93631C14.2874 2.414 13.4951 2.08581 12.6858 2.01515C12.5122 2 12.3415 2 12 2C7.28595 2 4.92893 2 3.46447 3.46447C2 4.92893 2 7.28595 2 12C2 16.714 2 19.0711 3.46447 20.5355C4.1485 21.2196 5.02727 21.5841 6.25 21.7784L7.75 21.9313C8.9058 22 10.2996 22 12 22C13.7004 22 15.0942 22 16.25 21.9313L17.75 21.7784C18.9727 21.5841 19.8515 21.2196 20.5355 20.5355Z`,
-			fill: `currentColor`,
-			style: {
-				color: `var(--solar-secondary-color, currentColor)`,
-				opacity: `var(--solar-secondary-opacity, 0.5)`
-			}
-		}),
-		(0, import_jsx_runtime.jsx)(`path`, {
-			d: `M7 7.25C6.58579 7.25 6.25 7.58579 6.25 8C6.25 8.41421 6.58579 8.75 7 8.75H13C13.4142 8.75 13.75 8.41421 13.75 8C13.75 7.58579 13.4142 7.25 13 7.25H7Z`,
-			fill: `currentColor`
-		}),
-		(0, import_jsx_runtime.jsx)(`path`, {
-			d: `M13.052 16.25C13.9505 16.25 14.6997 16.2499 15.2945 16.3299C15.9223 16.4143 16.4891 16.6 16.9445 17.0555C17.4 17.5109 17.5857 18.0777 17.6701 18.7055C17.7501 19.3003 17.75 20.0495 17.75 20.948V20.948L17.75 21.7812L16.25 21.9219V21C16.25 20.036 16.2484 19.3884 16.1835 18.9054C16.1214 18.4439 16.0142 18.2464 15.8839 18.1161C15.7536 17.9858 15.5561 17.8786 15.0946 17.8165C14.6116 17.7516 13.964 17.75 13 17.75H11C10.036 17.75 9.38843 17.7516 8.90539 17.8165C8.44393 17.8786 8.24644 17.9858 8.11612 18.1161C7.9858 18.2464 7.87858 18.4439 7.81654 18.9054C7.7516 19.3884 7.75 20.036 7.75 21V21.9258L6.25 21.7773L6.25 20.948V20.948C6.24997 20.0495 6.24995 19.3003 6.32991 18.7055C6.41432 18.0777 6.59999 17.5109 7.05546 17.0555C7.51093 16.6 8.07773 16.4143 8.70552 16.3299C9.3003 16.2499 10.0495 16.25 10.948 16.25H10.948H13.052H13.052Z`,
-			fill: `currentColor`
-		})
-	]
-}));
-//#endregion
-//#region src/renderer/mainWindow/pages/settings/SettingsSearchHighlight.tsx
-var import_main = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
-	module.exports = (function(modules) {
-		var installedModules = {};
-		function __webpack_require__(moduleId) {
-			if (installedModules[moduleId]) return installedModules[moduleId].exports;
-			var module$1 = installedModules[moduleId] = {
-				exports: {},
-				id: moduleId,
-				loaded: false
-			};
-			modules[moduleId].call(module$1.exports, module$1, module$1.exports, __webpack_require__);
-			module$1.loaded = true;
-			return module$1.exports;
-		}
-		__webpack_require__.m = modules;
-		__webpack_require__.c = installedModules;
-		__webpack_require__.p = "";
-		return __webpack_require__(0);
-	})([
-		(function(module$2, exports$1, __webpack_require__) {
-			module$2.exports = __webpack_require__(1);
-		}),
-		(function(module$3, exports$2, __webpack_require__) {
-			"use strict";
-			Object.defineProperty(exports$2, "__esModule", { value: true });
-			function _interopRequireDefault(obj) {
-				return obj && obj.__esModule ? obj : { "default": obj };
-			}
-			exports$2["default"] = _interopRequireDefault(__webpack_require__(2))["default"];
-			module$3.exports = exports$2["default"];
-		}),
-		(function(module$4, exports$3, __webpack_require__) {
-			"use strict";
-			Object.defineProperty(exports$3, "__esModule", { value: true });
-			var _extends = Object.assign || function(target) {
-				for (var i = 1; i < arguments.length; i++) {
-					var source = arguments[i];
-					for (var key in source) if (Object.prototype.hasOwnProperty.call(source, key)) target[key] = source[key];
-				}
-				return target;
-			};
-			exports$3["default"] = Highlighter;
-			function _interopRequireDefault(obj) {
-				return obj && obj.__esModule ? obj : { "default": obj };
-			}
-			function _objectWithoutProperties(obj, keys) {
-				var target = {};
-				for (var i in obj) {
-					if (keys.indexOf(i) >= 0) continue;
-					if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
-					target[i] = obj[i];
-				}
-				return target;
-			}
-			var _highlightWordsCore = __webpack_require__(3);
-			var _react = __webpack_require__(4);
-			var _memoizeOne2 = _interopRequireDefault(__webpack_require__(5));
-			/**
-			* Highlighter component
-			* @param {object} props - Component properties
-			* @param {string} [props.activeClassName] - The class name to be applied to an active match. Use along with `activeIndex`.
-			* @param {number} [props.activeIndex] - Specify the match index that should be actively highlighted. Use along with `activeClassName`.
-			* @param {object} [props.activeStyle] - The inline style to be applied to an active match. Use along with `activeIndex`.
-			* @param {boolean} [props.autoEscape] - Escape characters in searchWords which are meaningful in regular expressions.
-			* @param {string} [props.className] - CSS class name applied to the outer/wrapper `<span>`.
-			* @param {(options: object) => Array<{start: number, end: number}>} [props.findChunks] - Use a custom function to search for matching chunks.  See the default `findChunks` function in `highlight-words-core` for signature.
-			* @param {string|object} [props.highlightClassName] - CSS class name applied to highlighted text or object mapping search term matches to class names.
-			* @param {object} [props.highlightStyle] - Inline styles applied to highlighted text.
-			* @param {React.ComponentType|string} [props.highlightTag] - Type of tag to wrap around highlighted matches. Defaults to `mark` but can also be a React component (class or functional).
-			* @param {(text: string) => string} [props.sanitize] - Process each search word and text to highlight before comparing.
-			* @param {Array<string|RegExp>} props.searchWords - Array of search words. String search terms are automatically cast to RegExps unless `autoEscape` is true.
-			* @param {string} props.textToHighlight - The text to highlight matches in.
-			* @param {React.ComponentType|string} [props.unhighlightTag] - Type of tag applied to unhighlighted parts. Defaults to `span` but can also be a React component (class or functional).
-			* @param {string} [props.unhighlightClassName] - CSS class name applied to unhighlighted text.
-			* @param {object} [props.unhighlightStyle] - Inline styles applied to the unhighlighted text.
-			* @param {object} [props.rest] - Additional attributes passed to the outer `<span>` element.
-			*/
-			function Highlighter(_ref) {
-				var _ref$activeClassName = _ref.activeClassName;
-				var activeClassName = _ref$activeClassName === void 0 ? "" : _ref$activeClassName;
-				var _ref$activeIndex = _ref.activeIndex;
-				var activeIndex = _ref$activeIndex === void 0 ? -1 : _ref$activeIndex;
-				var activeStyle = _ref.activeStyle;
-				var autoEscape = _ref.autoEscape;
-				var _ref$caseSensitive = _ref.caseSensitive;
-				var caseSensitive = _ref$caseSensitive === void 0 ? false : _ref$caseSensitive;
-				var className = _ref.className;
-				var findChunks = _ref.findChunks;
-				var _ref$highlightClassName = _ref.highlightClassName;
-				var highlightClassName = _ref$highlightClassName === void 0 ? "" : _ref$highlightClassName;
-				var _ref$highlightStyle = _ref.highlightStyle;
-				var highlightStyle = _ref$highlightStyle === void 0 ? {} : _ref$highlightStyle;
-				var _ref$highlightTag = _ref.highlightTag;
-				var highlightTag = _ref$highlightTag === void 0 ? "mark" : _ref$highlightTag;
-				var sanitize = _ref.sanitize;
-				var searchWords = _ref.searchWords;
-				var textToHighlight = _ref.textToHighlight;
-				var _ref$unhighlightTag = _ref.unhighlightTag;
-				var unhighlightTag = _ref$unhighlightTag === void 0 ? "span" : _ref$unhighlightTag;
-				var _ref$unhighlightClassName = _ref.unhighlightClassName;
-				var unhighlightClassName = _ref$unhighlightClassName === void 0 ? "" : _ref$unhighlightClassName;
-				var unhighlightStyle = _ref.unhighlightStyle;
-				var rest = _objectWithoutProperties(_ref, [
-					"activeClassName",
-					"activeIndex",
-					"activeStyle",
-					"autoEscape",
-					"caseSensitive",
-					"className",
-					"findChunks",
-					"highlightClassName",
-					"highlightStyle",
-					"highlightTag",
-					"sanitize",
-					"searchWords",
-					"textToHighlight",
-					"unhighlightTag",
-					"unhighlightClassName",
-					"unhighlightStyle"
-				]);
-				var chunks = (0, _highlightWordsCore.findAll)({
-					autoEscape,
-					caseSensitive,
-					findChunks,
-					sanitize,
-					searchWords,
-					textToHighlight
-				});
-				var HighlightTag = highlightTag;
-				var highlightIndex = -1;
-				var highlightClassNames = "";
-				var highlightStyles = void 0;
-				var memoizedLowercaseProps = (0, _memoizeOne2["default"])(function lowercaseProps(object) {
-					var mapped = {};
-					for (var key in object) mapped[key.toLowerCase()] = object[key];
-					return mapped;
-				});
-				return (0, _react.createElement)("span", _extends({ className }, rest, { children: chunks.map(function(chunk, index) {
-					var text = textToHighlight.substr(chunk.start, chunk.end - chunk.start);
-					if (chunk.highlight) {
-						highlightIndex++;
-						var highlightClass = void 0;
-						if (typeof highlightClassName === "object") {
-							if (!caseSensitive) {
-								highlightClassName = memoizedLowercaseProps(highlightClassName);
-								highlightClass = highlightClassName[text.toLowerCase()];
-							} else highlightClass = highlightClassName[text];
-						} else highlightClass = highlightClassName;
-						var isActive = highlightIndex === +activeIndex;
-						highlightClassNames = highlightClass + " " + (isActive ? activeClassName : "");
-						highlightStyles = isActive === true && activeStyle != null ? Object.assign({}, highlightStyle, activeStyle) : highlightStyle;
-						var props = {
-							children: text,
-							className: highlightClassNames,
-							key: index,
-							style: highlightStyles
-						};
-						if (typeof HighlightTag !== "string") props.highlightIndex = highlightIndex;
-						return (0, _react.createElement)(HighlightTag, props);
-					} else return (0, _react.createElement)(unhighlightTag, {
-						children: text,
-						className: unhighlightClassName,
-						key: index,
-						style: unhighlightStyle
-					});
-				}) }));
-			}
-			module$4.exports = exports$3["default"];
-		}),
-		(function(module$5, exports$4) {
-			module$5.exports = (function(modules) {
-				var installedModules = {};
-				function __webpack_require__(moduleId) {
-					if (installedModules[moduleId]) return installedModules[moduleId].exports;
-					var module$6 = installedModules[moduleId] = {
-						exports: {},
-						id: moduleId,
-						loaded: false
-					};
-					modules[moduleId].call(module$6.exports, module$6, module$6.exports, __webpack_require__);
-					module$6.loaded = true;
-					return module$6.exports;
-				}
-				__webpack_require__.m = modules;
-				__webpack_require__.c = installedModules;
-				__webpack_require__.p = "";
-				return __webpack_require__(0);
-			})([
-				(function(module$7, exports$5, __webpack_require__) {
-					module$7.exports = __webpack_require__(1);
-				}),
-				(function(module$8, exports$6, __webpack_require__) {
-					"use strict";
-					Object.defineProperty(exports$6, "__esModule", { value: true });
-					var _utils = __webpack_require__(2);
-					Object.defineProperty(exports$6, "combineChunks", {
-						enumerable: true,
-						get: function get() {
-							return _utils.combineChunks;
-						}
-					});
-					Object.defineProperty(exports$6, "fillInChunks", {
-						enumerable: true,
-						get: function get() {
-							return _utils.fillInChunks;
-						}
-					});
-					Object.defineProperty(exports$6, "findAll", {
-						enumerable: true,
-						get: function get() {
-							return _utils.findAll;
-						}
-					});
-					Object.defineProperty(exports$6, "findChunks", {
-						enumerable: true,
-						get: function get() {
-							return _utils.findChunks;
-						}
-					});
-				}),
-				(function(module$9, exports$7) {
-					"use strict";
-					Object.defineProperty(exports$7, "__esModule", { value: true });
-					exports$7.findAll = function findAll(_ref) {
-						var autoEscape = _ref.autoEscape, _ref$caseSensitive = _ref.caseSensitive, caseSensitive = _ref$caseSensitive === void 0 ? false : _ref$caseSensitive, _ref$findChunks = _ref.findChunks, findChunks = _ref$findChunks === void 0 ? defaultFindChunks : _ref$findChunks, sanitize = _ref.sanitize, searchWords = _ref.searchWords, textToHighlight = _ref.textToHighlight;
-						return fillInChunks({
-							chunksToHighlight: combineChunks({ chunks: findChunks({
-								autoEscape,
-								caseSensitive,
-								sanitize,
-								searchWords,
-								textToHighlight
-							}) }),
-							totalLength: textToHighlight ? textToHighlight.length : 0
-						});
-					};
-					/**
-					* Takes an array of {start:number, end:number} objects and combines chunks that overlap into single chunks.
-					* @return {start:number, end:number}[]
-					*/
-					var combineChunks = exports$7.combineChunks = function combineChunks(_ref2) {
-						var chunks = _ref2.chunks;
-						chunks = chunks.sort(function(first, second) {
-							return first.start - second.start;
-						}).reduce(function(processedChunks, nextChunk) {
-							if (processedChunks.length === 0) return [nextChunk];
-							else {
-								var prevChunk = processedChunks.pop();
-								if (nextChunk.start <= prevChunk.end) {
-									var endIndex = Math.max(prevChunk.end, nextChunk.end);
-									processedChunks.push({
-										start: prevChunk.start,
-										end: endIndex
-									});
-								} else processedChunks.push(prevChunk, nextChunk);
-								return processedChunks;
-							}
-						}, []);
-						return chunks;
-					};
-					/**
-					* Examine text for any matches.
-					* If we find matches, add them to the returned array as a "chunk" object ({start:number, end:number}).
-					* @return {start:number, end:number}[]
-					*/
-					var defaultFindChunks = function defaultFindChunks(_ref3) {
-						var autoEscape = _ref3.autoEscape, caseSensitive = _ref3.caseSensitive, _ref3$sanitize = _ref3.sanitize, sanitize = _ref3$sanitize === void 0 ? identity : _ref3$sanitize, searchWords = _ref3.searchWords, textToHighlight = _ref3.textToHighlight;
-						textToHighlight = sanitize(textToHighlight);
-						return searchWords.filter(function(searchWord) {
-							return searchWord;
-						}).reduce(function(chunks, searchWord) {
-							searchWord = sanitize(searchWord);
-							if (autoEscape) searchWord = escapeRegExpFn(searchWord);
-							var regex = new RegExp(searchWord, caseSensitive ? "g" : "gi");
-							var match = void 0;
-							while (match = regex.exec(textToHighlight)) {
-								var start = match.index;
-								var end = regex.lastIndex;
-								if (end > start) chunks.push({
-									start,
-									end
-								});
-								if (match.index == regex.lastIndex) regex.lastIndex++;
-							}
-							return chunks;
-						}, []);
-					};
-					exports$7.findChunks = defaultFindChunks;
-					/**
-					* Given a set of chunks to highlight, create an additional set of chunks
-					* to represent the bits of text between the highlighted text.
-					* @param chunksToHighlight {start:number, end:number}[]
-					* @param totalLength number
-					* @return {start:number, end:number, highlight:boolean}[]
-					*/
-					var fillInChunks = exports$7.fillInChunks = function fillInChunks(_ref4) {
-						var chunksToHighlight = _ref4.chunksToHighlight, totalLength = _ref4.totalLength;
-						var allChunks = [];
-						var append = function append(start, end, highlight) {
-							if (end - start > 0) allChunks.push({
-								start,
-								end,
-								highlight
-							});
-						};
-						if (chunksToHighlight.length === 0) append(0, totalLength, false);
-						else {
-							var lastIndex = 0;
-							chunksToHighlight.forEach(function(chunk) {
-								append(lastIndex, chunk.start, false);
-								append(chunk.start, chunk.end, true);
-								lastIndex = chunk.end;
-							});
-							append(lastIndex, totalLength, false);
-						}
-						return allChunks;
-					};
-					function identity(value) {
-						return value;
-					}
-					function escapeRegExpFn(str) {
-						return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-					}
-				})
-			]);
-		}),
-		(function(module$10, exports$8) {
-			module$10.exports = require_react();
-		}),
-		(function(module$11, exports$9) {
-			"use strict";
-			var simpleIsEqual = function simpleIsEqual(a, b) {
-				return a === b;
-			};
-			function index(resultFn) {
-				var isEqual = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : simpleIsEqual;
-				var lastThis = void 0;
-				var lastArgs = [];
-				var lastResult = void 0;
-				var calledOnce = false;
-				var isNewArgEqualToLast = function isNewArgEqualToLast(newArg, index) {
-					return isEqual(newArg, lastArgs[index]);
-				};
-				return function result() {
-					for (var _len = arguments.length, newArgs = Array(_len), _key = 0; _key < _len; _key++) newArgs[_key] = arguments[_key];
-					if (calledOnce && lastThis === this && newArgs.length === lastArgs.length && newArgs.every(isNewArgEqualToLast)) return lastResult;
-					calledOnce = true;
-					lastThis = this;
-					lastArgs = newArgs;
-					lastResult = resultFn.apply(this, newArgs);
-					return lastResult;
-				};
-			}
-			module$11.exports = index;
-		})
-	]);
-})))(), 1);
-var { memo: memo$2 } = await importShared("react");
-/**
-* Renders text matching the active settings search terminology with a highlight wrapper.
-* Will render text minimally without highlights if empty or no text provided.
-*/
-var SettingsSearchHighlight = ({ text, children, className, highlightClassName }) => {
-	const searchWords = useSettingsState("searchWords");
-	const content = text ?? children ?? "";
-	if (!content) return null;
-	if (!searchWords || !searchWords.length) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-		className,
-		children: content
-	});
-	const lowerContent = content.toLowerCase();
-	if (!searchWords.some((word) => word && lowerContent.includes(word.toLowerCase()))) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-		className,
-		children: content
-	});
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_main.default, {
-		className,
-		searchWords,
-		textToHighlight: content,
-		highlightClassName: highlightClassName ?? "bg-warning/40 rounded-sm px-0.5",
-		autoEscape: true
-	});
-};
-var SettingsSearchHighlight_default = memo$2(SettingsSearchHighlight);
-//#endregion
-//#region src/renderer/mainWindow/components/LynxSwitch.tsx
-var { Description: Description$2, Surface, Switch: Switch$3 } = await importShared("@heroui/react");
-var { useCallback: useCallback$5, useEffect: useEffect$7, useState: useState$7 } = await importShared("react");
-/**
-* Customizable switch component with title, description, and search highlighting.
-* Supports both controlled and uncontrolled modes.
-*/
-function LynxSwitch({ enabled = false, onEnabledChange, title, description, isDisabled, className, size = "md", thumbIcon, icon, variant = "default" }) {
-	const [isSelected, setIsSelected] = useState$7(enabled);
-	useEffect$7(() => {
-		setIsSelected(enabled);
-	}, [enabled]);
-	const onChange = useCallback$5((selected) => {
-		setIsSelected(selected);
-		onEnabledChange?.(selected);
-	}, [onEnabledChange]);
-	const toggle = () => {
-		setIsSelected(!isSelected);
-		onEnabledChange?.(!isSelected);
-	};
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Surface, {
-		className: `px-3 py-2 rounded-2xl transition-colors duration-300 ${isDisabled ? "" : "cursor-pointer"} border-2 ${isSelected ? "border-accent/40" : "border-surface"} w-full shadow-surface`,
-		variant,
-		onClick: isDisabled ? void 0 : toggle,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$3, {
-			size,
-			onChange,
-			isDisabled,
-			isSelected,
-			className: ["", className].join(" "),
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Switch$3.Content, {
-				className: "flex flex-row items-center justify-between w-full gap-x-2",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex flex-row items-center gap-x-2",
-					children: [icon, /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-						className: "text-sm cursor-pointer",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SettingsSearchHighlight_default, { text: title })
-					})]
-				}), description && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description$2, {
-					className: "pointer-events-none p-0",
-					children: typeof description === "string" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SettingsSearchHighlight_default, {
-						text: description,
-						className: "text-xs text-muted"
-					}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-						className: "text-xs text-muted",
-						children: description
-					})
-				})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$3.Control, { children: thumbIcon ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$3.Thumb, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$3.Icon, { children: thumbIcon }) }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$3.Thumb, {}) })]
-			})
-		})
 	});
 }
 //#endregion
@@ -7260,13 +7927,12 @@ var useCurrentTabId = () => useContext$10(TabContext);
 //#endregion
 //#region src/renderer/mainWindow/components/TabModal.tsx
 var { Modal: Modal$1 } = await importShared("@heroui/react");
-var { useCallback: useCallback$4, useEffect: useEffect$6, useLayoutEffect: useLayoutEffect$1, useMemo: useMemo$8, useRef: useRef$8, useState: useState$6 } = await importShared("react");
+var { useCallback: useCallback$5, useLayoutEffect: useLayoutEffect$1, useRef: useRef$9, useState: useState$8 } = await importShared("react");
 var { UNSAFE_PortalProvider } = await importShared("react-aria");
 function TabModal({ isOpen, onOpenChange, children, size = "cover", isDismissable = true, backdropVariant, dialogClassName, containerClassName, isKeyboardDismissDisabled, tabId: explicitTabId }) {
-	const anchorRef = useRef$8(null);
+	const anchorRef = useRef$9(null);
 	const contextTabId = useCurrentTabId();
-	const [domTabId, setDomTabId] = useState$6(void 0);
-	const runningCards = useCardsState("runningCard");
+	const [domTabId, setDomTabId] = useState$8(void 0);
 	useLayoutEffect$1(() => {
 		if (anchorRef.current) {
 			const wrapper = anchorRef.current.closest("[id$=\"_wrapper\"]");
@@ -7274,32 +7940,25 @@ function TabModal({ isOpen, onOpenChange, children, size = "cover", isDismissabl
 		}
 	}, []);
 	const resolvedTabId = explicitTabId ?? contextTabId ?? domTabId;
-	const [targetContainer, setTargetContainer] = useState$6(() => {
-		if (typeof document === "undefined") return null;
-		return resolvedTabId ? document.getElementById(`${resolvedTabId}_wrapper`) : null;
-	});
-	const currentRunningCard = useMemo$8(() => resolvedTabId ? runningCards.find((card) => card.tabId === resolvedTabId) : void 0, [runningCards, resolvedTabId]);
-	useEffect$6(() => {
-		if (!isOpen) {
-			setTargetContainer(null);
-			return;
+	const getContainer = useCallback$5(() => {
+		if (resolvedTabId) {
+			const el = document.getElementById(`${resolvedTabId}_wrapper`);
+			if (el) return el;
 		}
-		if (resolvedTabId) setTargetContainer(document.getElementById(`${resolvedTabId}_wrapper`));
-		else if (anchorRef.current) {
+		if (anchorRef.current) {
 			const wrapper = anchorRef.current.closest("[id$=\"_wrapper\"]");
-			setTargetContainer(wrapper ?? null);
-		} else setTargetContainer(null);
-	}, [isOpen, resolvedTabId]);
-	useEffect$6(() => {
-		if (isOpen && currentRunningCard && currentRunningCard.currentView === "browser") {
-			browserIpc.send.setVisible(currentRunningCard.id, false);
-			return () => {
-				browserIpc.send.setVisible(currentRunningCard.id, true);
-			};
+			if (wrapper) return wrapper;
 		}
-	}, [isOpen, currentRunningCard]);
-	const handleBackdropClick = useCallback$4((e) => {
-		if (isDismissable && e.target instanceof HTMLElement && e.target.closest(".modal__backdrop, .modal__container") && !e.target.closest(".modal__dialog")) onOpenChange?.(false);
+		return document.body;
+	}, [resolvedTabId]);
+	const mouseDownTargetRef = useRef$9(null);
+	const handleBackdropMouseDown = useCallback$5((e) => {
+		mouseDownTargetRef.current = e.target;
+	}, []);
+	const handleBackdropClick = useCallback$5((e) => {
+		const mouseDownTarget = mouseDownTargetRef.current;
+		mouseDownTargetRef.current = null;
+		if (isDismissable && mouseDownTarget instanceof HTMLElement && mouseDownTarget.closest(".modal__backdrop, .modal__container") && !mouseDownTarget.closest(".modal__dialog") && e.target instanceof HTMLElement && e.target.closest(".modal__backdrop, .modal__container") && !e.target.closest(".modal__dialog")) onOpenChange?.(false);
 	}, [isDismissable, onOpenChange]);
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 		ref: anchorRef,
@@ -7308,13 +7967,14 @@ function TabModal({ isOpen, onOpenChange, children, size = "cover", isDismissabl
 	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal$1, {
 		isOpen,
 		onOpenChange,
-		children: targetContainer ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(UNSAFE_PortalProvider, {
-			getContainer: () => targetContainer,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(UNSAFE_PortalProvider, {
+			getContainer,
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal$1.Backdrop, {
-				className: "h-full",
 				isDismissable: false,
 				variant: backdropVariant,
 				onClick: handleBackdropClick,
+				onMouseDown: handleBackdropMouseDown,
+				className: "h-full pointer-events-auto",
 				isKeyboardDismissDisabled,
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal$1.Container, {
 					size,
@@ -7329,21 +7989,6 @@ function TabModal({ isOpen, onOpenChange, children, size = "cover", isDismissabl
 					})
 				})
 			})
-		}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal$1.Backdrop, {
-			className: "h-full",
-			isDismissable: false,
-			variant: backdropVariant,
-			onClick: handleBackdropClick,
-			isKeyboardDismissDisabled,
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal$1.Container, {
-				size,
-				scroll: "inside",
-				className: `h-full max-h-full ${containerClassName}`,
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal$1.Dialog, {
-					className: size === "cover" ? `h-full max-h-full ${dialogClassName}` : dialogClassName,
-					children
-				})
-			})
 		})
 	})] });
 }
@@ -7353,7 +7998,7 @@ var { createContext: createContext$6 } = await importShared("react");
 var LayoutGroupContext = createContext$6({});
 //#endregion
 //#region node_modules/framer-motion/dist/es/utils/use-constant.mjs
-var { useRef: useRef$7 } = await importShared("react");
+var { useRef: useRef$8 } = await importShared("react");
 /**
 * Creates a constant value over the lifecycle of a component.
 *
@@ -7362,7 +8007,7 @@ var { useRef: useRef$7 } = await importShared("react");
 * you can ensure that initialisers don't execute twice or more.
 */
 function useConstant(init) {
-	const ref = useRef$7(null);
+	const ref = useRef$8(null);
 	if (ref.current === null) ref.current = init();
 	return ref.current;
 }
@@ -7371,8 +8016,8 @@ function useConstant(init) {
 var isBrowser$2 = typeof window !== "undefined";
 //#endregion
 //#region node_modules/framer-motion/dist/es/utils/use-isomorphic-effect.mjs
-var { useLayoutEffect, useEffect: useEffect$5 } = await importShared("react");
-var useIsomorphicLayoutEffect = isBrowser$2 ? useLayoutEffect : useEffect$5;
+var { useLayoutEffect, useEffect: useEffect$7 } = await importShared("react");
+var useIsomorphicLayoutEffect = isBrowser$2 ? useLayoutEffect : useEffect$7;
 //#endregion
 //#region node_modules/framer-motion/dist/es/context/PresenceContext.mjs
 var { createContext: createContext$5 } = await importShared("react");
@@ -7426,7 +8071,7 @@ var isZeroValueString = (v) => /^0[^.\s]+$/u.test(v);
 //#endregion
 //#region node_modules/motion-utils/dist/es/memo.mjs
 /*#__NO_SIDE_EFFECTS__*/
-function memo$1(callback) {
+function memo$7(callback) {
 	let result;
 	return () => {
 		if (result === void 0) result = callback();
@@ -9293,7 +9938,7 @@ var supportsFlags = {};
 //#endregion
 //#region node_modules/motion-dom/dist/es/utils/supports/memo.mjs
 function memoSupports(callback, supportsFlag) {
-	const memoized = /* @__PURE__ */ memo$1(callback);
+	const memoized = /* @__PURE__ */ memo$7(callback);
 	return () => supportsFlags[supportsFlag] ?? memoized();
 }
 //#endregion
@@ -9700,7 +10345,7 @@ var colorProperties = /* @__PURE__ */ new Set([
 	"borderBottomColor",
 	"borderLeftColor"
 ]);
-var supportsWaapi = /*@__PURE__*/ memo$1(() => Object.hasOwnProperty.call(Element.prototype, "animate"));
+var supportsWaapi = /*@__PURE__*/ memo$7(() => Object.hasOwnProperty.call(Element.prototype, "animate"));
 function supportsBrowserAnimation(options) {
 	const { motionValue, name, repeatDelay, repeatType, damping, type, keyframes } = options;
 	const subject = motionValue?.owner?.current;
@@ -14649,7 +15294,7 @@ function useComposedRefs(...refs) {
 //#endregion
 //#region node_modules/framer-motion/dist/es/components/AnimatePresence/PopChild.mjs
 var React$1 = await importShared("react");
-var { useId: useId$2, useRef: useRef$6, useContext: useContext$9, useInsertionEffect: useInsertionEffect$2 } = await importShared("react");
+var { useId: useId$2, useRef: useRef$7, useContext: useContext$9, useInsertionEffect: useInsertionEffect$2 } = await importShared("react");
 /**
 * Measurement functionality has to be within a separate component
 * to leverage snapshot lifecycle.
@@ -14683,8 +15328,8 @@ var PopChildMeasure = class extends React$1.Component {
 };
 function PopChild({ children, isPresent, anchorX, anchorY, root, pop }) {
 	const id = useId$2();
-	const ref = useRef$6(null);
-	const size = useRef$6({
+	const ref = useRef$7(null);
+	const size = useRef$7({
 		width: 0,
 		height: 0,
 		top: 0,
@@ -14740,18 +15385,18 @@ function PopChild({ children, isPresent, anchorX, anchorY, root, pop }) {
 //#endregion
 //#region node_modules/framer-motion/dist/es/components/AnimatePresence/PresenceChild.mjs
 var React = await importShared("react");
-var { useId: useId$1, useRef: useRef$5, useMemo: useMemo$7 } = await importShared("react");
+var { useId: useId$1, useRef: useRef$6, useMemo: useMemo$8 } = await importShared("react");
 var PresenceChild = ({ children, initial, isPresent, onExitComplete, custom, presenceAffectsLayout, mode, anchorX, anchorY, root }) => {
 	const presenceChildren = useConstant(newChildrenMap);
 	const id = useId$1();
-	const isPresentRef = useRef$5(isPresent);
-	const onExitCompleteRef = useRef$5(onExitComplete);
+	const isPresentRef = useRef$6(isPresent);
+	const onExitCompleteRef = useRef$6(onExitComplete);
 	useIsomorphicLayoutEffect(() => {
 		isPresentRef.current = isPresent;
 		onExitCompleteRef.current = onExitComplete;
 	});
 	let isReusedContext = true;
-	let context = useMemo$7(() => {
+	let context = useMemo$8(() => {
 		isReusedContext = false;
 		return {
 			id,
@@ -14782,7 +15427,7 @@ var PresenceChild = ({ children, initial, isPresent, onExitComplete, custom, pre
 	* so they can detect that layout change.
 	*/
 	if (presenceAffectsLayout && isReusedContext) context = { ...context };
-	useMemo$7(() => {
+	useMemo$8(() => {
 		presenceChildren.forEach((_, key) => presenceChildren.set(key, false));
 	}, [isPresent]);
 	/**
@@ -14810,7 +15455,7 @@ function newChildrenMap() {
 }
 //#endregion
 //#region node_modules/framer-motion/dist/es/components/AnimatePresence/use-presence.mjs
-var { useContext: useContext$8, useId, useEffect: useEffect$4, useCallback: useCallback$3 } = await importShared("react");
+var { useContext: useContext$8, useId, useEffect: useEffect$6, useCallback: useCallback$4 } = await importShared("react");
 /**
 * When a component is the child of `AnimatePresence`, it can use `usePresence`
 * to access information about whether it's still present in the React tree.
@@ -14839,10 +15484,10 @@ function usePresence(subscribe = true) {
 	if (context === null) return [true, null];
 	const { isPresent, onExitComplete, register } = context;
 	const id = useId();
-	useEffect$4(() => {
+	useEffect$6(() => {
 		if (subscribe) return register(id);
 	}, [subscribe]);
-	const safeToRemove = useCallback$3(() => subscribe && onExitComplete && onExitComplete(id), [
+	const safeToRemove = useCallback$4(() => subscribe && onExitComplete && onExitComplete(id), [
 		id,
 		onExitComplete,
 		subscribe
@@ -14862,7 +15507,7 @@ function onlyElements(children) {
 }
 //#endregion
 //#region node_modules/framer-motion/dist/es/components/AnimatePresence/index.mjs
-var { useMemo: useMemo$6, useRef: useRef$4, useState: useState$5, useContext: useContext$7 } = await importShared("react");
+var { useMemo: useMemo$7, useRef: useRef$5, useState: useState$7, useContext: useContext$7 } = await importShared("react");
 /**
 * `AnimatePresence` enables the animation of components that have been removed from the tree.
 *
@@ -14902,7 +15547,7 @@ var AnimatePresence = ({ children, custom, initial = true, onExitComplete, prese
 	* Filter any children that aren't ReactElements. We can only track components
 	* between renders with a props.key.
 	*/
-	const presentChildren = useMemo$6(() => onlyElements(children), [children]);
+	const presentChildren = useMemo$7(() => onlyElements(children), [children]);
 	/**
 	* Track the keys of the currently rendered children. This is used to
 	* determine which children are exiting.
@@ -14911,13 +15556,13 @@ var AnimatePresence = ({ children, custom, initial = true, onExitComplete, prese
 	/**
 	* If `initial={false}` we only want to pass this to components in the first render.
 	*/
-	const isInitialRender = useRef$4(true);
+	const isInitialRender = useRef$5(true);
 	/**
 	* A ref containing the currently present children. When all exit animations
 	* are complete, we use this to re-render the component with the latest children
 	* *committed* rather than the latest children *rendered*.
 	*/
-	const pendingPresentChildren = useRef$4(presentChildren);
+	const pendingPresentChildren = useRef$5(presentChildren);
 	/**
 	* Track which exiting children have finished animating out.
 	*/
@@ -14925,13 +15570,13 @@ var AnimatePresence = ({ children, custom, initial = true, onExitComplete, prese
 	/**
 	* Track which components are currently processing exit to prevent duplicate processing.
 	*/
-	const exitingComponents = useRef$4(/* @__PURE__ */ new Set());
+	const exitingComponents = useRef$5(/* @__PURE__ */ new Set());
 	/**
 	* Save children to render as React state. To ensure this component is concurrent-safe,
 	* we check for exiting children via an effect.
 	*/
-	const [diffedChildren, setDiffedChildren] = useState$5(presentChildren);
-	const [renderedChildren, setRenderedChildren] = useState$5(presentChildren);
+	const [diffedChildren, setDiffedChildren] = useState$7(presentChildren);
+	const [renderedChildren, setRenderedChildren] = useState$7(presentChildren);
 	useIsomorphicLayoutEffect(() => {
 		if (propagate && !isParentPresent && !renderedChildren.length) safeToRemove?.();
 	}, [
@@ -15125,10 +15770,10 @@ function getCurrentTreeVariants(props, context) {
 }
 //#endregion
 //#region node_modules/framer-motion/dist/es/context/MotionContext/create.mjs
-var { useContext: useContext$6, useMemo: useMemo$5 } = await importShared("react");
+var { useContext: useContext$6, useMemo: useMemo$6 } = await importShared("react");
 function useCreateMotionContext(props) {
 	const { initial, animate } = getCurrentTreeVariants(props, useContext$6(MotionContext));
-	return useMemo$5(() => ({
+	return useMemo$6(() => ({
 		initial,
 		animate
 	}), [variantLabelsAsDependency(initial), variantLabelsAsDependency(animate)]);
@@ -15146,12 +15791,12 @@ var createHtmlRenderState = () => ({
 });
 //#endregion
 //#region node_modules/framer-motion/dist/es/render/html/use-props.mjs
-var { useMemo: useMemo$4 } = await importShared("react");
+var { useMemo: useMemo$5 } = await importShared("react");
 function copyRawValuesOnly(target, source, props) {
 	for (const key in source) if (!isMotionValue(source[key]) && !isForcedMotionValue(key, props)) target[key] = source[key];
 }
 function useInitialMotionValues({ transformTemplate }, visualState) {
-	return useMemo$4(() => {
+	return useMemo$5(() => {
 		const state = createHtmlRenderState();
 		buildHTMLStyles(state, visualState, transformTemplate);
 		return Object.assign({}, state.vars, state.style);
@@ -15187,9 +15832,9 @@ var createSvgRenderState = () => ({
 });
 //#endregion
 //#region node_modules/framer-motion/dist/es/render/svg/use-props.mjs
-var { useMemo: useMemo$3 } = await importShared("react");
+var { useMemo: useMemo$4 } = await importShared("react");
 function useSVGProps(props, visualState, _isStatic, Component) {
-	const visualProps = useMemo$3(() => {
+	const visualProps = useMemo$4(() => {
 		const state = createSvgRenderState();
 		buildSVGAttrs(state, visualState, isSVGTag(Component), props.transformTemplate, props.style);
 		return {
@@ -15322,7 +15967,7 @@ function isSVGComponent(Component) {
 }
 //#endregion
 //#region node_modules/framer-motion/dist/es/render/dom/use-render.mjs
-var { Fragment: Fragment$1, useMemo: useMemo$2, createElement } = await importShared("react");
+var { Fragment: Fragment$1, useMemo: useMemo$3, createElement } = await importShared("react");
 function useRender(Component, props, ref, { latestValues }, isStatic, forwardMotionProps = false, isSVG, isValidProp) {
 	const visualProps = (isSVG ?? isSVGComponent(Component) ? useSVGProps : useHTMLProps)(props, latestValues, isStatic, Component);
 	const filteredProps = filterProps(props, typeof Component === "string", forwardMotionProps, isValidProp);
@@ -15337,7 +15982,7 @@ function useRender(Component, props, ref, { latestValues }, isStatic, forwardMot
 	* will be handled by the onChange handler
 	*/
 	const { children } = props;
-	const renderedChildren = useMemo$2(() => isMotionValue(children) ? children.get() : children, [children]);
+	const renderedChildren = useMemo$3(() => isMotionValue(children) ? children.get() : children, [children]);
 	return createElement(Component, {
 		...elementProps,
 		children: renderedChildren
@@ -15413,7 +16058,7 @@ var useSVGVisualState = /*@__PURE__*/ makeUseVisualState({
 var motionComponentSymbol = Symbol.for("motionComponentSymbol");
 //#endregion
 //#region node_modules/framer-motion/dist/es/motion/utils/use-motion-ref.mjs
-var { useRef: useRef$3, useInsertionEffect: useInsertionEffect$1, useCallback: useCallback$2 } = await importShared("react");
+var { useRef: useRef$4, useInsertionEffect: useInsertionEffect$1, useCallback: useCallback$3 } = await importShared("react");
 /**
 * Creates a ref function that, when called, hydrates the provided
 * external ref and VisualElement.
@@ -15426,12 +16071,12 @@ function useMotionRef(visualState, visualElement, externalRef) {
 	* when using asChild - this would cause the callback to be recreated,
 	* triggering element remounts and breaking AnimatePresence exit animations.
 	*/
-	const externalRefContainer = useRef$3(externalRef);
+	const externalRefContainer = useRef$4(externalRef);
 	useInsertionEffect$1(() => {
 		externalRefContainer.current = externalRef;
 	});
-	const refCleanup = useRef$3(null);
-	return useCallback$2((instance) => {
+	const refCleanup = useRef$4(null);
+	return useCallback$3((instance) => {
 		if (instance) visualState.onMount?.(instance);
 		if (visualElement) instance ? visualElement.mount(instance) : visualElement.unmount();
 		const ref = externalRefContainer.current;
@@ -15460,7 +16105,7 @@ function isRefObject(ref) {
 }
 //#endregion
 //#region node_modules/framer-motion/dist/es/motion/utils/use-visual-element.mjs
-var { useContext: useContext$4, useRef: useRef$2, useInsertionEffect, useEffect: useEffect$3 } = await importShared("react");
+var { useContext: useContext$4, useRef: useRef$3, useInsertionEffect, useEffect: useEffect$5 } = await importShared("react");
 function useVisualElement(Component, visualState, props, createVisualElement, ProjectionNodeConstructor, isSVG) {
 	const { visualElement: parent } = useContext$4(MotionContext);
 	const lazyContext = useContext$4(LazyContext);
@@ -15468,12 +16113,12 @@ function useVisualElement(Component, visualState, props, createVisualElement, Pr
 	const motionConfig = useContext$4(MotionConfigContext);
 	const reducedMotionConfig = motionConfig.reducedMotion;
 	const skipAnimations = motionConfig.skipAnimations;
-	const visualElementRef = useRef$2(null);
+	const visualElementRef = useRef$3(null);
 	/**
 	* Track whether the component has been through React's commit phase.
 	* Used to detect when LazyMotion features load after the component has mounted.
 	*/
-	const hasMountedOnce = useRef$2(false);
+	const hasMountedOnce = useRef$3(false);
 	/**
 	* If we haven't preloaded a renderer, check to see if we have one lazy-loaded
 	*/
@@ -15504,7 +16149,7 @@ function useVisualElement(Component, visualState, props, createVisualElement, Pr
 	*/
 	const initialLayoutGroupConfig = useContext$4(SwitchLayoutGroupContext);
 	if (visualElement && !visualElement.projection && ProjectionNodeConstructor && (visualElement.type === "html" || visualElement.type === "svg")) createProjectionNode(visualElementRef.current, props, ProjectionNodeConstructor, initialLayoutGroupConfig);
-	const isMounted = useRef$2(false);
+	const isMounted = useRef$3(false);
 	useInsertionEffect(() => {
 		/**
 		* Check the component has already mounted before calling
@@ -15517,7 +16162,7 @@ function useVisualElement(Component, visualState, props, createVisualElement, Pr
 	* was present on initial render - it will be deleted after this.
 	*/
 	const optimisedAppearId = props[optimizedAppearDataAttribute];
-	const wantsHandoff = useRef$2(Boolean(optimisedAppearId) && typeof window !== "undefined" && !window.MotionHandoffIsComplete?.(optimisedAppearId) && window.MotionHasOptimisedAnimation?.(optimisedAppearId));
+	const wantsHandoff = useRef$3(Boolean(optimisedAppearId) && typeof window !== "undefined" && !window.MotionHandoffIsComplete?.(optimisedAppearId) && window.MotionHasOptimisedAnimation?.(optimisedAppearId));
 	useIsomorphicLayoutEffect(() => {
 		/**
 		* Track that this component has mounted. This is used to detect when
@@ -15541,7 +16186,7 @@ function useVisualElement(Component, visualState, props, createVisualElement, Pr
 		*/
 		if (wantsHandoff.current && visualElement.animationState) visualElement.animationState.animateChanges();
 	});
-	useEffect$3(() => {
+	useEffect$5(() => {
 		if (!visualElement) return;
 		if (!wantsHandoff.current && visualElement.animationState) visualElement.animationState.animateChanges();
 		if (wantsHandoff.current) {
@@ -17055,7 +17700,7 @@ var motion = /*@__PURE__*/ createMotionProxy({
 }, createDomVisualElement);
 //#endregion
 //#region node_modules/framer-motion/dist/es/value/use-motion-value.mjs
-var { useContext: useContext$1, useState: useState$4, useEffect: useEffect$2 } = await importShared("react");
+var { useContext: useContext$1, useState: useState$6, useEffect: useEffect$4 } = await importShared("react");
 /**
 * Creates a `MotionValue` to track the state and velocity of a value.
 *
@@ -17082,8 +17727,8 @@ function useMotionValue(initial) {
 	*/
 	const { isStatic } = useContext$1(MotionConfigContext);
 	if (isStatic) {
-		const [, setLatest] = useState$4(initial);
-		useEffect$2(() => value.on("change", setLatest), []);
+		const [, setLatest] = useState$6(initial);
+		useEffect$4(() => value.on("change", setLatest), []);
 	}
 	return value;
 }
@@ -17170,6 +17815,120 @@ function useMapTransform(inputValue, inputRange, outputMap, options) {
 	const output = useConstant(() => ({}));
 	for (const key of keys) output[key] = useTransform(inputValue, inputRange, outputMap[key], options);
 	return output;
+}
+//#endregion
+//#region node_modules/framer-motion/dist/es/gestures/drag/use-drag-controls.mjs
+/**
+* Can manually trigger a drag gesture on one or more `drag`-enabled `motion` components.
+*
+* ```jsx
+* const dragControls = useDragControls()
+*
+* function startDrag(event) {
+*   dragControls.start(event, { snapToCursor: true })
+* }
+*
+* return (
+*   <>
+*     <div onPointerDown={startDrag} />
+*     <motion.div drag="x" dragControls={dragControls} />
+*   </>
+* )
+* ```
+*
+* @public
+*/
+var DragControls = class {
+	constructor() {
+		this.componentControls = /* @__PURE__ */ new Set();
+	}
+	/**
+	* Subscribe a component's internal `VisualElementDragControls` to the user-facing API.
+	*
+	* @internal
+	*/
+	subscribe(controls) {
+		this.componentControls.add(controls);
+		return () => this.componentControls.delete(controls);
+	}
+	/**
+	* Start a drag gesture on every `motion` component that has this set of drag controls
+	* passed into it via the `dragControls` prop.
+	*
+	* ```jsx
+	* dragControls.start(e, {
+	*   snapToCursor: true
+	* })
+	* ```
+	*
+	* @param event - PointerEvent
+	* @param options - Options
+	*
+	* @public
+	*/
+	start(event, options) {
+		this.componentControls.forEach((controls) => {
+			controls.start(event.nativeEvent || event, options);
+		});
+	}
+	/**
+	* Cancels a drag gesture.
+	*
+	* ```jsx
+	* dragControls.cancel()
+	* ```
+	*
+	* @public
+	*/
+	cancel() {
+		this.componentControls.forEach((controls) => {
+			controls.cancel();
+		});
+	}
+	/**
+	* Stops a drag gesture.
+	*
+	* ```jsx
+	* dragControls.stop()
+	* ```
+	*
+	* @public
+	*/
+	stop() {
+		this.componentControls.forEach((controls) => {
+			controls.stop();
+		});
+	}
+};
+var createDragControls = () => new DragControls();
+/**
+* Usually, dragging is initiated by pressing down on a `motion` component with a `drag` prop
+* and moving it. For some use-cases, for instance clicking at an arbitrary point on a video scrubber, we
+* might want to initiate that dragging from a different component than the draggable one.
+*
+* By creating a `dragControls` using the `useDragControls` hook, we can pass this into
+* the draggable component's `dragControls` prop. It exposes a `start` method
+* that can start dragging from pointer events on other components.
+*
+* ```jsx
+* const dragControls = useDragControls()
+*
+* function startDrag(event) {
+*   dragControls.start(event, { snapToCursor: true })
+* }
+*
+* return (
+*   <>
+*     <div onPointerDown={startDrag} />
+*     <motion.div drag="x" dragControls={dragControls} />
+*   </>
+* )
+* ```
+*
+* @public
+*/
+function useDragControls() {
+	return useConstant(createDragControls);
 }
 //#endregion
 //#region node_modules/framer-motion/dist/es/context/ReorderContext.mjs
@@ -17265,13 +18024,13 @@ function detectAxis(layouts) {
 }
 //#endregion
 //#region node_modules/framer-motion/dist/es/components/Reorder/Group.mjs
-var { forwardRef: forwardRef$1, useRef: useRef$1, useState: useState$3, useEffect: useEffect$1 } = await importShared("react");
+var { forwardRef: forwardRef$1, useRef: useRef$2, useState: useState$5, useEffect: useEffect$3 } = await importShared("react");
 function ReorderGroupComponent({ children, as = "ul", axis: axisOverride, onReorder, values, ...props }, externalRef) {
 	const Component = useConstant(() => motion[as]);
-	const itemLayouts = useRef$1(/* @__PURE__ */ new Map());
-	const [detectedAxis, setDetectedAxis] = useState$3("y");
-	const isReordering = useRef$1(false);
-	const groupRef = useRef$1(null);
+	const itemLayouts = useRef$2(/* @__PURE__ */ new Map());
+	const [detectedAxis, setDetectedAxis] = useState$5("y");
+	const isReordering = useRef$2(false);
+	const groupRef = useRef$2(null);
 	const axis = axisOverride || detectedAxis;
 	const valuesSet = new Set(values);
 	itemLayouts.current.forEach((_, value) => {
@@ -17312,7 +18071,7 @@ function ReorderGroupComponent({ children, as = "ul", axis: axisOverride, onReor
 			}
 		}
 	};
-	useEffect$1(() => {
+	useEffect$3(() => {
 		isReordering.current = false;
 	});
 	const setRef = (element) => {
@@ -17482,32 +18241,479 @@ function ReorderItemComponent({ children, style = {}, value, as = "li", onDrag, 
 }
 var ReorderItem = /*@__PURE__*/ forwardRef(ReorderItemComponent);
 //#endregion
+//#region src/renderer/mainWindow/pages/settings/SettingsSearchHighlight.tsx
+var import_main = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
+	module.exports = (function(modules) {
+		var installedModules = {};
+		function __webpack_require__(moduleId) {
+			if (installedModules[moduleId]) return installedModules[moduleId].exports;
+			var module$1 = installedModules[moduleId] = {
+				exports: {},
+				id: moduleId,
+				loaded: false
+			};
+			modules[moduleId].call(module$1.exports, module$1, module$1.exports, __webpack_require__);
+			module$1.loaded = true;
+			return module$1.exports;
+		}
+		__webpack_require__.m = modules;
+		__webpack_require__.c = installedModules;
+		__webpack_require__.p = "";
+		return __webpack_require__(0);
+	})([
+		(function(module$2, exports$1, __webpack_require__) {
+			module$2.exports = __webpack_require__(1);
+		}),
+		(function(module$3, exports$2, __webpack_require__) {
+			"use strict";
+			Object.defineProperty(exports$2, "__esModule", { value: true });
+			function _interopRequireDefault(obj) {
+				return obj && obj.__esModule ? obj : { "default": obj };
+			}
+			exports$2["default"] = _interopRequireDefault(__webpack_require__(2))["default"];
+			module$3.exports = exports$2["default"];
+		}),
+		(function(module$4, exports$3, __webpack_require__) {
+			"use strict";
+			Object.defineProperty(exports$3, "__esModule", { value: true });
+			var _extends = Object.assign || function(target) {
+				for (var i = 1; i < arguments.length; i++) {
+					var source = arguments[i];
+					for (var key in source) if (Object.prototype.hasOwnProperty.call(source, key)) target[key] = source[key];
+				}
+				return target;
+			};
+			exports$3["default"] = Highlighter;
+			function _interopRequireDefault(obj) {
+				return obj && obj.__esModule ? obj : { "default": obj };
+			}
+			function _objectWithoutProperties(obj, keys) {
+				var target = {};
+				for (var i in obj) {
+					if (keys.indexOf(i) >= 0) continue;
+					if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
+					target[i] = obj[i];
+				}
+				return target;
+			}
+			var _highlightWordsCore = __webpack_require__(3);
+			var _react = __webpack_require__(4);
+			var _memoizeOne2 = _interopRequireDefault(__webpack_require__(5));
+			/**
+			* Highlighter component
+			* @param {object} props - Component properties
+			* @param {string} [props.activeClassName] - The class name to be applied to an active match. Use along with `activeIndex`.
+			* @param {number} [props.activeIndex] - Specify the match index that should be actively highlighted. Use along with `activeClassName`.
+			* @param {object} [props.activeStyle] - The inline style to be applied to an active match. Use along with `activeIndex`.
+			* @param {boolean} [props.autoEscape] - Escape characters in searchWords which are meaningful in regular expressions.
+			* @param {string} [props.className] - CSS class name applied to the outer/wrapper `<span>`.
+			* @param {(options: object) => Array<{start: number, end: number}>} [props.findChunks] - Use a custom function to search for matching chunks.  See the default `findChunks` function in `highlight-words-core` for signature.
+			* @param {string|object} [props.highlightClassName] - CSS class name applied to highlighted text or object mapping search term matches to class names.
+			* @param {object} [props.highlightStyle] - Inline styles applied to highlighted text.
+			* @param {React.ComponentType|string} [props.highlightTag] - Type of tag to wrap around highlighted matches. Defaults to `mark` but can also be a React component (class or functional).
+			* @param {(text: string) => string} [props.sanitize] - Process each search word and text to highlight before comparing.
+			* @param {Array<string|RegExp>} props.searchWords - Array of search words. String search terms are automatically cast to RegExps unless `autoEscape` is true.
+			* @param {string} props.textToHighlight - The text to highlight matches in.
+			* @param {React.ComponentType|string} [props.unhighlightTag] - Type of tag applied to unhighlighted parts. Defaults to `span` but can also be a React component (class or functional).
+			* @param {string} [props.unhighlightClassName] - CSS class name applied to unhighlighted text.
+			* @param {object} [props.unhighlightStyle] - Inline styles applied to the unhighlighted text.
+			* @param {object} [props.rest] - Additional attributes passed to the outer `<span>` element.
+			*/
+			function Highlighter(_ref) {
+				var _ref$activeClassName = _ref.activeClassName;
+				var activeClassName = _ref$activeClassName === void 0 ? "" : _ref$activeClassName;
+				var _ref$activeIndex = _ref.activeIndex;
+				var activeIndex = _ref$activeIndex === void 0 ? -1 : _ref$activeIndex;
+				var activeStyle = _ref.activeStyle;
+				var autoEscape = _ref.autoEscape;
+				var _ref$caseSensitive = _ref.caseSensitive;
+				var caseSensitive = _ref$caseSensitive === void 0 ? false : _ref$caseSensitive;
+				var className = _ref.className;
+				var findChunks = _ref.findChunks;
+				var _ref$highlightClassName = _ref.highlightClassName;
+				var highlightClassName = _ref$highlightClassName === void 0 ? "" : _ref$highlightClassName;
+				var _ref$highlightStyle = _ref.highlightStyle;
+				var highlightStyle = _ref$highlightStyle === void 0 ? {} : _ref$highlightStyle;
+				var _ref$highlightTag = _ref.highlightTag;
+				var highlightTag = _ref$highlightTag === void 0 ? "mark" : _ref$highlightTag;
+				var sanitize = _ref.sanitize;
+				var searchWords = _ref.searchWords;
+				var textToHighlight = _ref.textToHighlight;
+				var _ref$unhighlightTag = _ref.unhighlightTag;
+				var unhighlightTag = _ref$unhighlightTag === void 0 ? "span" : _ref$unhighlightTag;
+				var _ref$unhighlightClassName = _ref.unhighlightClassName;
+				var unhighlightClassName = _ref$unhighlightClassName === void 0 ? "" : _ref$unhighlightClassName;
+				var unhighlightStyle = _ref.unhighlightStyle;
+				var rest = _objectWithoutProperties(_ref, [
+					"activeClassName",
+					"activeIndex",
+					"activeStyle",
+					"autoEscape",
+					"caseSensitive",
+					"className",
+					"findChunks",
+					"highlightClassName",
+					"highlightStyle",
+					"highlightTag",
+					"sanitize",
+					"searchWords",
+					"textToHighlight",
+					"unhighlightTag",
+					"unhighlightClassName",
+					"unhighlightStyle"
+				]);
+				var chunks = (0, _highlightWordsCore.findAll)({
+					autoEscape,
+					caseSensitive,
+					findChunks,
+					sanitize,
+					searchWords,
+					textToHighlight
+				});
+				var HighlightTag = highlightTag;
+				var highlightIndex = -1;
+				var highlightClassNames = "";
+				var highlightStyles = void 0;
+				var memoizedLowercaseProps = (0, _memoizeOne2["default"])(function lowercaseProps(object) {
+					var mapped = {};
+					for (var key in object) mapped[key.toLowerCase()] = object[key];
+					return mapped;
+				});
+				return (0, _react.createElement)("span", _extends({ className }, rest, { children: chunks.map(function(chunk, index) {
+					var text = textToHighlight.substr(chunk.start, chunk.end - chunk.start);
+					if (chunk.highlight) {
+						highlightIndex++;
+						var highlightClass = void 0;
+						if (typeof highlightClassName === "object") {
+							if (!caseSensitive) {
+								highlightClassName = memoizedLowercaseProps(highlightClassName);
+								highlightClass = highlightClassName[text.toLowerCase()];
+							} else highlightClass = highlightClassName[text];
+						} else highlightClass = highlightClassName;
+						var isActive = highlightIndex === +activeIndex;
+						highlightClassNames = highlightClass + " " + (isActive ? activeClassName : "");
+						highlightStyles = isActive === true && activeStyle != null ? Object.assign({}, highlightStyle, activeStyle) : highlightStyle;
+						var props = {
+							children: text,
+							className: highlightClassNames,
+							key: index,
+							style: highlightStyles
+						};
+						if (typeof HighlightTag !== "string") props.highlightIndex = highlightIndex;
+						return (0, _react.createElement)(HighlightTag, props);
+					} else return (0, _react.createElement)(unhighlightTag, {
+						children: text,
+						className: unhighlightClassName,
+						key: index,
+						style: unhighlightStyle
+					});
+				}) }));
+			}
+			module$4.exports = exports$3["default"];
+		}),
+		(function(module$5, exports$4) {
+			module$5.exports = (function(modules) {
+				var installedModules = {};
+				function __webpack_require__(moduleId) {
+					if (installedModules[moduleId]) return installedModules[moduleId].exports;
+					var module$6 = installedModules[moduleId] = {
+						exports: {},
+						id: moduleId,
+						loaded: false
+					};
+					modules[moduleId].call(module$6.exports, module$6, module$6.exports, __webpack_require__);
+					module$6.loaded = true;
+					return module$6.exports;
+				}
+				__webpack_require__.m = modules;
+				__webpack_require__.c = installedModules;
+				__webpack_require__.p = "";
+				return __webpack_require__(0);
+			})([
+				(function(module$7, exports$5, __webpack_require__) {
+					module$7.exports = __webpack_require__(1);
+				}),
+				(function(module$8, exports$6, __webpack_require__) {
+					"use strict";
+					Object.defineProperty(exports$6, "__esModule", { value: true });
+					var _utils = __webpack_require__(2);
+					Object.defineProperty(exports$6, "combineChunks", {
+						enumerable: true,
+						get: function get() {
+							return _utils.combineChunks;
+						}
+					});
+					Object.defineProperty(exports$6, "fillInChunks", {
+						enumerable: true,
+						get: function get() {
+							return _utils.fillInChunks;
+						}
+					});
+					Object.defineProperty(exports$6, "findAll", {
+						enumerable: true,
+						get: function get() {
+							return _utils.findAll;
+						}
+					});
+					Object.defineProperty(exports$6, "findChunks", {
+						enumerable: true,
+						get: function get() {
+							return _utils.findChunks;
+						}
+					});
+				}),
+				(function(module$9, exports$7) {
+					"use strict";
+					Object.defineProperty(exports$7, "__esModule", { value: true });
+					exports$7.findAll = function findAll(_ref) {
+						var autoEscape = _ref.autoEscape, _ref$caseSensitive = _ref.caseSensitive, caseSensitive = _ref$caseSensitive === void 0 ? false : _ref$caseSensitive, _ref$findChunks = _ref.findChunks, findChunks = _ref$findChunks === void 0 ? defaultFindChunks : _ref$findChunks, sanitize = _ref.sanitize, searchWords = _ref.searchWords, textToHighlight = _ref.textToHighlight;
+						return fillInChunks({
+							chunksToHighlight: combineChunks({ chunks: findChunks({
+								autoEscape,
+								caseSensitive,
+								sanitize,
+								searchWords,
+								textToHighlight
+							}) }),
+							totalLength: textToHighlight ? textToHighlight.length : 0
+						});
+					};
+					/**
+					* Takes an array of {start:number, end:number} objects and combines chunks that overlap into single chunks.
+					* @return {start:number, end:number}[]
+					*/
+					var combineChunks = exports$7.combineChunks = function combineChunks(_ref2) {
+						var chunks = _ref2.chunks;
+						chunks = chunks.sort(function(first, second) {
+							return first.start - second.start;
+						}).reduce(function(processedChunks, nextChunk) {
+							if (processedChunks.length === 0) return [nextChunk];
+							else {
+								var prevChunk = processedChunks.pop();
+								if (nextChunk.start <= prevChunk.end) {
+									var endIndex = Math.max(prevChunk.end, nextChunk.end);
+									processedChunks.push({
+										start: prevChunk.start,
+										end: endIndex
+									});
+								} else processedChunks.push(prevChunk, nextChunk);
+								return processedChunks;
+							}
+						}, []);
+						return chunks;
+					};
+					/**
+					* Examine text for any matches.
+					* If we find matches, add them to the returned array as a "chunk" object ({start:number, end:number}).
+					* @return {start:number, end:number}[]
+					*/
+					var defaultFindChunks = function defaultFindChunks(_ref3) {
+						var autoEscape = _ref3.autoEscape, caseSensitive = _ref3.caseSensitive, _ref3$sanitize = _ref3.sanitize, sanitize = _ref3$sanitize === void 0 ? identity : _ref3$sanitize, searchWords = _ref3.searchWords, textToHighlight = _ref3.textToHighlight;
+						textToHighlight = sanitize(textToHighlight);
+						return searchWords.filter(function(searchWord) {
+							return searchWord;
+						}).reduce(function(chunks, searchWord) {
+							searchWord = sanitize(searchWord);
+							if (autoEscape) searchWord = escapeRegExpFn(searchWord);
+							var regex = new RegExp(searchWord, caseSensitive ? "g" : "gi");
+							var match = void 0;
+							while (match = regex.exec(textToHighlight)) {
+								var start = match.index;
+								var end = regex.lastIndex;
+								if (end > start) chunks.push({
+									start,
+									end
+								});
+								if (match.index == regex.lastIndex) regex.lastIndex++;
+							}
+							return chunks;
+						}, []);
+					};
+					exports$7.findChunks = defaultFindChunks;
+					/**
+					* Given a set of chunks to highlight, create an additional set of chunks
+					* to represent the bits of text between the highlighted text.
+					* @param chunksToHighlight {start:number, end:number}[]
+					* @param totalLength number
+					* @return {start:number, end:number, highlight:boolean}[]
+					*/
+					var fillInChunks = exports$7.fillInChunks = function fillInChunks(_ref4) {
+						var chunksToHighlight = _ref4.chunksToHighlight, totalLength = _ref4.totalLength;
+						var allChunks = [];
+						var append = function append(start, end, highlight) {
+							if (end - start > 0) allChunks.push({
+								start,
+								end,
+								highlight
+							});
+						};
+						if (chunksToHighlight.length === 0) append(0, totalLength, false);
+						else {
+							var lastIndex = 0;
+							chunksToHighlight.forEach(function(chunk) {
+								append(lastIndex, chunk.start, false);
+								append(chunk.start, chunk.end, true);
+								lastIndex = chunk.end;
+							});
+							append(lastIndex, totalLength, false);
+						}
+						return allChunks;
+					};
+					function identity(value) {
+						return value;
+					}
+					function escapeRegExpFn(str) {
+						return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+					}
+				})
+			]);
+		}),
+		(function(module$10, exports$8) {
+			module$10.exports = require_react();
+		}),
+		(function(module$11, exports$9) {
+			"use strict";
+			var simpleIsEqual = function simpleIsEqual(a, b) {
+				return a === b;
+			};
+			function index(resultFn) {
+				var isEqual = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : simpleIsEqual;
+				var lastThis = void 0;
+				var lastArgs = [];
+				var lastResult = void 0;
+				var calledOnce = false;
+				var isNewArgEqualToLast = function isNewArgEqualToLast(newArg, index) {
+					return isEqual(newArg, lastArgs[index]);
+				};
+				return function result() {
+					for (var _len = arguments.length, newArgs = Array(_len), _key = 0; _key < _len; _key++) newArgs[_key] = arguments[_key];
+					if (calledOnce && lastThis === this && newArgs.length === lastArgs.length && newArgs.every(isNewArgEqualToLast)) return lastResult;
+					calledOnce = true;
+					lastThis = this;
+					lastArgs = newArgs;
+					lastResult = resultFn.apply(this, newArgs);
+					return lastResult;
+				};
+			}
+			module$11.exports = index;
+		})
+	]);
+})))(), 1);
+var { memo: memo$6 } = await importShared("react");
+/**
+* Renders text matching the active settings search terminology with a highlight wrapper.
+* Will render text minimally without highlights if empty or no text provided.
+*/
+var SettingsSearchHighlight = ({ text, children, className, highlightClassName }) => {
+	const searchWords = useSettingsState("searchWords");
+	const content = text ?? children ?? "";
+	if (!content) return null;
+	if (!searchWords || !searchWords.length) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+		className,
+		children: content
+	});
+	const lowerContent = content.toLowerCase();
+	if (!searchWords.some((word) => word && lowerContent.includes(word.toLowerCase()))) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+		className,
+		children: content
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_main.default, {
+		className,
+		searchWords,
+		textToHighlight: content,
+		highlightClassName: highlightClassName ?? "bg-warning/40 rounded-sm px-0.5",
+		autoEscape: true
+	});
+};
+var SettingsSearchHighlight_default = memo$6(SettingsSearchHighlight);
+//#endregion
+//#region src/renderer/mainWindow/components/LynxSwitch.tsx
+var { Description: Description$2, Surface, Switch: Switch$3 } = await importShared("@heroui/react");
+var { useCallback: useCallback$2, useEffect: useEffect$2, useState: useState$4 } = await importShared("react");
+/**
+* Customizable switch component with title, description, and search highlighting.
+* Supports both controlled and uncontrolled modes.
+*/
+function LynxSwitch({ enabled = false, onEnabledChange, title, description, isDisabled, className, size = "md", thumbIcon, icon, variant = "default" }) {
+	const [isSelected, setIsSelected] = useState$4(enabled);
+	useEffect$2(() => {
+		setIsSelected(enabled);
+	}, [enabled]);
+	const onChange = useCallback$2((selected) => {
+		setIsSelected(selected);
+		onEnabledChange?.(selected);
+	}, [onEnabledChange]);
+	const toggle = () => {
+		setIsSelected(!isSelected);
+		onEnabledChange?.(!isSelected);
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Surface, {
+		className: `px-3 py-2 rounded-2xl transition-colors duration-300 ${isDisabled ? "" : "cursor-pointer"} border-2 ${isSelected ? "border-accent/40" : "border-surface"} w-full shadow-surface`,
+		variant,
+		onClick: isDisabled ? void 0 : toggle,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$3, {
+			size,
+			onChange,
+			isDisabled,
+			isSelected,
+			className: ["", className].join(" "),
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Switch$3.Content, {
+				className: "flex flex-row items-center justify-between w-full gap-x-2",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex flex-row items-center gap-x-2",
+					children: [icon, /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "text-sm cursor-pointer",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SettingsSearchHighlight_default, { text: title })
+					})]
+				}), description && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description$2, {
+					className: "pointer-events-none p-0",
+					children: typeof description === "string" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SettingsSearchHighlight_default, {
+						text: description,
+						className: "text-xs text-muted"
+					}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "text-xs text-muted",
+						children: description
+					})
+				})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$3.Control, { children: thumbIcon ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$3.Thumb, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$3.Icon, { children: thumbIcon }) }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$3.Thumb, {}) })]
+			})
+		})
+	});
+}
+//#endregion
 //#region extension/src/renderer/components/settings/MetricVisibilitySettings.tsx
-var { Checkbox: Checkbox$1, CheckboxGroup, Label: Label$2 } = await importShared("@heroui/react");
-var { useCallback: useCallback$1, useMemo: useMemo$1 } = await importShared("react");
-var { useDispatch: useDispatch$3 } = await importShared("react-redux");
+var { Checkbox: Checkbox$1, CheckboxGroup, Label: Label$3 } = await importShared("@heroui/react");
+var { memo: memo$5, useCallback: useCallback$1, useMemo: useMemo$2 } = await importShared("react");
+var { useDispatch: useDispatch$4 } = await importShared("react-redux");
 var VISIBILITY_OPTIONS = [
 	{
 		value: "icon",
-		label: "Icon"
+		label: "Sensor Icon",
+		description: "Hardware glyph indicator",
+		Icon: Activity
 	},
 	{
 		value: "label",
-		label: "Label"
+		label: "Metric Label",
+		description: "Name or alias of the metric",
+		Icon: Type
 	},
 	{
 		value: "value",
-		label: "Value"
+		label: "Numerical Value",
+		description: "Live sensor reading and unit",
+		Icon: Eye
 	},
 	{
 		value: "progressBar",
-		label: "Progress Bar"
+		label: "Progress Bar",
+		description: "Dynamic gradient level bar",
+		Icon: ChartNoAxesColumn
 	}
 ];
-function MetricVisibilitySettings() {
+var MetricVisibilitySettings = memo$5(() => {
 	const metricVisibility = useHMonitorState("metricVisibility");
-	const dispatch = useDispatch$3();
-	const selectedValues = useMemo$1(() => {
+	const dispatch = useDispatch$4();
+	const selectedValues = useMemo$2(() => {
 		return Object.entries(metricVisibility).filter(([, isVisible]) => isVisible).map(([key]) => key);
 	}, [metricVisibility]);
 	const onValueChange = useCallback$1((values) => {
@@ -17524,20 +18730,474 @@ function MetricVisibilitySettings() {
 		onChange: onValueChange,
 		isInvalid: selectedValues.length === 0,
 		isRequired: true,
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$2, { children: "Metric Visibility" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: "flex flex-row gap-x-4",
-			children: VISIBILITY_OPTIONS.map(({ value, label }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox$1, {
-				id: value,
-				value,
-				className: "mt-2",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox$1.Content, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox$1.Control, {
-					className: "size-5 rounded-lg before:rounded-lg",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox$1.Indicator, {})
-				}), label] })
-			}, value))
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex flex-col gap-1",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$3, {
+				className: "text-xs font-semibold text-foreground",
+				children: "Visible Metric Components"
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "text-xs text-muted",
+				children: "Select which components appear inside each individual metric badge"
+			})]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "grid grid-cols-4 gap-2.5",
+			children: VISIBILITY_OPTIONS.map(({ value, label, description, Icon }) => {
+				const isSelected = selectedValues.includes(value);
+				return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox$1, {
+					className: `p-3 rounded-3xl transition-all duration-200 cursor-pointer select-none ${isSelected ? "bg-accent/10 border border-accent/60 shadow-xs" : "bg-surface"}`,
+					id: value,
+					value,
+					variant: "secondary",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox$1.Content, {
+						className: "flex flex-col items-start gap-1 w-full",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center justify-between w-full",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: `size-7 rounded-full flex items-center justify-center ${isSelected ? "bg-accent text-accent-foreground" : "bg-surface-secondary text-muted"}`,
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon, { className: "size-3.5" })
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox$1.Control, {
+									className: "size-4.5 rounded-full",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox$1.Indicator, {})
+								})]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-xs font-semibold text-foreground mt-1",
+								children: label
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-[10px] text-muted line-clamp-1",
+								children: description
+							})
+						]
+					})
+				}, value);
+			})
 		})]
 	});
-}
+});
+MetricVisibilitySettings.displayName = "MetricVisibilitySettings";
+//#endregion
+//#region extension/src/renderer/components/settings/ConfigurationTab.tsx
+var { Button: Button$3, Description: Description$1, Label: Label$2, NumberField: NumberField$1, Switch: Switch$2 } = await importShared("@heroui/react");
+var { memo: memo$4 } = await importShared("react");
+var DISPLAY_STYLES = [
+	{
+		value: "default",
+		label: "Standard",
+		preview: { type: "default" }
+	},
+	{
+		value: "compact",
+		label: "Compact",
+		preview: { type: "compact" }
+	},
+	{
+		value: "segmented",
+		label: "Segmented",
+		preview: { type: "segmented" }
+	},
+	{
+		value: "ghost",
+		label: "Ghost (Minimal)",
+		preview: { type: "ghost" }
+	},
+	{
+		value: "two-column",
+		label: "Two-Column Stack",
+		preview: { type: "two-column" }
+	},
+	{
+		value: "raw",
+		label: "Raw Text",
+		preview: { type: "raw" }
+	},
+	{
+		value: "raw-two-column",
+		label: "Raw (Two-Column)",
+		preview: { type: "raw-two-column" }
+	}
+];
+var INTERVAL_PRESETS = [
+	{
+		label: "0.5s (Ultra Fast)",
+		value: .5
+	},
+	{
+		label: "1s (Standard)",
+		value: 1
+	},
+	{
+		label: "2s (Balanced)",
+		value: 2
+	},
+	{
+		label: "5s (Low CPU)",
+		value: 5
+	}
+];
+var ConfigurationTab = memo$4(({ settings, updateState, handleDisplayStyleChange, isRawStyle }) => {
+	const { enabled, refreshInterval, displayStyle, showSectionLabel, enableHoverDetails = true, showTopProcesses = true } = settings;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "flex flex-col gap-y-5 pb-4",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			onKeyDown: (e) => {
+				if (e.key === "Enter" || e.key === " ") updateState("enabled", !enabled);
+			},
+			className: "relative overflow-hidden rounded-3xl p-5  transition-all duration-200 cursor-pointer flex items-center justify-between gap-4 select-none " + (enabled ? "bg-accent/10 border border-accent/30" : "bg-surface-secondary opacity-80"),
+			tabIndex: 0,
+			role: "button",
+			onClick: () => updateState("enabled", !enabled),
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center gap-x-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: `size-12 rounded-full flex items-center justify-center shrink-0 transition-colors ${enabled ? "bg-accent text-accent-foreground shadow-md" : "bg-surface-tertiary text-muted"}`,
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$2, { className: "size-7" })
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex flex-col",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "text-base font-semibold text-foreground",
+						children: "Hardware Monitor Service"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "text-sm text-muted mt-0.5",
+						children: enabled ? "Real-time telemetry and hardware sensor monitoring is actively streaming to the status bar." : "Monitoring is currently paused. No background sensor readings or ping requests will run."
+					})]
+				})]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$2, {
+				size: "lg",
+				isSelected: enabled,
+				"aria-label": "Toggle system monitoring",
+				onChange: (value) => updateState("enabled", value),
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$2.Content, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$2.Control, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$2.Thumb, {}) }) })
+			})]
+		}), enabled && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex flex-col gap-y-5",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "p-5 bg-surface-secondary rounded-3xl flex flex-col gap-y-3",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "flex items-center justify-between",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-x-2.5",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$9, { className: "size-5 text-accent" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+									className: "text-sm font-semibold text-foreground",
+									children: "Update Frequency"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+									className: "text-xs text-muted",
+									children: "Control how often hardware telemetry is updated"
+								})] })]
+							})
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "flex flex-wrap items-center gap-2 pt-1",
+							children: INTERVAL_PRESETS.map((preset) => {
+								const isSelected = refreshInterval === preset.value;
+								return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$3, {
+									className: `text-xs font-medium shadow-surface transition-transform active:scale-[0.97] ${isSelected ? "bg-accent text-accent-foreground" : "bg-surface text-surface-foreground"}`,
+									size: "sm",
+									onPress: () => updateState("refreshInterval", preset.value),
+									children: [isSelected && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { className: "size-3.5" }), preset.label]
+								}, preset.value);
+							})
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "pt-2",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NumberField$1, {
+								step: .5,
+								maxValue: 60,
+								minValue: .5,
+								value: refreshInterval,
+								onChange: (value) => updateState("refreshInterval", value),
+								fullWidth: true,
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$2, {
+										className: "text-xs font-medium text-foreground/80",
+										children: "Custom Interval (seconds)"
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NumberField$1.Group, { children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField$1.DecrementButton, {}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField$1.Input, { className: "font-mono text-sm" }),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField$1.IncrementButton, {})
+									] }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description$1, {
+										className: "text-xs text-muted",
+										children: "Accepts values between 0.5s (responsive) up to 60s (battery-friendly)."
+									})
+								]
+							})
+						})
+					]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "p-5 bg-surface-secondary rounded-3xl flex flex-col gap-y-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "flex items-center justify-between",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-x-2.5",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$11, { className: "size-5 text-accent" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+								className: "text-sm font-semibold text-foreground",
+								children: "Status Bar Layout Style"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								className: "text-xs text-muted",
+								children: "Choose visual presentation for metrics"
+							})] })]
+						})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "grid grid-cols-5 gap-3",
+						children: DISPLAY_STYLES.map((style) => {
+							const isSelected = displayStyle === style.value;
+							return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								onKeyDown: (e) => {
+									if (e.key === "Enter" || e.key === " ") handleDisplayStyleChange(style.value);
+								},
+								className: "relative flex flex-col justify-between p-3.5 rounded-3xl cursor-pointer transition-all duration-200 select-none text-left " + (isSelected ? "bg-accent/10 border border-accent shadow-sm ring-1 ring-accent" : "bg-surface"),
+								tabIndex: 0,
+								role: "button",
+								onClick: () => handleDisplayStyleChange(style.value),
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "text-sm font-semibold text-foreground flex items-center gap-1.5",
+									children: style.label
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "w-full h-11 rounded-2xl bg-surface-secondary/70  flex items-center justify-center px-2 my-1 overflow-hidden pointer-events-none",
+									children: [
+										style.preview.type === "default" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-center gap-1.5 text-[10px]",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "font-semibold text-accent",
+													children: "CPU"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-foreground/70",
+													children: "42%"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+													className: "w-8 h-1.5 bg-foreground/10 rounded-full overflow-hidden",
+													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "w-1/2 h-full bg-accent rounded-full" })
+												})
+											]
+										}),
+										style.preview.type === "compact" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-center gap-1 text-[9px]",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "font-semibold text-accent",
+													children: "CPU"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-foreground/70",
+													children: "42%"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+													className: "w-5 h-1 bg-foreground/10 rounded-full overflow-hidden",
+													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "w-1/2 h-full bg-accent rounded-full" })
+												})
+											]
+										}),
+										style.preview.type === "segmented" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-center gap-1 text-[9px] bg-surface border border-surface-tertiary rounded-full px-1.5 py-0.5",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "font-semibold text-accent uppercase text-[8px]",
+													children: "CPU"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-px h-2 bg-foreground/20 shrink-0" }),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-foreground/80",
+													children: "42°C"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-px h-2 bg-foreground/20 shrink-0" }),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "flex items-center gap-1",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-foreground/80",
+														children: "35%"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+														className: "w-3.5 h-1 bg-foreground/10 rounded-full overflow-hidden shrink-0",
+														children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "w-1/2 h-full bg-accent rounded-full" })
+													})]
+												})
+											]
+										}),
+										style.preview.type === "ghost" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-center gap-1 text-[9px] px-1 py-0.5",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "font-semibold text-foreground/80",
+													children: "CPU"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-foreground/30",
+													children: "•"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-foreground/70",
+													children: "42°C"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-foreground/30",
+													children: "•"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-foreground/70",
+													children: "35%"
+												})
+											]
+										}),
+										style.preview.type === "two-column" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex flex-col gap-0.5 text-[8px] leading-tight",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-center gap-1",
+												children: [
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "font-bold text-accent",
+														children: "CPU"
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "42%" }),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+														className: "w-4 h-1 bg-foreground/10 rounded-full overflow-hidden",
+														children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "w-1/2 h-full bg-accent rounded-full" })
+													})
+												]
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex items-center gap-1",
+												children: [
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "font-bold text-accent",
+														children: "GPU"
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "58°C" }),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+														className: "w-4 h-1 bg-foreground/10 rounded-full overflow-hidden",
+														children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "w-2/3 h-full bg-accent rounded-full" })
+													})
+												]
+											})]
+										}),
+										style.preview.type === "raw" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-center gap-1 text-[10px] font-mono",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-muted",
+													children: "CPU:"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "font-semibold text-foreground",
+													children: "42%"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-muted mx-0.5",
+													children: "/"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-muted",
+													children: "GPU:"
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "font-semibold text-foreground",
+													children: "58°C"
+												})
+											]
+										}),
+										style.preview.type === "raw-two-column" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex flex-col gap-0.5 text-[9px] font-mono leading-tight",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-muted",
+													children: "CPU:"
+												}),
+												" ",
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "font-semibold text-foreground",
+													children: "42%"
+												})
+											] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-muted",
+													children: "GPU:"
+												}),
+												" ",
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "font-semibold text-foreground",
+													children: "58°C"
+												})
+											] })]
+										})
+									]
+								})]
+							}, style.value);
+						})
+					})]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "p-5 bg-surface-secondary rounded-3xl flex flex-col gap-y-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex items-center gap-x-2.5",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$1, { className: "size-5 text-accent" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+							className: "text-sm font-semibold text-foreground",
+							children: "Hover Details Panel"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "text-xs text-muted",
+							children: "Configure telemetry popover charts and detailed breakdown on hover"
+						})] })]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "pt-1 flex flex-col gap-y-3",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LynxSwitch, {
+							description: "Displays an interactive telemetry popover with historical charts when hovering metrics in the status bar. Disabling completely closes and removes the background view.",
+							className: "p-1",
+							enabled: enableHoverDetails,
+							title: "Enable Hover Details Panel",
+							onEnabledChange: (value) => updateState("enableHoverDetails", value)
+						}), enableHoverDetails && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LynxSwitch, {
+							description: "Sample and display the top 3 resource-consuming processes (CPU, GPU, RAM) inside flyout popovers for instant troubleshooting.",
+							className: "p-1",
+							enabled: showTopProcesses,
+							title: "Top Resource-Consuming Processes",
+							onEnabledChange: (value) => updateState("showTopProcesses", value)
+						})]
+					})]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "p-5 bg-surface-secondary rounded-3xl flex flex-col gap-y-4",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-x-2.5",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Sparkles, { className: "size-5 text-accent" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+								className: "text-sm font-semibold text-foreground",
+								children: "Visual Elements & Labels"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								className: "text-xs text-muted",
+								children: "Customize individual elements displayed for each active metric"
+							})] })]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "pt-1",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LynxSwitch, {
+								onEnabledChange: (value) => {
+									if (!isRawStyle) updateState("showSectionLabel", value);
+								},
+								className: "p-1",
+								isDisabled: isRawStyle,
+								enabled: showSectionLabel,
+								title: "Display Section Headers",
+								description: "Shows label badges (e.g. CPU, GPU) next to each group. Disabled in Raw modes."
+							})
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: `mt-2 ${isRawStyle ? "opacity-50 pointer-events-none" : ""}`,
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MetricVisibilitySettings, {}), isRawStyle && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								className: "text-xs mt-2 italic text-warning",
+								children: "Note: Icon, Label, and Progress Bar controls are disabled because a Raw text style is active."
+							})]
+						})
+					]
+				})
+			]
+		})]
+	});
+});
+ConfigurationTab.displayName = "ConfigurationTab";
 //#endregion
 //#region node_modules/@solar-icons/react/dist/icons/linear/unread.mjs
 var { forwardRef: t } = await importShared("react");
@@ -17553,21 +19213,135 @@ var r = t((t, r) => (0, import_jsx_runtime.jsx)(a, {
 	})
 }));
 //#endregion
+//#region extension/src/renderer/components/settings/SettingsCategoryCard.tsx
+var { Card, Switch: Switch$1 } = await importShared("@heroui/react");
+var { memo: memo$3 } = await importShared("react");
+var CATEGORY_META = {
+	cpu: {
+		badge: "CPU",
+		badgeClass: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
+		iconBgClass: "bg-cyan-500/15 text-cyan-400",
+		Icon: i$14
+	},
+	gpu: {
+		badge: "GPU",
+		badgeClass: "bg-purple-500/15 text-purple-400 border-purple-500/30",
+		iconBgClass: "bg-purple-500/15 text-purple-400",
+		Icon: Activity
+	},
+	memory: {
+		badge: "RAM",
+		badgeClass: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+		iconBgClass: "bg-emerald-500/15 text-emerald-400",
+		Icon: Database
+	},
+	network: {
+		badge: "NET",
+		badgeClass: "bg-amber-500/15 text-amber-400 border-amber-500/30",
+		iconBgClass: "bg-amber-500/15 text-amber-400",
+		Icon: Network
+	},
+	uptime: {
+		badge: "UPTIME",
+		badgeClass: "bg-sky-500/15 text-sky-400 border-sky-500/30",
+		iconBgClass: "bg-sky-500/15 text-sky-400",
+		Icon: Clock
+	},
+	ping: {
+		badge: "PING",
+		badgeClass: "bg-rose-500/15 text-rose-400 border-rose-500/30",
+		iconBgClass: "bg-rose-500/15 text-rose-400",
+		Icon: Radio
+	}
+};
+var SettingsCategoryCard = memo$3(({ category, title, icon, iconClassName, badge, badgeClassName, dragHandle, headerExtra, headerActions, isActive, onToggle, toggleAriaLabel, isDisabled, disabledMessage, className, headerClassName, contentClassName, children }) => {
+	const meta = category ? CATEGORY_META[category] : void 0;
+	const resolvedIconBg = iconClassName ?? meta?.iconBgClass ?? "bg-accent/15 text-accent";
+	const resolvedBadgeClass = badgeClassName ?? meta?.badgeClass ?? "bg-accent/15 text-accent border-accent/30";
+	const resolvedBadge = badge ?? meta?.badge ?? category?.toUpperCase();
+	const IconComp = meta?.Icon;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+		className: "rounded-3xl bg-surface-secondary/70 border border-border overflow-hidden shadow-xs " + (className ?? ""),
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card.Header, {
+			className: "flex flex-row justify-between items-center bg-surface/80 rounded-2xl py-3 px-4 border-b border-surface-tertiary/60 " + (headerClassName ?? ""),
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-row items-center gap-x-3",
+				children: [
+					dragHandle,
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: `size-8 rounded-full flex items-center justify-center shrink-0 ${resolvedIconBg}`,
+						children: icon ? icon : IconComp ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconComp, { className: "size-4.5" }) : null
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex items-center gap-x-2",
+						children: [resolvedBadge && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "px-1.5 py-0.5 rounded-md text-[10px] font-bold tracking-wide uppercase border " + resolvedBadgeClass,
+							children: resolvedBadge
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "font-semibold text-foreground text-sm hover:text-foreground/90 transition-colors",
+							children: title
+						})]
+					})
+				]
+			}), (headerExtra || headerActions || onToggle !== void 0) && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-row items-center gap-x-3",
+				children: [
+					headerExtra,
+					headerActions,
+					onToggle !== void 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$1, {
+						"aria-label": toggleAriaLabel ?? `Toggle active state for ${typeof title === "string" ? title : "section"}`,
+						onChange: onToggle,
+						isSelected: isActive,
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$1.Content, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$1.Control, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$1.Thumb, {}) }) })
+					})
+				]
+			})]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card.Content, {
+			className: "flex flex-col gap-y-3 p-3.5 relative bg-surface/80 rounded-3xl " + (contentClassName ?? ""),
+			children: [isDisabled && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "absolute inset-0 bg-surface/75 backdrop-blur-[1px] z-20 flex items-center justify-center rounded-2xl",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "text-xs text-muted font-medium bg-surface-secondary px-3 py-1.5 rounded-xl border border-surface-tertiary shadow-xs",
+					children: disabledMessage ?? "This section is currently disabled. Toggle the switch above to activate."
+				})
+			}), children]
+		})]
+	});
+});
+SettingsCategoryCard.displayName = "SettingsCategoryCard";
+//#endregion
 //#region extension/src/renderer/components/settings/PingSettings.tsx
-var { Card: Card$2, CloseButton, Description: Description$1, Input: Input$1, Kbd, Label: Label$1, NumberField: NumberField$1, Switch: Switch$2, TextField, ToggleButton } = await importShared("@heroui/react");
-var { useEffect, useRef, useState: useState$2 } = await importShared("react");
-var { useDispatch: useDispatch$2 } = await importShared("react-redux");
-function PingSettings({ dragHandle }) {
-	const dispatch = useDispatch$2();
+var { Button: Button$2, CloseButton, Description, Input: Input$1, Kbd, Label: Label$1, NumberField, Switch, TextField } = await importShared("@heroui/react");
+var { memo: memo$2, useEffect: useEffect$1, useRef: useRef$1, useState: useState$3 } = await importShared("react");
+var { useDispatch: useDispatch$3 } = await importShared("react-redux");
+var POPULAR_HOST_PRESETS = [
+	{
+		host: "1.1.1.1",
+		label: "Cloudflare (1.1.1.1)"
+	},
+	{
+		host: "8.8.8.8",
+		label: "Google (8.8.8.8)"
+	},
+	{
+		host: "9.9.9.9",
+		label: "Quad9 (9.9.9.9)"
+	}
+];
+var PingSettings = memo$2(({ dragHandle }) => {
+	const dispatch = useDispatch$3();
 	const preConfig = useHMonitorState("pingState");
-	const debounceTimerRef = useRef(null);
-	const [isActive, setIsActive] = useState$2(preConfig.isActive);
-	const [hostInput, setHostInput] = useState$2("");
-	const [interval, setInterval] = useState$2(preConfig.interval);
-	const [timeoutMs, setTimeoutMs] = useState$2(preConfig.timeout);
-	const [hosts, setHosts] = useState$2(preConfig.hosts);
-	const [enabledHosts, setEnabledHosts] = useState$2(preConfig.enabledHosts);
-	useEffect(() => {
+	const { hardwareData } = useHardwareData();
+	const detectedGateway = hardwareData.networkDetails?.find((d) => d.gateway)?.gateway;
+	const debounceTimerRef = useRef$1(null);
+	const [isActive, setIsActive] = useState$3(preConfig.isActive);
+	const [autoPingGateway, setAutoPingGateway] = useState$3(preConfig.autoPingGateway !== false);
+	const [hostInput, setHostInput] = useState$3("");
+	const [interval, setInterval] = useState$3(preConfig.interval);
+	const [timeoutMs, setTimeoutMs] = useState$3(preConfig.timeout);
+	const [hosts, setHosts] = useState$3(preConfig.hosts);
+	const [enabledHosts, setEnabledHosts] = useState$3(preConfig.enabledHosts);
+	useEffect$1(() => {
 		debounceTimerRef.current = setTimeout(() => {
 			const uniqueHosts = Array.from(new Set(hosts));
 			const newState = {
@@ -17575,7 +19349,8 @@ function PingSettings({ dragHandle }) {
 				enabledHosts: Array.from(new Set(enabledHosts)).filter((host) => uniqueHosts.includes(host)),
 				timeout: timeoutMs,
 				interval,
-				isActive
+				isActive,
+				autoPingGateway
 			};
 			if (!isEqual(newState, preConfig)) dispatch(hmonitorActions.setPingState(newState));
 		}, 300);
@@ -17587,139 +19362,264 @@ function PingSettings({ dragHandle }) {
 		};
 	}, [
 		isActive,
+		autoPingGateway,
 		interval,
 		timeoutMs,
 		hosts,
-		enabledHosts
+		enabledHosts,
+		preConfig,
+		dispatch
 	]);
 	const onToggleActivate = () => setIsActive((prevState) => !prevState);
-	const onToggleHost = (host) => setEnabledHosts((preConfig) => preConfig.includes(host) ? preConfig.filter((p) => p !== host) : [...preConfig, host]);
-	const onHostChange = (e) => {
-		const force = e?.key === "Enter";
-		const value = hostInput.replaceAll(",", "").trim();
+	const onToggleHost = (host) => {
+		setEnabledHosts((prev) => prev.includes(host) ? prev.filter((p) => p !== host) : [...prev, host]);
+	};
+	const onHostAdd = (hostToAdd) => {
+		const value = (hostToAdd ?? hostInput).replaceAll(",", "").trim();
 		if (!value) return;
-		if (force || hostInput.endsWith(" ") || hostInput.endsWith(",")) {
-			setHosts((prevState) => prevState.includes(value) ? prevState : [value, ...prevState]);
-			setHostInput("");
-		}
+		setHosts((prev) => prev.includes(value) ? prev : [value, ...prev]);
+		setEnabledHosts((prev) => prev.includes(value) ? prev : [value, ...prev]);
+		if (!hostToAdd) setHostInput("");
+	};
+	const onHostKeyUp = (e) => {
+		if (e.key === "Enter" || hostInput.endsWith(" ") || hostInput.endsWith(",")) onHostAdd();
 	};
 	const removeHost = (host) => {
-		setHosts((prevState) => prevState.filter((h) => h !== host));
+		setHosts((prev) => prev.filter((h) => h !== host));
+		setEnabledHosts((prev) => prev.filter((h) => h !== host));
 	};
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card$2, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card$2.Header, {
-		className: "flex flex-row justify-between items-center",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "flex flex-row items-center gap-x-2",
-			children: [dragHandle, /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-				onClick: onToggleActivate,
-				className: "font-medium cursor-pointer",
-				children: "Ping"
-			})]
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$2, {
-			isSelected: isActive,
-			"aria-label": "Activate Ping",
-			onChange: onToggleActivate,
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$2.Content, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$2.Control, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$2.Thumb, {}) }) })
-		})]
-	}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card$2.Content, {
-		className: "flex-col items-start gap-y-1",
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SettingsCategoryCard, {
+		category: "ping",
+		isActive,
+		isDisabled: !isActive,
+		dragHandle,
+		onToggle: onToggleActivate,
+		contentClassName: "gap-y-3.5",
+		title: "Network Latency & Ping",
+		toggleAriaLabel: "Activate Ping Monitoring",
+		disabledMessage: "Ping monitoring is inactive. Toggle the switch above to enable.",
 		children: [
-			!isActive && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "absolute inset-1.5 top-10.5 bg-surface-secondary/50 z-20 rounded-3xl" }),
-			hosts.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, { children: "Select hosts to display in the status bar" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "flex flex-row flex-wrap gap-2 mb-4",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AnimatePresence, { children: hosts.map((host) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(motion.div, {
-					layout: true,
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToggleButton, {
-						size: "sm",
-						onChange: () => onToggleHost(host),
-						isSelected: enabledHosts.includes(host),
-						children: ({ isSelected: selected }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-							selected && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(r, { className: "size-5" }),
-							host,
-							!selected && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CloseButton, { onPress: () => removeHost(host) })
-						] })
-					})
-				}, host)) })
-			})] }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TextField, {
-				type: "text",
-				value: hostInput,
-				variant: "secondary",
-				onKeyUp: onHostChange,
-				onChange: setHostInput,
-				fullWidth: true,
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, { children: "Host" }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input$1, { placeholder: "8.8.8.8" }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Description$1, {
-						className: "flex flex-row items-center gap-x-1",
-						children: [
-							"Type a host and press",
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Kbd, {
-								className: "h-5",
-								children: "Enter"
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Kbd, {
-								className: "h-5",
-								children: "Space"
-							}),
-							"or",
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Kbd, {
-								className: "h-5",
-								children: ","
-							}),
-							"to add"
-						]
-					})
-				]
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center justify-between p-3 bg-surface-secondary/70 border border-surface-tertiary rounded-2xl",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-start gap-2.5 mr-3",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "p-2 bg-accent/10 text-accent rounded-xl shrink-0 mt-0.5",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$3, { className: "size-5" })
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex items-center gap-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "text-xs font-semibold text-foreground",
+							children: "Auto-Ping Default Gateway (LAN)"
+						}), detectedGateway && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-surface border border-surface-tertiary text-accent font-semibold",
+							children: detectedGateway
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "text-[11px] text-muted leading-relaxed mt-0.5",
+						children: "Automatically pings your local router to isolate Wi-Fi/cable bottlenecks from ISP/Internet latency."
+					})] })]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
+					size: "sm",
+					isSelected: autoPingGateway,
+					onChange: setAutoPingGateway,
+					"aria-label": "Toggle Auto-Ping Default Gateway",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch.Content, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch.Control, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch.Thumb, {}) }) })
+				})]
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NumberField$1, {
-				minValue: 100,
-				value: interval,
-				variant: "secondary",
-				onChange: setInterval,
-				fullWidth: true,
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, { children: "Interval" }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NumberField$1.Group, { children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField$1.DecrementButton, {}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField$1.Input, {}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField$1.IncrementButton, {})
-					] }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description$1, { children: "Interval in milliseconds" })
-				]
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-col gap-y-1.5",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
+					className: "text-xs font-semibold text-foreground/90",
+					children: "Quick Preset Servers"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "flex flex-wrap gap-1.5",
+					children: POPULAR_HOST_PRESETS.map((preset) => {
+						const alreadyAdded = hosts.includes(preset.host);
+						return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$2, {
+							size: "sm",
+							isDisabled: alreadyAdded,
+							onPress: () => onHostAdd(preset.host),
+							variant: alreadyAdded ? "secondary" : "tertiary",
+							className: "text-xs h-7 px-2.5 transition-transform active:scale-[0.97]",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$12, { className: "size-3.5 mr-1 text-accent" }),
+								preset.label,
+								!alreadyAdded && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "size-3 ml-1 text-muted" })
+							]
+						}, preset.host);
+					})
+				})]
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NumberField$1, {
-				minValue: 100,
-				value: timeoutMs,
-				variant: "secondary",
-				onChange: setTimeoutMs,
-				fullWidth: true,
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, { children: "Timeout" }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NumberField$1.Group, { children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField$1.DecrementButton, {}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField$1.Input, {}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField$1.IncrementButton, {})
-					] }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description$1, { children: "Timeout in milliseconds" })
-				]
+			hosts.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-col gap-y-1.5",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Label$1, {
+					className: "text-xs font-semibold text-foreground/90",
+					children: [
+						"Active Monitored Hosts (",
+						enabledHosts.length,
+						"/",
+						hosts.length,
+						" showing)"
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "flex flex-row flex-wrap gap-2 min-h-8 items-center",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AnimatePresence, { children: hosts.map((host) => {
+						const isEnabled = enabledHosts.includes(host);
+						const isGatewayHost = Boolean(detectedGateway && host === detectedGateway);
+						return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(motion.div, {
+							className: "flex items-center gap-1.5 px-2 py-1.5 rounded-full border text-xs font-medium select-none transition-colors " + (isEnabled ? "bg-accent/10 border-accent/40 text-accent font-semibold" : "bg-surface border-surface-tertiary text-muted opacity-60"),
+							transition: { duration: .15 },
+							exit: {
+								opacity: 0,
+								scale: .9
+							},
+							animate: {
+								opacity: 1,
+								scale: 1
+							},
+							initial: {
+								opacity: 0,
+								scale: .9
+							},
+							layout: true,
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+								type: "button",
+								onClick: () => onToggleHost(host),
+								className: "flex items-center gap-1 cursor-pointer focus:outline-hidden",
+								children: [
+									isGatewayHost ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$3, { className: `size-4 ${isEnabled ? "text-accent" : "text-muted"}` }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(r, { className: `size-4 ${isEnabled ? "text-accent" : "text-muted"}` }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "font-JetBrainsMono",
+										children: host
+									}),
+									isGatewayHost && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "text-[10px] text-muted font-normal",
+										children: "(Gateway)"
+									})
+								]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CloseButton, {
+								onPress: () => removeHost(host),
+								"aria-label": `Remove host ${host}`,
+								className: "size-3.5 hover:text-danger bg-transparent"
+							})]
+						}, host);
+					}) })
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center gap-2",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TextField, {
+					type: "text",
+					value: hostInput,
+					className: "flex-1",
+					variant: "secondary",
+					onKeyUp: onHostKeyUp,
+					onChange: setHostInput,
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
+							className: "text-xs font-semibold text-foreground/90",
+							children: "Add Custom Host / IP"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input$1, {
+							className: "text-xs",
+							placeholder: "e.g. 1.1.1.1 or google.com"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Description, {
+							className: "flex flex-row items-center gap-x-1 text-xs text-muted mt-1",
+							children: [
+								"Type host and press",
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Kbd, {
+									className: "h-4.5 text-[10px] px-1.5",
+									children: "Enter"
+								}),
+								"or click"
+							]
+						})
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$2, {
+					size: "sm",
+					variant: "secondary",
+					className: "shrink-0 mb-1",
+					onPress: () => onHostAdd(),
+					isDisabled: !hostInput.trim(),
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "size-4" }), "Add"]
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "grid grid-cols-2 gap-3 pt-1",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NumberField, {
+					minValue: 100,
+					value: interval,
+					variant: "secondary",
+					onChange: setInterval,
+					fullWidth: true,
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center justify-between mb-1",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
+								className: "text-xs font-semibold text-foreground/90",
+								children: "Ping Interval"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+								className: "text-[11px] text-muted",
+								children: [interval, " ms"]
+							})]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NumberField.Group, { children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField.DecrementButton, {}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField.Input, { className: "text-xs" }),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField.IncrementButton, {})
+						] }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Description, {
+							className: "text-[11px] text-muted flex items-center gap-1 mt-1",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Timer, { className: "size-3" }), " Time between each ping check"]
+						})
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NumberField, {
+					minValue: 100,
+					value: timeoutMs,
+					variant: "secondary",
+					onChange: setTimeoutMs,
+					fullWidth: true,
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center justify-between mb-1",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label$1, {
+								className: "text-xs font-semibold text-foreground/90",
+								children: "Ping Timeout"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+								className: "text-[11px] text-muted",
+								children: [timeoutMs, " ms"]
+							})]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NumberField.Group, { children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField.DecrementButton, {}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField.Input, { className: "text-xs" }),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField.IncrementButton, {})
+						] }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Description, {
+							className: "text-[11px] text-muted flex items-center gap-1 mt-1",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Timer, { className: "size-3" }), " Max wait time before packet drops"]
+						})
+					]
+				})]
 			})
 		]
-	})] });
-}
+	});
+});
+PingSettings.displayName = "PingSettings";
 //#endregion
 //#region extension/src/renderer/components/settings/SettingsModalCard.tsx
-var { Button: Button$1, Card: Card$1, Chip, Input, ListBox: ListBox$1, Select: Select$1, Separator, Switch: Switch$1 } = await importShared("@heroui/react");
-var { memo, useState: useState$1 } = await importShared("react");
-var { useDispatch: useDispatch$1 } = await importShared("react-redux");
+var { Button: Button$1, Chip, Input, ListBox: ListBox$1, Select: Select$1 } = await importShared("@heroui/react");
+var { memo: memo$1, useState: useState$2 } = await importShared("react");
+var { useDispatch: useDispatch$2 } = await importShared("react-redux");
 /**
 * A reusable component for managing custom metrics for a piece of hardware.
 */
 function CustomMetricsSection({ config, hardware, type }) {
-	const dispatch = useDispatch$1();
-	const [isAdding, setIsAdding] = useState$1(false);
-	const [formState, setFormState] = useState$1({
+	const dispatch = useDispatch$2();
+	const [isAdding, setIsAdding] = useState$2(false);
+	const [formState, setFormState] = useState$2({
 		sensorIdentifier: "",
 		label: ""
 	});
@@ -17750,127 +19650,169 @@ function CustomMetricsSection({ config, hardware, type }) {
 		}));
 	};
 	if (hardware.sensors.length === 0 && custom.length === 0) return null;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [(custom.length > 0 || isAdding) && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Separator, { className: "my-2" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "w-full flex flex-col gap-2",
-		children: [custom.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: "flex flex-wrap gap-2",
-			children: custom.map((metric) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Chip, {
-				size: "lg",
-				variant: "soft",
-				color: "accent",
-				className: "px-2",
-				children: [metric.label, /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$1, {
-					size: "sm",
-					className: "size-4.5",
-					variant: "danger-soft",
-					onPress: () => handleRemoveMetric(metric.id),
-					isIconOnly: true,
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "size-3" })
-				})]
-			}, metric.id))
-		}), isAdding ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "flex items-center gap-2 p-2",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1, {
-					onChange: (key) => {
-						if (!key) return;
-						const value = key;
-						setFormState((prev) => ({
-							...prev,
-							sensorIdentifier: value,
-							label: value ? hardware.sensors.find((s) => s.Identifier === value)?.Name ?? "" : ""
-						}));
-					},
-					variant: "secondary",
-					placeholder: "Select a sensor",
-					value: formState.sensorIdentifier,
-					fullWidth: true,
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1.Trigger, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select$1.Value, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select$1.Indicator, {})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select$1.Popover, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListBox$1, {
-						items: hardware.sensors,
-						children: (sensor) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ListBox$1.Item, {
-							id: sensor.Identifier,
-							textValue: `${sensor.Name} (${sensor.Type})`,
-							children: [`${sensor.Name} (${sensor.Type})`, /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListBox$1.ItemIndicator, {})]
-						}, sensor.Identifier)
-					}) })]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-					variant: "secondary",
-					value: formState.label,
-					placeholder: "Display Label",
-					onChange: (e) => setFormState((prev) => ({
-						...prev,
-						label: e.target.value
-					}))
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$1, {
-					size: "sm",
-					variant: "secondary",
-					className: "shrink-0",
-					onPress: handleAddMetric,
-					isIconOnly: true,
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, {})
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$1, {
-					size: "sm",
-					variant: "tertiary",
-					className: "shrink-0",
-					onPress: () => setIsAdding(false),
-					isIconOnly: true,
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, {})
-				})
-			]
-		}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$1, {
-			className: "mt-2",
-			variant: "tertiary",
-			onPress: () => setIsAdding(true),
-			fullWidth: true,
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "size-3" }), "Add Custom Metric"]
-		})]
-	})] });
-}
-var SettingsModalCard = memo(({ onToggle, config, hardware, type, children, dragHandle, headerExtra }) => {
-	if (!config) return null;
-	const { active } = config;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card$1, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card$1.Header, {
-		className: "flex flex-row justify-between items-center",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "flex flex-row items-center gap-x-2",
-			children: [dragHandle, /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-				onClick: onToggle,
-				className: "font-medium cursor-pointer",
-				children: hardware.name
-			})]
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			className: "flex flex-row items-center gap-x-4",
-			children: [headerExtra?.(active), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$1, {
-				isSelected: active,
-				onChange: onToggle,
-				"aria-label": "Toggle active",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$1.Content, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$1.Control, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch$1.Thumb, {}) }) })
-			})]
-		})]
-	}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card$1.Content, {
-		className: "flex-col items-start gap-y-1 relative",
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "w-full flex flex-col gap-2 pt-2.5 border-t border-surface-tertiary/40",
 		children: [
-			!active && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "absolute inset-1.5 top-1.5 bg-surface-secondary/50 z-20 rounded-3xl" }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "flex flex-row items-center gap-x-2",
-				children
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center justify-between",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+					className: "text-xs font-semibold text-foreground/80",
+					children: [
+						"Custom Sensors (",
+						custom.length,
+						")"
+					]
+				}), !isAdding && hardware.sensors.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$1, {
+					size: "sm",
+					variant: "secondary",
+					className: "text-xs h-6 px-2.5",
+					onPress: () => setIsAdding(true),
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "size-3" }), "Add Custom Sensor"]
+				})]
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CustomMetricsSection, {
-				type,
-				config,
-				hardware
+			custom.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "flex flex-wrap gap-2",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AnimatePresence, { children: custom.map((metric) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(motion.div, {
+					exit: {
+						opacity: 0,
+						scale: .9
+					},
+					animate: {
+						opacity: 1,
+						scale: 1
+					},
+					initial: {
+						opacity: 0,
+						scale: .9
+					},
+					layout: true,
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Chip, {
+						variant: "soft",
+						color: "accent",
+						className: "flex items-center text-xs font-medium bg-accent/15 border border-accent/30 text-accent",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: metric.label }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$1, {
+							size: "sm",
+							variant: "ghost",
+							onPress: () => handleRemoveMetric(metric.id),
+							className: "size-4 min-w-0 p-0 rounded-full hover:bg-danger-soft hover:text-danger ml-1",
+							isIconOnly: true,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "size-3" })
+						})]
+					})
+				}, metric.id)) })
+			}),
+			isAdding && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-row items-stretch sm:items-center gap-2 p-3 bg-surface rounded-xl border border-surface-tertiary shadow-xs",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1, {
+						onChange: (key) => {
+							if (!key) return;
+							const value = key;
+							setFormState((prev) => ({
+								...prev,
+								sensorIdentifier: value,
+								label: value ? hardware.sensors.find((s) => s.Identifier === value)?.Name ?? "" : ""
+							}));
+						},
+						className: "flex-1",
+						variant: "secondary",
+						value: formState.sensorIdentifier,
+						placeholder: "Select available sensor",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select$1.Trigger, {
+							className: "text-xs",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select$1.Value, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select$1.Indicator, {})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select$1.Popover, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListBox$1, {
+							items: hardware.sensors,
+							children: (sensor) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ListBox$1.Item, {
+								id: sensor.Identifier,
+								textValue: `${sensor.Name} (${sensor.Type})`,
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex flex-col",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "text-xs font-medium text-foreground",
+										children: sensor.Name
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "text-[10px] text-muted",
+										children: sensor.Type
+									})]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListBox$1.ItemIndicator, {})]
+							}, sensor.Identifier)
+						}) })]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+						className: "w-44",
+						variant: "secondary",
+						value: formState.label,
+						placeholder: "Display label",
+						onChange: (e) => setFormState((prev) => ({
+							...prev,
+							label: e.target.value
+						}))
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex items-center gap-1.5 shrink-0 justify-end",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button$1, {
+							size: "sm",
+							variant: "primary",
+							className: "text-xs",
+							onPress: handleAddMetric,
+							isDisabled: !formState.sensorIdentifier || !formState.label,
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "size-3.5" }), "Add"]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button$1, {
+							size: "sm",
+							variant: "secondary",
+							className: "shrink-0 text-xs",
+							onPress: () => setIsAdding(false),
+							isIconOnly: true,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "size-3.5" })
+						})]
+					})
+				]
 			})
 		]
-	})] });
+	});
+}
+var SettingsModalCard = memo$1(({ onToggle, config, hardware, type, children, dragHandle, headerExtra }) => {
+	if (!config) return null;
+	const { active } = config;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SettingsCategoryCard, {
+		category: type,
+		isActive: active,
+		onToggle,
+		isDisabled: !active,
+		title: hardware.name,
+		dragHandle,
+		headerExtra: headerExtra?.(active),
+		toggleAriaLabel: `Toggle active state for ${hardware.name}`,
+		disabledMessage: "This hardware component is currently disabled. Toggle the switch to activate.",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex flex-col gap-y-1.5 w-full",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center justify-between",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "text-xs font-semibold text-foreground/80",
+					children: "Available Metrics"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "text-[11px] text-muted",
+					children: "Drag to reorder • Check to toggle"
+				})]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "flex flex-row items-center gap-x-2 w-full",
+				children
+			})]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CustomMetricsSection, {
+			type,
+			config,
+			hardware
+		})]
+	});
 });
+SettingsModalCard.displayName = "SettingsModalCard";
 //#endregion
-//#region extension/src/renderer/components/settings/SettingsModal.tsx
-var { Button, Card, Checkbox, Description, Label, ListBox, Modal, NumberField, ScrollShadow, Select, Spinner, Switch } = await importShared("@heroui/react");
-var { useCallback, useMemo, useState } = await importShared("react");
-var { useDispatch } = await importShared("react-redux");
+//#region extension/src/renderer/components/settings/MetricsTab.tsx
+var { Checkbox, Label, ListBox, Select } = await importShared("@heroui/react");
+var { memo, useEffect, useMemo: useMemo$1, useRef, useState: useState$1 } = await importShared("react");
+var { useDispatch: useDispatch$1 } = await importShared("react-redux");
 var METRIC_CONFIG = {
 	temp: {
 		label: "Temperature",
@@ -17878,10 +19820,10 @@ var METRIC_CONFIG = {
 	},
 	usage: {
 		label: "Usage",
-		Icon: Cpu
+		Icon: Activity
 	},
 	vram: {
-		label: "VRAM",
+		label: "VRAM Usage",
 		Icon: Database
 	},
 	memory: {
@@ -17904,51 +19846,563 @@ var METRIC_CONFIG = {
 		label: "Data Downloaded",
 		Icon: ArrowDown
 	},
+	publicIp: {
+		label: "Public IP",
+		Icon: Globe
+	},
+	vpnStatus: {
+		label: "VPN / Geo Status",
+		Icon: ShieldCheck
+	},
 	uptimeSystem: {
 		label: "System Uptime",
 		Icon: Clock
 	},
 	uptimeApp: {
-		label: "Application Uptime",
+		label: "App Uptime",
 		Icon: Timer
 	}
 };
-var DISPLAY_STYLES = [
-	{
-		value: "default",
-		label: "Default",
-		description: "Standard view with progress bars and labels."
-	},
-	{
-		value: "compact",
-		label: "Compact",
-		description: "A smaller, space-saving layout."
-	},
-	{
-		value: "two-column",
-		label: "Two Column",
-		description: "Metrics are stacked vertically to save horizontal space."
-	},
-	{
-		value: "raw",
-		label: "Raw Text",
-		description: "Minimalist text-only view for the smallest footprint."
-	},
-	{
-		value: "raw-two-column",
-		label: "Raw Text (Two Column)",
-		description: "Minimalist text stacked vertically."
-	}
-];
+var MetricReorderItem = memo(({ metricId, isSelected, onToggle, onDragEnd, labelText, IconComp, containerRef }) => {
+	const dragControls = useDragControls();
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ReorderItem, {
+		whileDrag: {
+			zIndex: 50,
+			scale: 1.03,
+			boxShadow: "0 8px 20px -4px rgba(0, 0, 0, 0.3)"
+		},
+		className: "flex flex-row items-center gap-x-1.5 px-2 py-1.5 shrink-0  rounded-xl border select-none transition-colors duration-150 " + (isSelected ? "border-accent/30 bg-accent/10 shadow-2xs text-foreground font-medium" : "border-border opacity-60 text-muted bg-surface-secondary"),
+		dragElastic: 0,
+		value: metricId,
+		dragListener: false,
+		dragMomentum: false,
+		onDragEnd,
+		dragControls,
+		dragConstraints: containerRef,
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			onPointerDown: (e) => {
+				e.stopPropagation();
+				dragControls.start(e);
+			},
+			title: "Drag to reorder metric",
+			className: "cursor-grab active:cursor-grabbing p-0.5 -m-0.5 flex items-center justify-center shrink-0",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GripVertical, { className: "size-3.5 text-muted hover:text-foreground active:cursor-grabbing shrink-0" })
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
+			onChange: onToggle,
+			isSelected,
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox.Content, {
+				className: "flex flex-row items-center gap-x-1.5 text-xs",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Control, {
+						className: "size-4 rounded-md",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Indicator, {})
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconComp, { className: `size-3.5 shrink-0 ${isSelected ? "text-accent" : "text-muted"}` }),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "whitespace-nowrap",
+						children: labelText
+					})
+				]
+			})
+		})]
+	});
+});
+MetricReorderItem.displayName = "MetricReorderItem";
+var HardwareMetricsReorderGroup = memo(({ type, hardwareName, config }) => {
+	const dispatch = useDispatch$1();
+	const nativeMetrics = useMemo$1(() => {
+		if (type === "cpu") return ["temp", "usage"];
+		if (type === "gpu") return [
+			"temp",
+			"usage",
+			"vram"
+		];
+		if (type === "memory") return ["memory"];
+		if (type === "network") return [
+			"uploadSpeed",
+			"downloadSpeed",
+			"uploadData",
+			"downloadData",
+			"publicIp",
+			"vpnStatus"
+		];
+		return [];
+	}, [type]);
+	const customIds = useMemo$1(() => config?.custom?.map((m) => m.id) ?? [], [config?.custom]);
+	const allAvailableMetricIds = useMemo$1(() => [...nativeMetrics, ...customIds], [nativeMetrics, customIds]);
+	const initialOrderedIds = useMemo$1(() => {
+		const currentEnabled = config?.enabled ?? [];
+		return [...currentEnabled.filter((id) => allAvailableMetricIds.includes(id)), ...allAvailableMetricIds.filter((id) => !currentEnabled.includes(id))];
+	}, [config?.enabled, allAvailableMetricIds]);
+	const [items, setItems] = useState$1(initialOrderedIds);
+	const isDraggingRef = useRef(false);
+	const containerRef = useRef(null);
+	useEffect(() => {
+		if (!isDraggingRef.current) setItems(initialOrderedIds);
+	}, [initialOrderedIds]);
+	if (!config) return null;
+	const handleReorder = (newOrder) => {
+		isDraggingRef.current = true;
+		setItems(newOrder);
+	};
+	const handleDragEnd = () => {
+		setTimeout(() => {
+			isDraggingRef.current = false;
+		}, 100);
+		const newEnabled = items.filter((id) => config.enabled.includes(id));
+		if (!isEqual(newEnabled, config.enabled)) dispatch(hmonitorActions.updateHardwareMetrics({
+			type,
+			name: hardwareName,
+			enabled: newEnabled
+		}));
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		className: "flex flex-col gap-y-2 w-full",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			ref: containerRef,
+			className: "w-full",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ReorderGroup, {
+				axis: "x",
+				values: items,
+				onReorder: handleReorder,
+				className: "flex flex-row items-center gap-2 w-full overflow-x-auto scrollbar-hide py-1",
+				children: items.map((metricId) => {
+					const isCustom = !nativeMetrics.includes(metricId);
+					const isSelected = config.enabled.includes(metricId);
+					const onToggle = () => {
+						let newEnabled;
+						if (isSelected) newEnabled = config.enabled.filter((id) => id !== metricId);
+						else newEnabled = items.filter((id) => id === metricId || config.enabled.includes(id));
+						dispatch(hmonitorActions.updateHardwareMetrics({
+							type,
+							name: hardwareName,
+							enabled: newEnabled
+						}));
+					};
+					let labelText;
+					let IconComp;
+					if (isCustom) {
+						labelText = config.custom.find((c) => c.id === metricId)?.label || "Custom Metric";
+						IconComp = Database;
+					} else {
+						const metConfig = METRIC_CONFIG[metricId];
+						labelText = metConfig?.label || metricId;
+						IconComp = metConfig?.Icon || Cpu;
+					}
+					return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MetricReorderItem, {
+						metricId,
+						onToggle,
+						IconComp,
+						labelText,
+						isSelected,
+						onDragEnd: handleDragEnd,
+						containerRef
+					}, metricId);
+				})
+			})
+		})
+	});
+});
+HardwareMetricsReorderGroup.displayName = "HardwareMetricsReorderGroup";
+var UptimeMetricsReorderGroup = memo(({ uptimeOrder, uptimeEnabled }) => {
+	const dispatch = useDispatch$1();
+	const defaultUptimeOrder = useMemo$1(() => ["uptimeSystem", "uptimeApp"], []);
+	const currentOrder = useMemo$1(() => uptimeOrder || defaultUptimeOrder, [uptimeOrder, defaultUptimeOrder]);
+	const [items, setItems] = useState$1(currentOrder);
+	const isDraggingRef = useRef(false);
+	const containerRef = useRef(null);
+	useEffect(() => {
+		if (!isDraggingRef.current) setItems(currentOrder);
+	}, [currentOrder]);
+	const handleReorder = (newOrder) => {
+		isDraggingRef.current = true;
+		setItems(newOrder);
+	};
+	const handleDragEnd = () => {
+		setTimeout(() => {
+			isDraggingRef.current = false;
+		}, 100);
+		if (!isEqual(items, currentOrder)) dispatch(hmonitorActions.updateUptimeOrder(items));
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		ref: containerRef,
+		className: "w-full",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ReorderGroup, {
+			axis: "x",
+			values: items,
+			onReorder: handleReorder,
+			className: "flex flex-row items-center gap-2 w-full overflow-x-auto scrollbar-hide py-1",
+			children: items.map((metricId) => {
+				const isSelected = metricId === "uptimeApp" ? uptimeEnabled.app : uptimeEnabled.system;
+				const labelText = metricId === "uptimeApp" ? "Application Uptime" : "System Uptime";
+				const IconComp = metricId === "uptimeApp" ? Timer : Clock;
+				const onToggle = () => {
+					if (metricId === "uptimeApp") dispatch(hmonitorActions.updateUptime({
+						...uptimeEnabled,
+						app: !isSelected
+					}));
+					else dispatch(hmonitorActions.updateUptime({
+						...uptimeEnabled,
+						system: !isSelected
+					}));
+				};
+				return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MetricReorderItem, {
+					metricId,
+					onToggle,
+					IconComp,
+					labelText,
+					isSelected,
+					onDragEnd: handleDragEnd,
+					containerRef
+				}, metricId);
+			})
+		})
+	});
+});
+UptimeMetricsReorderGroup.displayName = "UptimeMetricsReorderGroup";
+var SectionReorderItem = memo(({ type, index, totalSections, moveSection, children, containerRef }) => {
+	const dragControls = useDragControls();
+	const dragHandle = /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "flex items-center gap-0.5 shrink-0",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			onPointerDown: (e) => {
+				e.stopPropagation();
+				dragControls.start(e);
+			},
+			className: "cursor-grab active:cursor-grabbing p-1.5 rounded-md text-muted hover:text-foreground hover:bg-surface-secondary transition-colors",
+			title: "Drag to reorder section",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GripVertical, { className: "size-4" })
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex flex-col -space-y-1",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+				className: "p-0.5 text-muted hover:text-foreground disabled:opacity-20 disabled:pointer-events-none cursor-pointer",
+				type: "button",
+				disabled: index === 0,
+				title: "Move section up",
+				onClick: () => moveSection(index, "up"),
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronUp, { className: "size-3" })
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+				className: "p-0.5 text-muted hover:text-foreground disabled:opacity-20 disabled:pointer-events-none cursor-pointer",
+				type: "button",
+				title: "Move section down",
+				disabled: index === totalSections - 1,
+				onClick: () => moveSection(index, "down"),
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, { className: "size-3" })
+			})]
+		})]
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ReorderItem, {
+		whileDrag: {
+			zIndex: 40,
+			scale: 1.01,
+			boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.35)"
+		},
+		value: type,
+		dragElastic: 0,
+		dragListener: false,
+		dragMomentum: false,
+		dragControls,
+		dragConstraints: containerRef,
+		className: "relative select-none",
+		children: children(dragHandle)
+	});
+});
+SectionReorderItem.displayName = "SectionReorderItem";
+var MetricsTab = memo(({ settings, updateState, toggleHardwareActive, handleSectionReorder, selectedNetworkName, setSelectedNetworkName }) => {
+	const { enabledMetrics, availableHardware } = settings;
+	const cardsContainerRef = useRef(null);
+	const sectionsToRender = useMemo$1(() => {
+		return (settings.sectionOrder && settings.sectionOrder.length > 0 ? settings.sectionOrder : [
+			"cpu",
+			"gpu",
+			"memory",
+			"network",
+			"uptime",
+			"ping"
+		]).filter((type) => {
+			if (type === "cpu") return availableHardware.cpu.length > 0;
+			if (type === "gpu") return availableHardware.gpu.length > 0;
+			if (type === "memory") return availableHardware.memory.length > 0;
+			if (type === "network") return availableHardware.network.length > 0;
+			return true;
+		});
+	}, [settings.sectionOrder, availableHardware]);
+	const moveSection = (index, direction) => {
+		const targetIndex = direction === "up" ? index - 1 : index + 1;
+		if (targetIndex < 0 || targetIndex >= sectionsToRender.length) return;
+		const newOrder = [...sectionsToRender];
+		const temp = newOrder[index];
+		newOrder[index] = newOrder[targetIndex];
+		newOrder[targetIndex] = temp;
+		handleSectionReorder(newOrder);
+	};
+	const selectedNetworkConfig = useMemo$1(() => enabledMetrics.network.find((n) => n.name === selectedNetworkName), [selectedNetworkName, enabledMetrics.network]);
+	const selectedNetworkHardware = useMemo$1(() => availableHardware.network.find((n) => n.name === selectedNetworkName), [selectedNetworkName, availableHardware.network]);
+	const renderSectionSetting = (type, dragHandle) => {
+		switch (type) {
+			case "gpu": return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "flex flex-col gap-y-4",
+				children: availableHardware.gpu.map((hw) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SettingsModalCard, {
+					headerExtra: (active) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
+						variant: "secondary",
+						isDisabled: !active,
+						isSelected: settings.showAliasGpu,
+						onChange: (val) => updateState("showAliasGpu", val),
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox.Content, {
+							className: "text-xs",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Control, {
+								className: "size-4 rounded-md",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Indicator, {})
+							}), "Friendly Alias"]
+						})
+					}),
+					type: "gpu",
+					hardware: hw,
+					dragHandle,
+					onToggle: () => toggleHardwareActive(hw.name, "gpu"),
+					config: enabledMetrics.gpu.find((m) => m.name === hw.name),
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(HardwareMetricsReorderGroup, {
+						type: "gpu",
+						hardwareName: hw.name,
+						config: enabledMetrics.gpu.find((m) => m.name === hw.name)
+					})
+				}, `gpu-settings-${hw.name}`))
+			});
+			case "cpu": return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "flex flex-col gap-y-4",
+				children: availableHardware.cpu.map((hw) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SettingsModalCard, {
+					headerExtra: (active) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
+						variant: "secondary",
+						isDisabled: !active,
+						isSelected: settings.showAliasCpu,
+						onChange: (val) => updateState("showAliasCpu", val),
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox.Content, {
+							className: "text-xs",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Control, {
+								className: "size-4 rounded-md",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Indicator, {})
+							}), "Friendly Alias"]
+						})
+					}),
+					type: "cpu",
+					hardware: hw,
+					dragHandle,
+					onToggle: () => toggleHardwareActive(hw.name, "cpu"),
+					config: enabledMetrics.cpu.find((m) => m.name === hw.name),
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(HardwareMetricsReorderGroup, {
+						type: "cpu",
+						hardwareName: hw.name,
+						config: enabledMetrics.cpu.find((m) => m.name === hw.name)
+					})
+				}, `cpu-settings-${hw.name}`))
+			});
+			case "memory": return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "flex flex-col gap-y-4",
+				children: availableHardware.memory.map((hw) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SettingsModalCard, {
+					headerExtra: (active) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
+						variant: "secondary",
+						isDisabled: !active,
+						isSelected: settings.showAliasMemory,
+						onChange: (val) => updateState("showAliasMemory", val),
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox.Content, {
+							className: "text-xs",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Control, {
+								className: "size-4 rounded-md",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Indicator, {})
+							}), "Friendly Alias"]
+						})
+					}),
+					type: "memory",
+					hardware: hw,
+					dragHandle,
+					onToggle: () => toggleHardwareActive(hw.name, "memory"),
+					config: enabledMetrics.memory.find((m) => m.name === hw.name),
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(HardwareMetricsReorderGroup, {
+						type: "memory",
+						hardwareName: hw.name,
+						config: enabledMetrics.memory.find((m) => m.name === hw.name)
+					})
+				}, `memory-settings-${hw.name}`))
+			});
+			case "network": return availableHardware.network.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SettingsCategoryCard, {
+				onToggle: selectedNetworkConfig ? () => toggleHardwareActive(selectedNetworkName, "network") : void 0,
+				headerExtra: selectedNetworkConfig && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-center gap-3",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
+						variant: "secondary",
+						isSelected: settings.maskPublicIp ?? true,
+						isDisabled: !selectedNetworkConfig.active,
+						onChange: (val) => updateState("maskPublicIp", val),
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox.Content, {
+							className: "text-xs",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Control, {
+								className: "size-4 rounded-md",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Indicator, {})
+							}), "Mask Public IP"]
+						})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
+						variant: "secondary",
+						isSelected: settings.showAliasNetwork,
+						isDisabled: !selectedNetworkConfig.active,
+						onChange: (val) => updateState("showAliasNetwork", val),
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox.Content, {
+							className: "text-xs",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Control, {
+								className: "size-4 rounded-md",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Indicator, {})
+							}), "Friendly Alias"]
+						})
+					})]
+				}),
+				category: "network",
+				dragHandle,
+				title: "Network Interface",
+				isActive: selectedNetworkConfig?.active,
+				toggleAriaLabel: "Toggle network monitoring",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "w-full flex items-center justify-between gap-4",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
+						onChange: (value) => {
+							if (value) setSelectedNetworkName(value);
+						},
+						variant: "secondary",
+						selectionMode: "single",
+						value: selectedNetworkName,
+						placeholder: "Select a network interface to configure",
+						fullWidth: true,
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select.Trigger, {
+							className: "text-xs h-9",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select.Value, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select.Indicator, {})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select.Popover, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListBox, {
+							items: availableHardware.network,
+							children: (item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ListBox.Item, {
+								id: item.name,
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
+									className: "text-xs",
+									children: item.name
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListBox.ItemIndicator, {})]
+							}, item.name)
+						}) })]
+					})
+				}), selectedNetworkConfig && selectedNetworkHardware && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "w-full relative flex flex-col gap-y-1.5 pt-2 border-t border-surface-tertiary/40",
+					children: [
+						!selectedNetworkConfig.active && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "absolute inset-0 bg-surface/75 backdrop-blur-[1px] z-20 flex items-center justify-center rounded-xl",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								className: "text-xs text-muted font-medium bg-surface-secondary px-3 py-1.5 rounded-full border border-border",
+								children: "Selected network interface is disabled. Toggle above to activate."
+							})
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center justify-between",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-xs font-semibold text-foreground/80",
+								children: "Interface Metrics"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-[11px] text-muted",
+								children: "Drag to reorder • Check to toggle"
+							})]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(HardwareMetricsReorderGroup, {
+							type: "network",
+							config: selectedNetworkConfig,
+							hardwareName: selectedNetworkName
+						})
+					]
+				})]
+			});
+			case "uptime": return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(SettingsCategoryCard, {
+				category: "uptime",
+				dragHandle,
+				title: "System & Application Uptime",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-center justify-between",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "text-xs font-semibold text-foreground/80",
+						children: "Uptime Indicators"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "text-[11px] text-muted",
+						children: "Drag to reorder"
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(UptimeMetricsReorderGroup, {
+					uptimeOrder: settings.uptimeOrder,
+					uptimeEnabled: enabledMetrics.uptime
+				})]
+			});
+			case "ping": return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PingSettings, { dragHandle });
+			default: return null;
+		}
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "flex flex-col gap-y-5 pb-4",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "p-4 bg-surface-secondary rounded-3xl flex items-center justify-between flex-wrap gap-3",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center gap-x-2.5",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$15, { className: "size-5 text-accent" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+					className: "text-sm font-semibold text-foreground",
+					children: "Detected Hardware & Sensor Modules"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "text-xs text-muted",
+					children: "Reorder status bar sections by dragging handles or clicking arrows. Toggle individual sensors."
+				})] })]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center gap-2 flex-wrap text-xs",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "px-2.5 py-1 rounded-full bg-surface font-medium text-foreground",
+						children: ["CPU: ", availableHardware.cpu.length]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "px-2.5 py-1 rounded-full bg-surface font-medium text-foreground",
+						children: ["GPU: ", availableHardware.gpu.length]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "px-2.5 py-1 rounded-full bg-surface font-medium text-foreground",
+						children: ["RAM: ", availableHardware.memory.length]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "px-2.5 py-1 rounded-full bg-surface font-medium text-foreground",
+						children: ["NIC: ", availableHardware.network.length]
+					})
+				]
+			})]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "w-full",
+			ref: cardsContainerRef,
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ReorderGroup, {
+				axis: "y",
+				values: sectionsToRender,
+				onReorder: handleSectionReorder,
+				className: "flex flex-col gap-y-4",
+				children: sectionsToRender.map((type, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SectionReorderItem, {
+					type,
+					index,
+					moveSection,
+					containerRef: cardsContainerRef,
+					totalSections: sectionsToRender.length,
+					children: (dragHandle) => renderSectionSetting(type, dragHandle)
+				}, type))
+			})
+		})]
+	});
+});
+MetricsTab.displayName = "MetricsTab";
+//#endregion
+//#region extension/src/renderer/components/settings/SettingsModal.tsx
+var { Button, Modal, ScrollShadow, Spinner, Tabs } = await importShared("@heroui/react");
+var { useCallback, useMemo, useState } = await importShared("react");
+var { useDispatch } = await importShared("react-redux");
 function SettingsModal({ state }) {
 	const dispatch = useDispatch();
 	const settings = useHMonitorSelector((state) => state.hmonitor);
-	const { enabled, enabledMetrics, displayStyle, refreshInterval, showSectionLabel, availableHardware } = settings;
+	const { displayStyle, availableHardware } = settings;
+	const [activeTab, setActiveTab] = useState("config");
 	const [isSaving, setIsSaving] = useState(false);
+	const [isResetting, setIsResetting] = useState(false);
 	const [selectedNetworkName, setSelectedNetworkName] = useState(availableHardware.network[0]?.name || "");
 	const isRawStyle = useMemo(() => displayStyle === "raw" || displayStyle === "raw-two-column", [displayStyle]);
-	const selectedNetworkConfig = useMemo(() => enabledMetrics.network.find((n) => n.name === selectedNetworkName), [selectedNetworkName, enabledMetrics.network]);
-	const selectedNetworkHardware = useMemo(() => availableHardware.network.find((n) => n.name === selectedNetworkName), [selectedNetworkName, availableHardware.network]);
 	function updateState(key, value) {
 		dispatch(hmonitorActions.updateState({
 			key,
@@ -17970,41 +20424,26 @@ function SettingsModal({ state }) {
 		dispatch(hmonitorActions.saveSettings());
 		setTimeout(() => {
 			setIsSaving(false);
-			toastHolder?.top.success("Settings saved successfully!");
-		}, 700);
+			toastHolder?.top.success("Hardware monitor settings saved!");
+			state.close();
+		}, 450);
 	};
 	const resetSettings = () => {
-		setIsSaving(true);
+		setIsResetting(true);
 		window.electron.ipcRenderer.send(HMONITOR_IPC_RESET_CONFIG);
 		setTimeout(() => {
-			setIsSaving(false);
-			toastHolder?.top.success("Settings reset successfully!");
-		}, 1e3);
+			setIsResetting(false);
+			toastHolder?.top.success("Settings restored to defaults!");
+		}, 700);
 	};
 	const toggleHardwareActive = useCallback((name, type) => {
-		const hardwareConfig = enabledMetrics[type].find((metric) => metric.name === name);
+		const hardwareConfig = settings.enabledMetrics[type].find((metric) => metric.name === name);
 		if (hardwareConfig) dispatch(hmonitorActions.updateHardwareActive({
 			type,
 			name,
 			active: !hardwareConfig.active
 		}));
-	}, [enabledMetrics, dispatch]);
-	const sectionsToRender = useMemo(() => {
-		return (settings.sectionOrder && settings.sectionOrder.length > 0 ? settings.sectionOrder : [
-			"cpu",
-			"gpu",
-			"memory",
-			"network",
-			"uptime",
-			"ping"
-		]).filter((type) => {
-			if (type === "cpu") return availableHardware.cpu.length > 0;
-			if (type === "gpu") return availableHardware.gpu.length > 0;
-			if (type === "memory") return availableHardware.memory.length > 0;
-			if (type === "network") return availableHardware.network.length > 0;
-			return true;
-		});
-	}, [settings.sectionOrder, availableHardware]);
+	}, [settings.enabledMetrics, dispatch]);
 	const handleSectionReorder = (newOrder) => {
 		const missing = [
 			"cpu",
@@ -18016,385 +20455,156 @@ function SettingsModal({ state }) {
 		].filter((type) => !newOrder.includes(type));
 		dispatch(hmonitorActions.updateSectionOrder([...newOrder, ...missing]));
 	};
-	const renderMetricsReorderGroup = (type, hardwareName) => {
-		const config = enabledMetrics[type].find((m) => m.name === hardwareName);
-		if (!config) return null;
-		let nativeMetrics = [];
-		if (type === "cpu") nativeMetrics = ["temp", "usage"];
-		else if (type === "gpu") nativeMetrics = [
-			"temp",
-			"usage",
-			"vram"
-		];
-		else if (type === "memory") nativeMetrics = ["memory"];
-		else if (type === "network") nativeMetrics = [
-			"uploadSpeed",
-			"downloadSpeed",
-			"uploadData",
-			"downloadData"
-		];
-		const customIds = config.custom.map((m) => m.id);
-		const allAvailableMetricIds = [...nativeMetrics, ...customIds];
-		const currentEnabled = config.enabled;
-		const orderedMetricIds = [...currentEnabled.filter((id) => allAvailableMetricIds.includes(id)), ...allAvailableMetricIds.filter((id) => !currentEnabled.includes(id))];
-		const handleReorder = (newOrder) => {
-			const newEnabled = newOrder.filter((id) => currentEnabled.includes(id));
-			dispatch(hmonitorActions.updateHardwareMetrics({
-				type,
-				name: hardwareName,
-				enabled: newEnabled
-			}));
-		};
-		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: "flex flex-col gap-y-2 w-full",
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ReorderGroup, {
-				axis: "x",
-				values: orderedMetricIds,
-				onReorder: handleReorder,
-				className: "flex flex-row flex-wrap items-center gap-2 w-full",
-				children: orderedMetricIds.map((metricId) => {
-					const isCustom = !nativeMetrics.includes(metricId);
-					const isSelected = currentEnabled.includes(metricId);
-					const onToggle = () => {
-						const newEnabled = isSelected ? currentEnabled.filter((id) => id !== metricId) : [...currentEnabled, metricId];
-						dispatch(hmonitorActions.updateHardwareMetrics({
-							type,
-							name: hardwareName,
-							enabled: newEnabled
-						}));
-					};
-					let labelText;
-					let IconComp;
-					if (isCustom) {
-						labelText = config.custom.find((c) => c.id === metricId)?.label || "Custom Metric";
-						IconComp = Database;
-					} else {
-						const metConfig = METRIC_CONFIG[metricId];
-						labelText = metConfig?.label || metricId;
-						IconComp = metConfig?.Icon || Cpu;
-					}
-					return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ReorderItem, {
-						className: `flex flex-row items-center gap-x-1.5 px-3 py-1.5 bg-surface rounded-xl border border-foreground/10 ${!isSelected ? "opacity-50" : ""}`,
-						value: metricId,
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(GripVertical, { className: "size-3.5 cursor-grab text-foreground/40 hover:text-foreground/80 active:cursor-grabbing shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
-							variant: "secondary",
-							onChange: onToggle,
-							isSelected,
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox.Content, {
-								className: "flex flex-row items-center gap-x-1",
-								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Control, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Indicator, {}) }),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconComp, { className: "size-3.5 shrink-0" }),
-									labelText
-								]
-							})
-						})]
-					}, metricId);
-				})
-			})
-		});
-	};
-	const renderUptimeMetricsReorderGroup = () => {
-		const currentOrder = settings.uptimeOrder || ["uptimeSystem", "uptimeApp"];
-		const handleReorder = (newOrder) => {
-			dispatch(hmonitorActions.updateUptimeOrder(newOrder));
-		};
-		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ReorderGroup, {
-			axis: "x",
-			values: currentOrder,
-			onReorder: handleReorder,
-			className: "flex flex-row items-center gap-2 w-full",
-			children: currentOrder.map((metricId) => {
-				const isSelected = metricId === "uptimeApp" ? enabledMetrics.uptime.app : enabledMetrics.uptime.system;
-				const labelText = metricId === "uptimeApp" ? "Application Uptime" : "System Uptime";
-				const IconComp = metricId === "uptimeApp" ? Timer : Clock;
-				const onToggle = () => {
-					if (metricId === "uptimeApp") dispatch(hmonitorActions.updateUptime({
-						...enabledMetrics.uptime,
-						app: !isSelected
-					}));
-					else dispatch(hmonitorActions.updateUptime({
-						...enabledMetrics.uptime,
-						system: !isSelected
-					}));
-				};
-				return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ReorderItem, {
-					className: `flex flex-row items-center gap-x-1.5 px-3 py-1.5 bg-surface rounded-xl border border-foreground/10 ${!isSelected ? "opacity-50" : ""}`,
-					value: metricId,
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(GripVertical, { className: "size-3.5 cursor-grab text-foreground/40 hover:text-foreground/80 active:cursor-grabbing shrink-0" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
-						variant: "secondary",
-						onChange: onToggle,
-						isSelected,
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox.Content, {
-							className: "flex flex-row items-center gap-x-1",
-							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Control, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Indicator, {}) }),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconComp, { className: "size-3.5 shrink-0" }),
-								labelText
-							]
-						})
-					})]
-				}, metricId);
-			})
-		});
-	};
-	const renderSectionSetting = (type, dragHandle) => {
-		switch (type) {
-			case "gpu": return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "flex flex-col gap-y-2",
-				children: availableHardware.gpu.map((hw) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SettingsModalCard, {
-					headerExtra: (active) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
-						variant: "secondary",
-						isDisabled: !active,
-						isSelected: settings.showAliasGpu,
-						onChange: (val) => updateState("showAliasGpu", val),
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox.Content, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Control, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Indicator, {}) }), "Use Alias"] })
-					}),
-					type: "gpu",
-					hardware: hw,
-					dragHandle,
-					onToggle: () => toggleHardwareActive(hw.name, "gpu"),
-					config: enabledMetrics.gpu.find((m) => m.name === hw.name),
-					children: renderMetricsReorderGroup("gpu", hw.name)
-				}, `gpu-settings-${hw.name}`))
-			});
-			case "cpu": return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "flex flex-col gap-y-2",
-				children: availableHardware.cpu.map((hw) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SettingsModalCard, {
-					headerExtra: (active) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
-						variant: "secondary",
-						isDisabled: !active,
-						isSelected: settings.showAliasCpu,
-						onChange: (val) => updateState("showAliasCpu", val),
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox.Content, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Control, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Indicator, {}) }), "Use Alias"] })
-					}),
-					type: "cpu",
-					hardware: hw,
-					dragHandle,
-					onToggle: () => toggleHardwareActive(hw.name, "cpu"),
-					config: enabledMetrics.cpu.find((m) => m.name === hw.name),
-					children: renderMetricsReorderGroup("cpu", hw.name)
-				}, `cpu-settings-${hw.name}`))
-			});
-			case "memory": return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "flex flex-col gap-y-2",
-				children: availableHardware.memory.map((hw) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SettingsModalCard, {
-					headerExtra: (active) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
-						variant: "secondary",
-						isDisabled: !active,
-						isSelected: settings.showAliasMemory,
-						onChange: (val) => updateState("showAliasMemory", val),
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox.Content, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Control, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Indicator, {}) }), "Use Alias"] })
-					}),
-					type: "memory",
-					hardware: hw,
-					dragHandle,
-					onToggle: () => toggleHardwareActive(hw.name, "memory"),
-					config: enabledMetrics.memory.find((m) => m.name === hw.name),
-					children: renderMetricsReorderGroup("memory", hw.name)
-				}, `memory-settings-${hw.name}`))
-			});
-			case "network": return availableHardware.network.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card.Header, {
-				className: "flex flex-row justify-between items-center",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex flex-row items-center gap-x-2",
-					children: [dragHandle, /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-						className: "font-medium",
-						children: "Network Interface"
-					})]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex flex-row items-center gap-x-4",
-					children: [selectedNetworkConfig && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox, {
-						variant: "secondary",
-						isSelected: settings.showAliasNetwork,
-						isDisabled: !selectedNetworkConfig.active,
-						onChange: (val) => updateState("showAliasNetwork", val),
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Checkbox.Content, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Control, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Checkbox.Indicator, {}) }), "Use Alias"] })
-					}), selectedNetworkConfig && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
-						"aria-label": "Toggle network monitoring",
-						isSelected: selectedNetworkConfig.active,
-						onChange: () => toggleHardwareActive(selectedNetworkName, "network"),
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch.Content, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch.Control, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch.Thumb, {}) }) })
-					})]
-				})]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card.Content, {
-				className: "flex-col items-start relative gap-y-4",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "w-full flex items-center justify-between gap-4",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-						onChange: (value) => {
-							if (value) setSelectedNetworkName(value);
-						},
-						variant: "secondary",
-						selectionMode: "single",
-						value: selectedNetworkName,
-						placeholder: "Select a network interface to configure",
-						fullWidth: true,
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select.Trigger, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select.Value, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select.Indicator, {})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select.Popover, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListBox, {
-							items: availableHardware.network,
-							children: (item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ListBox.Item, {
-								id: item.name,
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: item.name }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListBox.ItemIndicator, {})]
-							}, item.name)
-						}) })]
-					})
-				}), selectedNetworkConfig && selectedNetworkHardware && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "w-full relative",
-					children: [!selectedNetworkConfig.active && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "absolute inset-0 bg-background/50 z-20 -m-1 rounded-xl" }), renderMetricsReorderGroup("network", selectedNetworkName)]
-				})]
-			})] });
-			case "uptime": return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card.Header, {
-				className: "flex flex-row items-center gap-x-2",
-				children: [dragHandle, /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					className: "font-medium",
-					children: "Uptime"
-				})]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card.Content, {
-				className: "flex-row items-center gap-2",
-				children: renderUptimeMetricsReorderGroup()
-			})] });
-			case "ping": return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PingSettings, { dragHandle });
-			default: return null;
-		}
-	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TabModal, {
 		size: "lg",
 		isOpen: state.isOpen,
 		onOpenChange: handleOpenChange,
-		dialogClassName: "max-w-4xl px-0",
+		dialogClassName: "max-w-5xl px-0 overflow-hidden flex flex-col max-h-[88vh]",
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal.CloseTrigger, {}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal.Header, {
-				className: "px-5",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal.Heading, {
-					className: "items-center justify-center",
-					children: "Hardware Monitor Settings"
-				})
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Modal.Header, {
+				className: "px-6 pt-5 pb-3 flex flex-col gap-y-3 border-b border-surface-tertiary/50",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "flex items-center justify-between",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex items-center gap-x-3",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "size-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-sm",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$14, { className: "size-6" })
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex flex-col",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "flex items-center gap-2",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal.Heading, {
+									className: "text-base font-bold text-foreground",
+									children: "Hardware Monitor"
+								})
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								className: "text-xs text-muted",
+								children: "Configure real-time CPU, GPU, Memory, Network, Uptime, and Latency telemetry"
+							})]
+						})]
+					})
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "w-full pt-1",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tabs, {
+						variant: "primary",
+						className: "w-full",
+						selectedKey: activeTab,
+						onSelectionChange: setActiveTab,
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tabs.ListContainer, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tabs.List, {
+							"aria-label": "Settings Categories",
+							className: "w-full grid grid-cols-2 gap-1",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tabs.Tab, {
+								id: "config",
+								className: "flex items-center justify-center gap-2 font-semibold",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$6, { className: "size-4" }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Configuration & Layout" }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tabs.Indicator, {})
+								]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Tabs.Tab, {
+								id: "metrics",
+								className: "flex items-center justify-center gap-2 font-semibold",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$14, { className: "size-4" }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Metrics & Hardware" }),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tabs.Indicator, {})
+								]
+							})]
+						}) })
+					})
+				})]
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Modal.Body, {
-				className: "overflow-hidden",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ScrollShadow, {
-					className: "px-4 size-full",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						onClick: () => updateState("enabled", !enabled),
-						className: "mb-4 rounded-xl bg-surface-secondary p-4 cursor-pointer flex items-center justify-between",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "flex flex-col",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, {
-								className: "text-base pointer-events-none",
-								children: "Enable System Monitoring"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description, {
-								className: "pointer-events-none",
-								children: "When disabled, all metrics collection will be paused"
-							})]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch, {
-							size: "lg",
-							isSelected: enabled,
-							"aria-label": "Toggle system monitoring",
-							onChange: (value) => updateState("enabled", value),
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch.Content, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch.Control, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Switch.Thumb, {}) }) })
-						})]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AnimatePresence, { children: enabled && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(motion.div, {
-						transition: { delay: .1 },
-						className: "flex flex-col gap-y-4",
-						exit: {
-							translateY: -10,
-							opacity: 0
-						},
-						animate: {
-							translateY: 0,
-							opacity: 1
-						},
-						initial: {
-							translateY: 10,
-							opacity: 0
-						},
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "p-4 bg-surface-secondary rounded-3xl flex flex-col gap-y-4",
-							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NumberField, {
-									step: .5,
-									maxValue: 60,
-									minValue: .5,
-									value: refreshInterval,
-									onChange: (value) => updateState("refreshInterval", value),
-									fullWidth: true,
-									children: [
-										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Refresh Interval (Seconds)" }),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NumberField.Group, { children: [
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField.DecrementButton, {}),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField.Input, {}),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField.IncrementButton, {})
-										] }),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description, { children: "How frequently metrics should update (0.5-60 seconds)" })
-									]
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select, {
-									value: displayStyle,
-									selectionMode: "single",
-									placeholder: "Select a display style",
-									onChange: (value) => handleDisplayStyleChange(value),
-									children: [
-										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: "Display Style" }),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Select.Trigger, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select.Value, {}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select.Indicator, {})] }),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Select.Popover, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListBox, { children: DISPLAY_STYLES.map((style) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ListBox.Item, {
-											id: style.value,
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-												className: "flex flex-col",
-												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Label, { children: style.label }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description, { children: style.description })]
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ListBox.ItemIndicator, {})]
-										}, style.value)) }) })
-									]
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(LynxSwitch, {
-									onEnabledChange: (value) => {
-										if (!isRawStyle) updateState("showSectionLabel", value);
-									},
-									className: "p-1",
-									isDisabled: isRawStyle,
-									enabled: showSectionLabel,
-									title: "Show Section Labels",
-									description: "Display headers for metric groups (disabled for Raw styles)"
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: isRawStyle ? "opacity-50 pointer-events-none" : "",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MetricVisibilitySettings, {}), isRawStyle && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-										className: "text-xs text-muted mt-1",
-										children: "Metric visibility is not applicable for Raw display styles."
-									})]
-								})
-							]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ReorderGroup, {
-							axis: "y",
-							values: sectionsToRender,
-							onReorder: handleSectionReorder,
-							className: "flex flex-col gap-y-2 p-2 bg-surface-secondary rounded-3xl",
-							children: sectionsToRender.map((type) => {
-								const dragHandle = /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "cursor-grab active:cursor-grabbing p-1 text-foreground/40 hover:text-foreground/80 transition-colors shrink-0",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GripVertical, { className: "size-4" })
-								});
-								return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ReorderItem, {
-									value: type,
-									className: "relative select-none",
-									children: renderSectionSetting(type, dragHandle)
-								}, type);
+				className: "p-0 overflow-hidden flex-1 relative min-h-96",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollShadow, {
+					className: "px-6 py-4 size-full",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AnimatePresence, {
+						mode: "wait",
+						children: activeTab === "config" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(motion.div, {
+							exit: {
+								opacity: 0,
+								y: -6
+							},
+							initial: {
+								opacity: 0,
+								y: 6
+							},
+							animate: {
+								opacity: 1,
+								y: 0
+							},
+							transition: {
+								duration: .15,
+								ease: "easeOut"
+							},
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ConfigurationTab, {
+								settings,
+								isRawStyle,
+								updateState,
+								handleDisplayStyleChange
 							})
-						})]
-					}) })]
+						}, "config-tab") : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(motion.div, {
+							exit: {
+								opacity: 0,
+								y: -6
+							},
+							initial: {
+								opacity: 0,
+								y: 6
+							},
+							animate: {
+								opacity: 1,
+								y: 0
+							},
+							transition: {
+								duration: .15,
+								ease: "easeOut"
+							},
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MetricsTab, {
+								settings,
+								updateState,
+								selectedNetworkName,
+								toggleHardwareActive,
+								handleSectionReorder,
+								setSelectedNetworkName
+							})
+						}, "metrics-tab")
+					})
 				})
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Modal.Footer, {
-				className: "px-4 justify-between w-full flex flex-row",
+				className: "px-6 pt-4 flex flex-row items-center justify-between w-full",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					size: "sm",
 					variant: "danger-soft",
-					isDisabled: isSaving,
 					onPress: resetSettings,
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RotateCcw, { className: "size-4" }), "Reset to Default"]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-					isPending: isSaving,
-					onPress: saveSettings,
-					children: [isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Spinner, { color: "current" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i, {}), !isSaving && "Save Settings"]
+					isDisabled: isSaving || isResetting,
+					className: "text-xs font-medium transition-transform active:scale-[0.97]",
+					children: [isResetting ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Spinner, {
+						size: "sm",
+						color: "current"
+					}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$8, { className: "size-4" }), "Reset Defaults"]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-center gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						size: "sm",
+						variant: "tertiary",
+						onPress: () => state.close(),
+						className: "text-xs font-medium transition-transform active:scale-[0.97]",
+						children: "Cancel"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						size: "sm",
+						variant: "primary",
+						isPending: isSaving,
+						onPress: saveSettings,
+						className: "text-xs font-semibold px-4 transition-transform active:scale-[0.97] shadow-sm",
+						children: isSaving ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Spinner, {
+							size: "sm",
+							color: "current"
+						}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$13, { className: "size-4" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Save Settings" })] })
+					})]
 				})]
 			})
 		]
@@ -18413,8 +20623,8 @@ function HardwareMonitorCard() {
 		onPress: state.open,
 		id: "hardware-monitor",
 		title: "Hardware Monitor",
-		icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$1, { className: "size-full m-1 text-indigo-500" }),
-		description: "Configure real-time monitoring of CPU, GPU, and Memory usage in the status bar."
+		icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(i$14, { className: "size-full m-1 text-accent" }),
+		description: "Configure real-time monitoring of CPU, GPU, Memory, Network, and Ping latency in the status bar."
 	})] });
 }
 //#endregion
@@ -18444,4 +20654,4 @@ function InitialExtensions(lynxAPI) {
 //#endregion
 export { InitialExtensions as t };
 
-//# sourceMappingURL=Extension-B-pqUdlM.js.map
+//# sourceMappingURL=Extension-BSraxyA-.js.map

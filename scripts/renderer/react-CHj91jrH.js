@@ -2,7 +2,7 @@
 (function() {
 	try {
 		var e = "undefined" != typeof window ? window : "undefined" != typeof global ? global : "undefined" != typeof globalThis ? globalThis : "undefined" != typeof self ? self : {};
-		e.SENTRY_RELEASE = { id: "f9f2e045fae8353a4c8417903eeca14e9c7534d6" };
+		e.SENTRY_RELEASE = { id: "ea803f2051806c332cf6a29b882a65ba1ae1bc76" };
 		var n = new e.Error().stack;
 		n && (e._sentryDebugIds = e._sentryDebugIds || {}, e._sentryDebugIds[n] = "f231bc0f-f8cc-45ce-bdb6-93f8ecf6eb6b", e._sentryDebugIdIdentifier = "sentry-dbid-f231bc0f-f8cc-45ce-bdb6-93f8ecf6eb6b");
 	} catch (e) {}
@@ -412,4 +412,4 @@ var require_react = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 //#endregion
 export { __commonJSMin as n, __toESM as r, require_react as t };
 
-//# sourceMappingURL=react-CAs43U7w.js.map
+//# sourceMappingURL=react-CHj91jrH.js.map
